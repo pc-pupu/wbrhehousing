@@ -193,7 +193,7 @@ function dashboard_content() {
     }
     ////end////
   }
-  // print_r($output['all-exsting-occupant']);die;
+  // print_r($output['all-exsting-occupant']);die; ok
   return theme('custom_dashboard_template', array('output' => $output));
 }
 
