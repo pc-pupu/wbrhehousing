@@ -44,6 +44,9 @@ xmlrpc.php
 /profiles
 /scripts
 /themes
+/old
+/.vscode
+
 #Ignore ALL ZIP files
 *.zip
 #Ignore pg-SQL DB Backup Files
