@@ -1,1 +1,0 @@
-This module used for to register a new user

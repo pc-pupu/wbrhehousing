@@ -1,1 +1,0 @@
-This module used by Housing Admin User to view allotment letter
