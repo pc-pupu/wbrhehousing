@@ -1,1 +1,0 @@
-This module used by Housing Admin User to view all application history appllied by all users along status

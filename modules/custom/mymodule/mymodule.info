@@ -1,4 +1,0 @@
-name = mymodule
-decsription = mymodule
-core = 7.x
-scripts[] = js/mymodule.js

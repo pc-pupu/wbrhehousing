@@ -1,1 +1,0 @@
-This module used for to implement the user login-logout process
