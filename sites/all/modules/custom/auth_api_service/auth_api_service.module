@@ -68,6 +68,7 @@ function auth_api_service_resource() {
                             'optional' => false,
                         )
                     ),
+                    'no_token' => TRUE,
                 ),
             ),
         )
@@ -81,9 +82,14 @@ function decrypt($data){
     // echo gettype($data);die;
     $encrptedString = base64_decode($data);
 	$cipher='aes-256-cbc';//to be shared with HRMS team
-    $secret = "3652874125963346";//uat////to be shared with HRMS team
-	$iv = "plkygtwsersuytvb";//uat//to be shared with HRMS team
+    // $secret = "3652874125963346";//uat////to be shared with HRMS team
+	// $iv = "plkygtwsersuytvb";//uat//to be shared with HRMS team
 	//$decryptedString = openssl_decrypt($encrptedString, $cipher, $secret, $option, $iv );  
+
+
+    // new 
+    $secret = variable_get('secret','');
+    $iv = variable_get('iv','');
 		
 	$decryptedString= openssl_decrypt($encrptedString,$cipher,$secret,OPENSSL_RAW_DATA,$iv);
 		 
@@ -266,6 +272,9 @@ function validate_token($given_token){
 }
 
 function checksum_validation($data = ''){
-    $hmac_secret="8392512033044595";
+    // $hmac_secret="8392512033044595";
+
+    $hmac_secret= variable_get('hmac_secret','');
+
     return $checksum=hash_hmac('sha256', mb_convert_encoding($data, "UTF-8"),$hmac_secret);
 }

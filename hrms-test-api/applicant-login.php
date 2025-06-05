@@ -6,7 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 function employeeSubmit(){
     
-        $hmac_secret="8392512033044595";
+        // $hmac_secret="8392512033044595";
+        $hmac_secret= "1Po/Rx7oUnNzy9QZ7NZJjA==";
 
         $req = array(
             'src'=>'HRMS',
@@ -29,14 +30,15 @@ function employeeSubmit(){
             'cs' => $checksum, // Send IV so the recipient can decrypt
         );
 
-        $payloadJson = json_encode($payload);//dd($payloadJson);
+        $payloadJson = json_encode($payload); // print($payloadJson); die;
         
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
           //CURLOPT_URL => 'http://10.173.42.87:8080/rhewbhousing/rhe-wbhousing-v2/auth/login-hrms',
 	      //CURLOPT_URL => 'http://172.25.142.221/rhewbhousing/auth/login-hrms',
-          CURLOPT_URL => 'http://172.25.142.221/auth/login-hrms',
+        //   CURLOPT_URL => 'http://172.25.142.221/auth/login-hrms',
+          CURLOPT_URL => 'http://localhost/housing/auth/login-hrms',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -76,7 +78,7 @@ function employeeSubmit(){
              header("Location: " . $header['redirect_url']);
              exit();
         }else{
-            header("Location: http://172.25.142.221/hrms-test-api/index.php");
+            header("Location: http://localhost/housing/hrms-test-api/index.php");
         }
 
 
@@ -116,14 +118,18 @@ function employeeSubmit(){
         $information = $data;
         $cipher = "AES-256-CBC";
         // $cipher='aes-128-cbc';//to be shared with HRMS team
-        $secret = "3652874125963346";//uat////to be shared with HRMS team
+        // $secret = "3652874125963346";//uat////to be shared with HRMS team
         //$secret="8392512033044595";//prod
         //$option = "0" ;
         // $iv = str_repeat("0",openssl_cipher_iv_length($cipher));
-        $iv = "plkygtwsersuytvb";//uat//to be shared with HRMS team
+        // $iv = "plkygtwsersuytvb";//uat//to be shared with HRMS team
         //$iv = "cbdhnwwwqkloieow";//prod
 
         //$encrptedString = openssl_encrypt($information, $cipher, $secret, $option , $iv);
+
+
+        $secret= 'DDThkqkxlOYQzpZUbqnfEGir5mWHV5mY';
+        $iv = 'ykDWpfWyXXjTY0bguBzKmcEFZTINLPEe';
 
         $encrptedString=openssl_encrypt($information,$cipher,$secret,OPENSSL_RAW_DATA,$iv);
         $encrptedString=base64_encode($encrptedString);
