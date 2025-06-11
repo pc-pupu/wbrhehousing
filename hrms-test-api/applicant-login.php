@@ -30,14 +30,14 @@ function employeeSubmit(){
             'cs' => $checksum, // Send IV so the recipient can decrypt
         );
 
-        $payloadJson = json_encode($payload); // print($payloadJson); die;
+        $payloadJson = json_encode($payload);   print($payloadJson); die;
         
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
           //CURLOPT_URL => 'http://10.173.42.87:8080/rhewbhousing/rhe-wbhousing-v2/auth/login-hrms',
 	      //CURLOPT_URL => 'http://172.25.142.221/rhewbhousing/auth/login-hrms',
-        //   CURLOPT_URL => 'http://172.25.142.221/auth/login-hrms',
+        //   CURLOPT_URL => 'https://rhe.wb.gov.in/auth/login-hrms',
           CURLOPT_URL => 'http://localhost/housing/auth/login-hrms',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
@@ -59,8 +59,12 @@ function employeeSubmit(){
         $response = curl_exec($curl);  //dd($response);
         // Get the response headers
         $header = curl_getinfo($curl);
-        //print_r($header);
-        //echo $header['redirect_url'];die;
+        echo '<pre>';
+        echo '$response -- '.$response;
+        echo '$Header -- ';
+        print_r($header);
+        echo '$URL -- ';
+        echo $header['redirect_url'];die;
 
         // Check if a redirect is being issued
         // if (isset($header['redirect_url']) && $header['redirect_url']) {
@@ -78,7 +82,8 @@ function employeeSubmit(){
              header("Location: " . $header['redirect_url']);
              exit();
         }else{
-            header("Location: http://localhost/housing/hrms-test-api/index.php");
+            // header("Location: http://localhost/housing/hrms-test-api/index.php");
+            header("Location: https://rhe.wb.gov.in");
         }
 
 
@@ -129,7 +134,8 @@ function employeeSubmit(){
 
 
         $secret= 'DDThkqkxlOYQzpZUbqnfEGir5mWHV5mY';
-        $iv = 'ykDWpfWyXXjTY0bguBzKmcEFZTINLPEe';
+        // $iv = 'ykDWpfWyXXjTY0bguBzKmcEFZTINLPEe';
+        $iv = 'ykDWpfWyXXjTY0bg';
 
         $encrptedString=openssl_encrypt($information,$cipher,$secret,OPENSSL_RAW_DATA,$iv);
         $encrptedString=base64_encode($encrptedString);

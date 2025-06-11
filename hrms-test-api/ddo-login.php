@@ -32,15 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'cs' => $checksum, // Send IV so the recipient can decrypt
         );
 
-        $payloadJson = json_encode($payload);  // print($payloadJson); die;
+        $payloadJson = json_encode($payload);   print($payloadJson); die;
         
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
           //CURLOPT_URL => 'http://10.173.42.87:8080/rhewbhousing/rhe-wbhousing-v2/auth/login-ddo',
 	    //   CURLOPT_URL => 'http://172.25.142.221/rhewbhousing/auth/login-ddo',
-        //   CURLOPT_URL => 'https://rhe.wb.gov.in/auth/login-ddo',
-          CURLOPT_URL => 'http://localhost/housing/auth/login-ddo',
+          CURLOPT_URL => 'https://rhe.wb.gov.in/auth/login-ddo',
+        //   CURLOPT_URL => 'http://localhost/housing/auth/login-ddo',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,

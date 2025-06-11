@@ -46,6 +46,8 @@ xmlrpc.php
 /themes
 /old
 /.vscode
+/hrms-test-api
+*.sql
 
 #Ignore ALL ZIP files
 *.zip

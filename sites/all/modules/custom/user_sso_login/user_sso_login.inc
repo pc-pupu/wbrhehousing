@@ -133,6 +133,7 @@ function user_sso_login($form, &$form_state, $userHRMSID)
                 ));
                 drupal_session_regenerate();
                 $form_state['redirect'] = 'dashboard';
+
             }
             catch(Exception $e)
             {
@@ -155,6 +156,7 @@ function user_sso_login($form, &$form_state, $userHRMSID)
     }
     //drupal_goto("products", array('fragment' => $node->nid));
     drupal_goto($form_state['redirect']);
+    return drupal_json_output(array('status' => 'success' , 'message'=> 'Redirect URL', 'status_code' => 200));
     // Regenerate the session ID to prevent against session fixation attacks.
     // This is called before hook_user in case one of those functions fails
     // or incorrectly does a redirect which would leave the old session in place.

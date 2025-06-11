@@ -11,6 +11,15 @@ function user_tagging_menu() {
     'access arguments' => array('administer User Tagging'),
 	);
 
+  $items['flat-wise-user-info'] = array(
+    'title' => 'Form For User Tagging',
+    'page callback' => 'flat_wise_user_info',
+    'page arguments' => array(1,2),
+    'file' => 'flat_wise_user_info.inc',
+    'access arguments' => array('access content'),
+	);
+
+
   return $items;
 }
 

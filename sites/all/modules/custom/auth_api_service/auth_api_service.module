@@ -98,6 +98,7 @@ function decrypt($data){
 }
 
 function applicant_login($data){
+    global $base_root, $base_path;
     // echo 'debolina';die;
    
 
@@ -114,8 +115,8 @@ function applicant_login($data){
 
     // Send timeout response if script takes too long
     if (time() - $_SERVER['REQUEST_TIME'] > 10) {
-        // drupal_json_output(array('status'  => 'error','message' => 'Request timed out.',));
-        drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
+        drupal_json_output(array('status'  => 'error','message' => 'Request timed out. Please try again.', 'status_code' => 408));
+        // drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
         drupal_exit();
     }
     
@@ -129,7 +130,8 @@ function applicant_login($data){
     if($cs == $cksm){
         
         if(empty($dataObj->hrmsid)){
-            drupal_json_output(array('error' => 'Missing required data'), 400);
+            // drupal_json_output(array('error' => 'Missing required data'), 400);
+            drupal_json_output(array('status'  => 'error','message' => 'Missing required data.', 'status_code' => 400));
             drupal_exit();
         }else{
             
@@ -145,7 +147,10 @@ function applicant_login($data){
 
             //*end *//
 
+            $url = $base_root . $base_path. '/dashboard';
+            drupal_add_http_header('redirect_url',$url);
             drupal_goto('/user/sso/' . base64_encode($dataObj->hrmsid));
+
             
             //** new code written for api not providing redirect_url in header but it is turned off cz it might be solved by whitelisting **//
             // Generate redirect URL (absolute URL is best here)
@@ -171,7 +176,9 @@ function applicant_login($data){
 
         }
     }else{
-        drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
+        // drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
+        drupal_json_output(array('status'  => 'error','message' => 'Error: Checksum mismatch', 'status_code' => 400));
+        drupal_exit();
     }
 }
 
