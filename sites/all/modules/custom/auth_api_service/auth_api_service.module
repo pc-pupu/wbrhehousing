@@ -110,7 +110,7 @@ function applicant_login($data){
     //print_r($bufferedOutput);
     //ob_end_clean();
     //die();
-    
+        
     set_time_limit(10); // Limit execution to 10 seconds
 
     // Send timeout response if script takes too long
@@ -119,14 +119,20 @@ function applicant_login($data){
         // drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
         drupal_exit();
     }
+
+    $data['encdata'] = 'qPulk+Qm812USMSsU3kPpVvEknTzyV5qTXxYc\/hoPn2jmCkSdv6Y4nx3uaet61IwjVBn3Om3PlMBygmEzadNG5DuYRddbN9r+QTNbC\/t+TuJ1vWqhSbSWGXhPpZSkk9rj298U3y6agBE1VjU+awHan8h9rs84KUqGodkUtYZ6pL0XNlOF5C\/xqX8ZHz8YF3fmDoefhn6G6mIQtdO\/SKPVO9Zdx06NVnxN\/c6mhzNFT5A7ErVC0TSNPyvHGEAcMP\/8kNglqE0ERL9XECAAwDAa+myCB1g1KEbtdD+bTbzOsbLrGXZ8XIJgztvAaJpUKsQ';
+
+    $data['cs'] = '51ef2d8ca4a9e62e7c8db805368a7c8d986d2cacb377bf2943524d70ce769e65';
     
     $encdata = $data['encdata'];
     $cs =  $data['cs']; 
 
-    $decrypted_data = decrypt($encdata);
+    $decrypted_data = decrypt($encdata); echo $decrypted_data; 
     $dataObj = json_decode($decrypted_data);
 
-    $cksm = checksum_validation($decrypted_data);
+    echo $cksm = checksum_validation($decrypted_data);
+die;
+
     if($cs == $cksm){
         
         if(empty($dataObj->hrmsid)){

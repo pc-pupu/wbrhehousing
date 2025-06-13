@@ -9,8 +9,16 @@
         </a>
     </div>
     <div id="content-wrapper" class="content-wrapper">
-            <div class="main-content p-5 min-vh-100">
+        <div class="main-content p-5 min-vh-100">
+            <h3 class = "" style="padding-top:10%;">
+                If you are a new applicant please click to continue button. 
+                <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success'), 'id' => 'my-button' ))); ?>
+            </h3>
+            <div class="" style="padding-top:5%;">
+                <h3>If you are an existing occupant, please fill the form for verification.</h3>
+                <?php print $messages; ?>
                 <?php print render($page['content']); ?>
             </div>
+        </div>
     </div>
 </div>

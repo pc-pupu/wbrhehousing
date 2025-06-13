@@ -97,6 +97,47 @@ jQuery(document).ready(function(){
 	});	
 });
 
+/*Done by Subham 13-06-2025*/
+jQuery(document).ready(function(){
+    jQuery("#edit-issue-date").datepicker({
+        dateFormat: "dd/mm/yy",
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "1947:" + new Date().getFullYear(),
+        minDate: new Date(1947, 0, 1),
+        maxDate: new Date(),
+        autoSize: true
+    }); 
+});
+/*End*/
+
+/*Done by Subham 13-06-2025*/
+jQuery(document).ready(function(){
+    jQuery("#edit-expiry-date").datepicker({
+        dateFormat: "dd/mm/yy",
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "1947:+15", // Allows selection starting from 2000 to current year +15 years ahead
+        minDate: new Date(1947, 0, 1), // Optional: restricts selection before 2000
+        autoSize: true
+    }); 
+});
+/*End*/
+
+/*Done by Subham 13-06-2025*/
+jQuery(document).ready(function(){
+    jQuery("#edit-date-of-birth").datepicker({
+        dateFormat: "dd/mm/yy",
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "1947:" + new Date().getFullYear(),
+        minDate: new Date(1947, 0, 1),
+        maxDate: new Date(),
+        autoSize: true
+    }); 
+});
+/*End*/
+
 // jQuery(document).ready(function(){
 // 	jQuery("#edit-dol").datepicker({
 // 	dateFormat: "dd/mm/yy",
@@ -344,4 +385,5 @@ jQuery(document).ready(function () {
 			jQuery('#edit-present-address').show();
 		}	
 	});*/
+
 

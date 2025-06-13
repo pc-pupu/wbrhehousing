@@ -21,6 +21,14 @@ function employeeSubmit(){
         );
         $jsonData =json_encode($req); //dd($jsonData);
 
+
+        // given json data
+
+        $jsonData = '{"src": "HRMS","hrmsid": "2000007780", "email": "JEETENDRAGUPTA@gmail.com","mobile": "7797660379","name": "JEETENDRA GUPTA","designation": "Additional District & Sessions Judge","status": "authenticated","sysTimeStamp": "12/06/2025 04:11:00"}';
+
+
+
+
         $encryptedData = encrypt($jsonData);
 
         $checksum=hash_hmac('sha256', mb_convert_encoding($jsonData, "UTF-8"),$hmac_secret);
