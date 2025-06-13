@@ -1,0 +1,15 @@
+th .table-class {
+    background: none repeat scroll 0 0 #473a39;
+    color:white;
+    text-align: center;
+    font-size: 18px;
+    line-height: 24px; 
+    font-weight: 200; 
+    border: 1px solid; 
+    border-color: white;
+    font-family: "Dosis",Arial,Verdana,serif;
+}
+.bg-class {
+    background: none repeat scroll 0 0 #473a39 !important;
+    color: white !important;
+}

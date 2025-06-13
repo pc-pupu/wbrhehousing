@@ -18,7 +18,14 @@ function user_tagging_menu() {
     'file' => 'flat_wise_user_info.inc',
     'access arguments' => array('access content'),
 	);
-
+  
+  $items['flat-wise-user-info-details'] = array(
+    'title' => 'Form For User Tagging',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flat_wise_user_details',1),
+    'file' => 'flat_wise_user_info.inc',
+    'access arguments' => array('access content'),
+	);
 
   return $items;
 }
@@ -30,4 +37,29 @@ function user_tagging_permission() {
       'description' => t('perform administer for User Tagging.')
     )
   );	
+}
+
+function get_flat_info_by_id($flat_id_en = 0){
+
+  $flat_id = decrypt_url($flat_id_en);
+
+  if($flat_id !=0){
+    
+    $query = db_select('housing_flat','hf');
+    $query->fields('hf',array('floor','flat_no','flat_id'));
+    $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+    $query->fields('he',array('estate_name'));
+    $query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+    $query->fields('hb',array('block_name'));
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+    $query->fields('hft',array('flat_type'));
+    $query->condition('hf.flat_id', $flat_id); 
+    $result = $query->execute()->fetchObject();
+ 
+    $final_result = 'Estate: '.$result->estate_name. ', Block: '.$result->block_name.', Floor: '.$result->floor.', Flat Type: '.$result->flat_type.', Flat No.: '.$result->flat_no;
+  }else{
+    $final_result = 'No Record Found!';
+  }
+
+  return $final_result;
 }

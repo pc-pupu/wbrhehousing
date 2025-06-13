@@ -25,3 +25,16 @@ document.addEventListener("DOMContentLoaded", function(){
       }); // addEventListener
     }) // forEach
   }); 
+
+  (function ($) {
+  Drupal.behaviors.setCookieAlert = {
+    attach: function (context, settings) {
+      $('#my-button', context).once('set-cookie-alert').click(function () {
+        // Set cookie (simple way)
+        document.cookie = "user_type=new; max-age=30;"; 
+        // Show alert
+        // alert('Cookie has been set!');
+      });
+    }
+  };
+})(jQuery);

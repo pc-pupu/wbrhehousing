@@ -69,18 +69,27 @@ function dashboard_content() {
   if($user_role == 4 || $user_role == 5){
 
     if($user_role == 4){
-      // checking hrms exist or not
-      $queryhrms = db_query("select flag from housing_user_tagging where hrms_id = '".$user->name."' ");
-      $resulthrms = $queryhrms->fetchObject();
-      if(empty($resulthrms)){
-        drupal_goto('user-tagging');
+
+      $check_user_login_type = $_COOKIE['user_type'];
+
+      if($check_user_login_type =='new'){
+        unset($_COOKIE['user_type']);
+        return theme('custom_dashboard_template', array('output' => $output));
       }else{
-        if($resulthrms->flag =='new'){
-          drupal_set_message('Please wait for the departmental approval.');
+        // checking hrms exist or not
+        $queryhrms = db_query("select flag from housing_user_tagging where hrms_id = '".$user->name."' ");
+        $resulthrms = $queryhrms->fetchObject();
+        if(empty($resulthrms)){
           drupal_goto('user-tagging');
+        }else{
+          if($resulthrms->flag =='new'){
+            drupal_set_message('Please wait for the departmental approval.');
+            drupal_goto('user-tagging');
+          }
         }
       }
     }
+    unset($_COOKIE['user_type']);
     
     $output['user_info'] = getHRMSUserData($user->name); 
     $output['user_info']['email'] = isset($output['user_info']['email'])? $output['user_info']['email'] : (($user->mail!='') ? $user->mail : 'N/A');
