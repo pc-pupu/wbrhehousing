@@ -54,7 +54,7 @@ function user_tagging_form($form, &$form_state) {
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
-		'#element_validate' => array('element_validate_date')
+		'#element_validate' => array('element_validate_date', 'element_validate_dob_before_license_issue')
 	);
 
     $form['personal_info']['license_no'] = array(
@@ -348,6 +348,26 @@ function element_validate_expiry_date($element, &$form_state) {
 
     if ($interval->y > 3 || ($interval->y == 3 && ($interval->m > 0 || $interval->d > 0))) {
       form_set_error('license_expiry_date', t('The license expiry date cannot be more than 3 years after the issue date.'));
+    }
+  }
+}
+
+/*DOB Validation {(DOB should before license expiry date)}*/
+function element_validate_dob_before_license_issue($element, &$form_state) {
+  if (!empty($form_state['values']['dob']) && !empty($form_state['values']['license_issue_date'])) {
+    $dob = trim($form_state['values']['dob']);
+    $license_issue = trim($form_state['values']['license_issue_date']);
+
+    $dob_date = DateTime::createFromFormat('d/m/Y', $dob);
+    $issue_date = DateTime::createFromFormat('d/m/Y', $license_issue);
+
+    if ($dob_date && $issue_date) {
+      if ($dob_date > $issue_date) {
+        form_set_error('dob', t('Date of Birth cannot be after License Issue Date.'));
+      }
+    }
+    else {
+      form_set_error('dob', t('Please enter valid dates in dd/mm/yyyy format.'));
     }
   }
 }
