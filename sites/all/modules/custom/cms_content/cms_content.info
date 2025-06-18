@@ -1,0 +1,4 @@
+name = CMS Content Module
+description = Module for CMS Content Management
+core = 7.x
+package = CMS Content Management 

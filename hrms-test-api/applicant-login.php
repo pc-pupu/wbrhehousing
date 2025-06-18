@@ -24,21 +24,21 @@ function employeeSubmit(){
 
         // given json data
 
-        $jsonData = '{"src": "HRMS","hrmsid": "2000007780", "email": "JEETENDRAGUPTA@gmail.com","mobile": "7797660379","name": "JEETENDRA GUPTA","designation": "Additional District & Sessions Judge","status": "authenticated","sysTimeStamp": "12/06/2025 04:11:00"}';
+        // $jsonData = '{"src": "HRMS","hrmsid": "2000007780", "email": "JEETENDRAGUPTA@gmail.com","mobile": "7797660379","name": "JEETENDRA GUPTA","designation": "Additional District & Sessions Judge","status": "authenticated","sysTimeStamp": "12/06/2025 04:11:00"}';
 
 
 
 
         $encryptedData = encrypt($jsonData);
 
-        $checksum=hash_hmac('sha256', mb_convert_encoding($jsonData, "UTF-8"),$hmac_secret);
+        $checksum=hash_hmac('sha256', mb_convert_encoding($jsonData, "UTF-8"),$hmac_secret, true);
 
         $payload = array(
             'encdata' => $encryptedData,
             'cs' => $checksum, // Send IV so the recipient can decrypt
         );
 
-        $payloadJson = json_encode($payload);   print($payloadJson); die;
+        $payloadJson = json_encode($payload);   // print($payloadJson); die;
         
         $curl = curl_init();
 

@@ -1,3 +1,17 @@
+<?php
+    global $user;
+    // check hrms exist in user-tagging table
+    $checkExist = 0;
+    $query = db_query("select housing_user_tagging_id from housing_user_tagging where hrms_id= '".$user->name."'");
+    $result = $query->fetchObject(); 
+    if(!empty($result)){
+        $checkExist = 1;
+    }else{
+        $checkExist = 0;
+    }
+
+?>
+
 <div class="dashboard">
     <div class="sidebar d-flex flex-column p-3">
         <a href="http://localhost/housing/" class="d-flex flex-column align-items-center mb-5 text-center">
@@ -10,10 +24,16 @@
     </div>
     <div id="content-wrapper" class="content-wrapper">
         <div class="main-content p-5 min-vh-100">
+        <?php 
+        if($checkExist == 0){
+            ?>
             <h3 class = "" style="padding-top:10%;">
                 If you are a new applicant please click to continue button. 
                 <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success'), 'id' => 'my-button' ))); ?>
             </h3>
+            <?php
+        }
+        ?>    
             <div class="" style="padding-top:5%;">
                 <h3>If you are an existing occupant, please fill the form for verification.</h3>
                 <?php print $messages; ?>
