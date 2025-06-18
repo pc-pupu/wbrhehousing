@@ -1,0 +1,25 @@
+<?php
+function cms_content_menu() {
+    $items = array();
+
+    $items['cms-content-add'] = array(
+        'title' => 'Add CMS Content',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cms_content_form'),
+        'file' => 'cms_content_form.inc',
+        'access arguments' => array('access content'),
+        // 'access arguments' => array('administer CMS Content Management')
+        );
+
+    return $items;
+}
+
+function cms_content_permission() {
+  return array(
+    'administer CMS Content Management' => array(
+      'title' => t('administer CMS Content Management'),
+      'description' => t('perform administer for CMS Content Management.')
+    )
+  );	
+}
+
