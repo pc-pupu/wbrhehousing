@@ -217,8 +217,7 @@ function user_tagging_form($form, &$form_state) {
         '#type' => 'markup',
         '#markup' => l('Exit', 'user/logout', array('html'=>true, 'attributes'=>array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'))))
     );
-
-                            
+                     
     return $form;
 }
 

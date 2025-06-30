@@ -24,18 +24,26 @@
     </div>
     <div id="content-wrapper" class="content-wrapper">
         <div class="main-content p-5 min-vh-100">
-        <?php 
-        if($checkExist == 0){
+            <?php 
+            if($checkExist == 0){
             ?>
-            <h3 class = "" style="padding-top:10%;">
-                If you are a new applicant please click to continue button. 
-                <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success'), 'id' => 'my-button' ))); ?>
-            </h3>
+            <div class="counter-box p-3 rounded mb-3 position-relative shadow-sm row">
+                <h6 class = "">
+                    <b class="text-danger">If you want to apply for new allotment of a rental housing flat please click here 
+                    <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success btn-sm'), 'id' => 'my-button' ))); ?></b>
+                </h6>
+
+                <h6 class = "">
+                    <b class="text-danger">If you have already submitted the physical hard copy application to the Housing Department Govt. of WB, please click here 
+                    <?php echo l('Click to Continue','#', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success btn-sm'), 'id' => 'my-button' ))); ?>
+                    to link it with your HRMS code</b>
+                </h6>
+            </div>
             <?php
-        }
-        ?>    
-            <div class="" style="padding-top:5%;">
-                <h3>If you are an existing occupant, please fill the form for verification.</h3>
+            }
+            ?> 
+            <div class="pt-5">
+                <h5><b>If you are currently occupying in a rental housing flat alloted by the Housing Department Govt. of WB, please fill the form for verification.</b></h5>
                 <?php print $messages; ?>
                 <?php print render($page['content']); ?>
             </div>

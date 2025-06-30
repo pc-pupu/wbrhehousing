@@ -1,6 +1,6 @@
 <?php
 // Done by Subham dt.05-06-2025
-function cms_content_form($form, &$form_state) {
+function cms_content_add_form($form, &$form_state) {
     $count = db_query("SELECT COUNT(*) FROM {housing_cms}")->fetchField();
     $order_no = $count + 1;
 
@@ -92,7 +92,7 @@ function cms_content_form($form, &$form_state) {
         '#suffix' => '</div></div>'
     );
 
-    $form['is_active_chk_radio'] = array(
+    $form['is_active_radio'] = array(
         '#title' => t('Content Activation Status'),
         '#type' => 'radios',
         '#options' => array(
@@ -129,48 +129,49 @@ function cms_content_form($form, &$form_state) {
         '#type' => 'submit',
         '#value' => t('Save'),
         '#attributes' => array('class' => array('btn bg-primary btn-sm px-5 rounded-pill text-white fw-bolder')),
-        '#submit' => array('cms_content_submit')
+        '#submit' => array('cms_content_add_submit')
     );
 
     return $form;
 }
 
-function cms_content_submit($form, &$form_state) {
+function cms_content_add_submit($form, &$form_state) {
     $values = $form_state['values'];
     $form_data = array();
-
+    
     $content_title = trim($values['content_title']);
     $url = str_replace(' ', '_', strtolower($content_title));
-
+    
     $content_type = trim($form_state['values']['content_type']);
-
+    
     $form_data['content_type']              =  $content_type;
     $form_data['content_title']             =  $content_title;
-    $form_data['link_title']                =  trim($form_state['values']['link_title']);
-    $form_data['order_no']                  =  trim($form_state['values']['order_no']);
-    $form_data['meta_keyword']              =  trim($form_state['values']['meta_keyword_text_box']);
-    $form_data['meta_description']          =  trim($form_state['values']['meta_desc_text']);
-    $form_data['date_of_notification']      =  trim($form_state['values']['don']);
-    $form_data['content_description']       =  trim($form_state['values']['content_description']);
-    $form_data['is_active']                 =  trim($form_state['values']['is_active_chk_radio']);
-    $form_data['is_new']                    =  trim($form_state['values']['is_new_chk_box']);
+    $form_data['link_title']                =  trim($values['link_title']);
+    $form_data['order_no']                  =  trim($values['order_no']);
+    $form_data['meta_keyword']              =  trim($values['meta_keyword_text_box']);
+    $form_data['meta_description']          =  trim($values['meta_desc_text']);
+    $form_data['date_of_notification']      =  trim($values['don']);
+    $form_data['created_date']              =  date('Y-m-d H:i:s');
+    $form_data['content_description']       =  trim($values['content_description']);
+    $form_data['is_active']                 =  trim($values['is_active_radio']);
+    $form_data['is_new']                    =  trim($values['is_new_chk_box']);
     $form_data['url']                       =  $url;
-
+    
     /*File Upload Handling without Drupal 7's default file managed table with content type-based directories*/
     if (!empty($_FILES['files']['name']['content_file_upload'])) {
         $file = $_FILES['files'];
         $file_name = $file['name']['content_file_upload'];
         $file_tmp = $file['tmp_name']['content_file_upload'];
-
+        
         $directory_name = str_replace(' ', '_', strtolower($content_type));
         $directory = 'public://doc/' . $directory_name . '/';
 
         file_prepare_directory($directory, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
-
+        
         $safe_name = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $file_name);
         $destination = $directory . $safe_name;
         $real_path = drupal_realpath($destination);
-
+        
         if (move_uploaded_file($file_tmp, $real_path)) {
             $form_data['file_name'] = $file_name;
             $form_data['file_path'] = $destination;
@@ -195,27 +196,5 @@ function cms_content_submit($form, &$form_state) {
         ->fields($form_data)
         ->execute();
         drupal_set_message(t('Content added successfully.'));
-    }
-}
-
-function cms_content_validate($form, &$form_state) {
-    if (!empty($_FILES['files']['name']['content_file_upload'])) {
-        $file = $_FILES['files'];
-        $file_name = $file['name']['content_file_upload'];
-        $file_tmp = $file['tmp_name']['content_file_upload'];
-        $file_type = $file['type']['content_file_upload'];
-        $file_size = $file['size']['content_file_upload'];
-
-        $allowed_extension = 'pdf';
-        $max_size = 1 * 1024 * 1024;
-
-        $ext = pathinfo($file_name, PATHINFO_EXTENSION);
-        if (strtolower($ext) != $allowed_extension) {
-            form_set_error('content_file_upload', t('Only PDF files are allowed.'));
-        }
-
-        if ($file_size > $max_size) {
-            form_set_error('content_file_upload', t('File size exceeds 1 MB limit.'));
-        }
     }
 }

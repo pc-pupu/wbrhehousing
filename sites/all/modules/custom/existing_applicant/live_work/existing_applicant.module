@@ -25,20 +25,8 @@
 			'page arguments' => array(),
 			'access arguments' => array('access content')
 		);
-		/* by dg 20-06-2025 */
-		$items['search-with-physical-application-no'] = array(
-			'title' => 'Legacy Applicant Details Check',
-			'page callback' => 'drupal_get_form',
-			'page arguments' => array('physical_applicant_search_form'),
-			'access arguments' => array('access content')
-		);
 
-		 $items['physical-application-view/%'] = array(
-			'title' => 'View Physical Application Details',
-			'page callback' => 'search_physical_data_fetch',
-			'page arguments' => array(1),
-			'access arguments' => array('access content'),
-		);
+		/* by dg 20-06-2025 */
 
 		$items['physical-application-edit/%'] = array(
 			'title' => 'Edit Physical Application Details',
@@ -47,8 +35,7 @@
 			'file' => 'include/existing_applicant_edit_form.inc',
 			'access arguments' => array('access content'),
 		);
-
-		/* end */
+		
 		return $items;	
 		
 	}
@@ -99,49 +86,41 @@
 			$query->addField('hoa', 'application_no');
 			$query->addField('hoa', 'date_of_application');
 			$query->addField('hoa', 'computer_serial_no');
-			$query->addField('hoa', 'online_application_id');
 			//$query->addField('he', 'estate_name');
 			//$query->addField('hft', 'flat_type');
 
 			$result =$query->execute();
 
 			///////////////////debaleena 23-09-2024////////////////////////
-			$header['sl_no'] = array('data' => 'Sl. No.');
 			$header['application_no'] = array('data' => 'Application No');
 			$header['applicant_name'] = array('data' => 'Applicant Name');
 			$header['date_of_application'] = array('data' => 'Date of Application');
 			$header['computer_serial_no'] = array('data' => 'Computer Serial No');
 			$header['mobile_no'] = array('data' => 'Mobile No.');
 			$header['gender'] = array('data' => 'Gender');
-			// $header['present_address'] = array('data' => 'Present Address');
-			// $header['parmanent_address'] = array('data' => 'Permanent Address');
-			$header['action'] = array('data' => 'Action', 'width'=>'10%');
+			$header['present_address'] = array('data' => 'Present Address');
+			$header['parmanent_address'] = array('data' => 'Permanent Address');
 			
 			$rows =array();
 		   	$output = '';
-			$c= 1;
 		   
 		   	while($data = $result->fetchObject()) {
-				// echo "<pre>";print_r($data);die;
 			   $fields = array();
-			   $fields[] = $c;
+		
 			   $fields[] = $data->application_no;
 			   $fields[] = $data->applicant_name;
 			   $fields[] = $data->date_of_application;
 			   $fields[] = $data->computer_serial_no;
 			   $fields[] = $data->mobile_no;
 			   $fields[] = $data->gender;
-			   
-			//    $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','.$data->present_district .','. $data->present_pincode;
-			//    $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.$data->permanent_district .','. $data->permanent_pincode;
-			
-				$fields[] = l('<i class="fa fa-edit"></i> Edit', 'physical-application-edit/'.encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
-				
-
+			   $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','
+			   				.$data->present_district .','. $data->present_pincode;
+			   $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.
+			   				$data->permanent_district .','. $data->permanent_pincode;
 		
+			   
 			  
 			   $rows[] = $fields;
-			   $c++;
 		  	}
 		
 				
@@ -230,123 +209,3 @@
 
 		// return $output;
 	}
-
-
-
-	/* by dg on 20-06-2025  */
-	function physical_applicant_search_form(){
-		
-		global $user_role;
-
-		$title_txt = t('Enter Your physical Application Number or Computer serial No: ');
-
-		$form['physical_application_no'] = array(
-			'#type' => 'textfield',
-			'#title' => $title_txt,
-			'#default_value' => '',
-			'#attributes' => array('placeholder' => 'Enter Your physical Application Number or Computer serial No', 'class' => array('form-control form-control-sm')),
-			'#required' => TRUE,
-			'#prefix' => '<br><br><div class="col-md-8"><div class="form-floating">',
-			'#suffix' => '</div></div>',
-			'#weight' => 2
-		);
-
-		$form['submit'] = array(
-			'#type' => 'submit',
-			'#value' => t('Search'),
-			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-			'#suffix' => '</div></div>',
-			'#attributes' => array('class' => array('text-centre btn bg-primary btn-sm px-5 mt-5 rounded-pill text-white fw-bolder')),
-			'#weight' => 3
-		);
-
-		return $form;
-	}
-
-
-	function physical_applicant_search_form_submit($form,&$form_state){
-
-		$app_no = isset($form_state['values']['physical_application_no']) && !empty($form_state['values']['physical_application_no']) ? $form_state['values']['physical_application_no'] : '';
-
-		$online_application_id = NULL;
-
-		if (!empty($app_no)) {
-			$parts = explode('-', $app_no);
-
-			$query = db_select('housing_online_application', 'hoa');
-			$query->fields('hoa', ['application_no', 'online_application_id']);
-			
-			if (!empty($parts[0]) && strtoupper($parts[0]) == 'PA') {
-				//echo "pp";die;
-				$query->condition('hoa.application_no', $app_no);
-			} else if (is_numeric($parts[0])) {
-				//echo "kk".$parts[0];die;
-				$query->condition('hoa.computer_serial_no', $app_no);
-			} else {
-				//echo "aa";die;
-				drupal_set_message(t('The Application Number is Incorrect.'), 'error');
-				return;
-			}
-
-			$result = $query->execute()->fetchObject();
-
-			if ($result && isset($result->online_application_id)) {
-				$online_application_id = $result->online_application_id;
-				drupal_goto('physical-application-view/' . encrypt_url($online_application_id));
-			} else {
-				drupal_set_message(t('No matching application found.'), 'error');
-			}
-		} else {
-			drupal_set_message(t('Please enter a valid Application Number.'), 'error');
-		}
-
-	}
-
-	function search_physical_data_fetch($app_id = ''){
-
-		$app_id = decrypt_url($app_id);
-
-		$query = db_select('housing_applicant', 'ha');
-		$query->innerJoin('housing_applicant_official_detail','haod','haod.housing_applicant_id = ha.housing_applicant_id');
-		$query->innerJoin('housing_online_application','hoa','hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
-		$query->innerjoin('users','u','u.uid = haod.uid');
-		$query->fields('ha', ['applicant_name', 'mobile_no','date_of_birth']);
-		$query->fields('hoa', ['application_no','date_of_application','online_application_id']);
-		$query->addField('u','mail');
-		$query->condition('hoa.online_application_id', $app_id);
-		$result = $query->execute();
-		$data = $result->fetchObject();
-
-		// echo "<pre>";print_r($result);die;
-
-		$display_output1 = '
-		    <div class="table-bottom">
-		        <table class="table table-list">
-		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>
-		          </tr>
-		           <tr>
-		            <th style="background-color:#00000000" width="50%">Application Number:</th>
-		            <td width="50%">Application for Existing Occupant Without HRMS ID</td>
-		          </tr>
-		          <tr>
-		            <th style="background-color:#00000000" width="50%">Application Number:</th>
-		            <td width="50%">'.(isset($data->application_no) ? $data->application_no : 'Not Avalaible').'</td>
-		          </tr>
-		          <tr>
-		            <th style="background-color:#00000000">Date of Application:</th>
-		            <td>'.(isset($data->date_of_application) ? $data->date_of_application : 'Not Avalaible').'</td>
-		          </tr>
-		         
-		        </table>
-		    </div>';
-
-    	return $display_output1;
-
-	}
-
-
-
-
-
-	/*  end  */
