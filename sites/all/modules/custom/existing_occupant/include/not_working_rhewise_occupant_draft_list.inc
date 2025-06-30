@@ -34,12 +34,28 @@
 					$db_and->condition('he.subdiv_id', $data_fetch->subdiv_id, '=');		
 					$query->condition($db_and);
 
+					/* added by dg 11-06-2025 */
+					$query->addExpression(
+					    "CASE
+					        WHEN hf.flat_no ~ '^[0-9]+$' THEN CAST(hf.flat_no AS INTEGER) 
+					        WHEN hf.flat_no ~ '^([0-9]+)/([0-9]+)$' THEN CAST(SPLIT_PART(hf.flat_no, '/', 1) AS INTEGER) 
+					        WHEN hf.flat_no ~ '^[0-9]+' THEN CAST(SUBSTRING(hf.flat_no FROM '^[0-9]+') AS INTEGER) 
+					        ELSE NULL 
+					    END",
+					    'flat_no_sort_key'
+					);
+
+					$query->orderBy('hb.block_name', 'ASC');
+					$query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
+					$query->orderBy('hf.flat_no', 'ASC');
+					/* end */
 					$result =$query->execute();
 
 				} else{																		
 					$query = db_select('housing_existing_occupant_draft', 'heod');
                     
                     $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+					$query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
                     $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
 					$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
                     $query->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
@@ -49,9 +65,27 @@
 					$query->addField('hft', 'flat_type');
 					$query->fields('hf', array('floor', 'flat_no'));
                     $query->addField('hd', 'district_name');
+					$query->addField('hb', 'block_name');
 					$query->fields('heod', array('housing_existing_occupant_draft_id','flat_id'));
 
 					$query->condition('he.division_id', $data_fetch->division_id, '=');
+
+					/* added by dg 11-06-2025 */
+					$query->addExpression(
+					    "CASE
+					        WHEN hf.flat_no ~ '^[0-9]+$' THEN CAST(hf.flat_no AS INTEGER) 
+					        WHEN hf.flat_no ~ '^([0-9]+)/([0-9]+)$' THEN CAST(SPLIT_PART(hf.flat_no, '/', 1) AS INTEGER) 
+					        WHEN hf.flat_no ~ '^[0-9]+' THEN CAST(SUBSTRING(hf.flat_no FROM '^[0-9]+') AS INTEGER) 
+					        ELSE NULL 
+					    END",
+					    'flat_no_sort_key'
+					);
+
+					$query->orderBy('hb.block_name', 'ASC');
+					$query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
+					$query->orderBy('hf.flat_no', 'ASC');
+
+					/* end */
 					$result =$query->execute();
 				}
 			}
@@ -61,6 +95,7 @@
 			$header['Applicant Name'] = array('data' => 'Applicant Name');
             $header['District'] = array('data' => 'District');
 			$header['Estate Name'] = array('data' => 'Estate Name');
+			$header['Block Name'] = array('data' => 'Block Name');
 			$header['Flat Type'] = array('data' => 'Flat Type');
 			$header['Flat No.'] = array('data' => 'Flat No.');
 			$header['Floor'] = array('data' => 'Floor');
@@ -82,6 +117,7 @@
 			$fields[] = $data->applicant_name;
             $fields[] = $data->district_name;
 			$fields[] = $data->estate_name;
+			$fields[] = $data->block_name;
 			$fields[] = $data->flat_type;
 			$fields[] = $data->flat_no;
 			$fields[] = $data->floor;
