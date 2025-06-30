@@ -1,24 +1,89 @@
 <?php
 
-	function existing_applicant_form($form, &$form_state) {
+	function existing_applicant_edit_form($form, &$form_state, $online_application_id = '') {
+
+		$online_application_id = decrypt_url($online_application_id);
 		
-		$district = isset($form_state['values']['district']) && !empty($form_state['values']['district']) ? $form_state['values']['district'] : '';
+		if (!empty($online_application_id) && is_numeric($online_application_id)) {
+			
+			$query = db_select('housing_applicant', 'ha');
+			$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');
+			$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+			$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+			$query->innerJoin('housing_ddo', 'hd', 'hd.ddo_id = haod.ddo_id');
+			$query->innerjoin('housing_new_allotment_application','hnaa','hnaa.online_application_id = hoa.online_application_id');
+			$query->condition('hoa.online_application_id', $online_application_id);
+			$query->fields('ha', array());
+			$query->fields('haod', array());
+			$query->fields('hnaa', array('allotment_category'));
+			$query->fields('hoa', array());
+			$query->fields('u', array('mail'));
+			$query->fields('hd', array('ddo_designation','district_code'));
+
+
+			$result = $query->execute();
+			$data = $result->fetchObject();
+			// echo "<pre>";print_r($data);die;
+		} else {
+			// If the ID is not valid, you may handle this accordingly
+			drupal_set_message('Invalid or missing application ID.', 'error');
+			$data = null;
+		}
+		if(!empty($data->date_of_birth))
+			$dob = date_format_change($data->date_of_birth);
+
+		if(!empty($data->date_of_joining))
+			$doj = date_format_change($data->date_of_joining);
+
+		if(!empty($data->date_of_retirement))
+			$dor  = date_format_change($data->date_of_retirement);
+
+		if(!empty($data->date_of_application))
+			$doa  = date_format_change($data->date_of_application);
 		
-		$designation = isset($form_state['values']['designation']) && !empty($form_state['values']['designation']) ? $form_state['values']['designation'] : '';
-		$dob = isset($form_state['values']['dob']) && !empty($form_state['values']['dob']) ? $form_state['values']['dob'] : '';
+			
+		// echo $dob;die;
+		// $district = isset($form_state['values']['district']) && !empty($form_state['values']['district']) ? $form_state['values']['district'] : '';
 		
-		$pay_band_id = isset($form_state['values']['pay_band']) && !empty($form_state['values']['pay_band']) ? $form_state['values']['pay_band'] : 0;
-	    $rhe_flat_type = rhe_flat_type_rst_pay_band_id($pay_band_id);
-	    $reason = isset($form_state['values']['reason']) && !empty($form_state['values']['reason']) ? $form_state['values']['reason'] : '';
+		// $designation = isset($form_state['values']['designation']) && !empty($form_state['values']['designation']) ? $form_state['values']['designation'] : '';
+		// $dob = isset($form_state['values']['dob']) && !empty($form_state['values']['dob']) ? $form_state['values']['dob'] : '';
 		
-		$chk_permanent_address = isset($form_state['values']['chk_permanent_address']) ? $form_state['values']['chk_permanent_address'] : '';
+		// $pay_band_id = isset($form_state['values']['pay_band']) && !empty($form_state['values']['pay_band']) ? $form_state['values']['pay_band'] : 0;
+	    $rhe_flat_type = rhe_flat_type_rst_pay_band_id($data->pay_band_id);
+		// echo $rhe_flat_type;die;
+	    // $reason = isset($form_state['values']['reason']) && !empty($form_state['values']['reason']) ? $form_state['values']['reason'] : '';
+		
+		// $chk_permanent_address = isset($form_state['values']['chk_permanent_address']) ? $form_state['values']['chk_permanent_address'] : '';
 		
 		$form['form_begin'] = array(
 			'#type' => 'markup',
 			'#markup' => '<div class="online_application">',
 			'#weight' => -2
 		);
-		
+
+		$form['app_uid'] = array(
+				'#type' => 'hidden',
+				'#value' => $data->uid,
+				'#attributes' => array('readonly' => 'readonly'),
+		);
+
+		$form['housing_applicant_id'] = array(
+				'#type' => 'hidden',
+				'#value' => $data->housing_applicant_id,
+				'#attributes' => array('readonly' => 'readonly'),
+		);
+		$form['housing_official_detail_id'] = array(
+				'#type' => 'hidden',
+				'#value' => $data->applicant_official_detail_id,
+				'#attributes' => array('readonly' => 'readonly'),
+		);
+
+		$form['housing_online_application_id'] = array(
+				'#type' => 'hidden',
+				'#value' => $data->online_application_id,
+				'#attributes' => array('readonly' => 'readonly'),
+		);
+		// echo "<pre>";print_r($form);die;
 		//personal information
 		$form['prrsonal_info'] = array(
 			'#type' => 'fieldset',
@@ -30,6 +95,7 @@
 		$form['prrsonal_info']['applicant_name'] = array(
 			'#title' => t('Applicant\'s Name'),
 			'#type' => 'textfield',
+			'#default_value' => $data->applicant_name,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_alphabatic_fullstop'), 
@@ -40,7 +106,7 @@
 		$form['prrsonal_info']['applicant_father_name'] = array(
 			'#title' => t('Father / Husband Name'),
 			'#type' => 'textfield',
-			'#default_value' => '',
+			'#default_value' => $data->guardian_name,
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
 			'#element_validate' => array('element_validate_alphabatic_fullstop'), 
@@ -58,6 +124,7 @@
 		$form['prrsonal_info']['permanent_address']['permanent_street'] = array(
 			'#title' => t('Address'),
 			'#type' => 'textfield',
+			'#default_value' => $data->permanent_street,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -67,6 +134,7 @@
 		$form['prrsonal_info']['permanent_address']['permanent_city_town_village'] = array(
 			'#title' => t('City / Town / Village'),
 			'#type' => 'textfield',
+			'#default_value' => $data->permanent_city_town_village,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
@@ -76,6 +144,7 @@
 		$form['prrsonal_info']['permanent_address']['permanent_post_office'] = array(
 			'#title' => t('Post Office'),
 			'#type' => 'textfield',
+			'#default_value' => $data->permanent_post_office,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -85,6 +154,7 @@
 		$form['prrsonal_info']['permanent_address']['permanent_district'] = array(
 			'#title' => t('District'),
 			'#type' => 'select',
+			'#default_value' => $data->permanent_district,
 			'#options' => district_list(),
 			//'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
@@ -98,6 +168,7 @@
 		$form['prrsonal_info']['permanent_address']['permanent_pincode'] = array(
 			'#title' => t('Pincode'),
 			'#type' => 'textfield',
+			'#default_value' => $data->permanent_pincode,
 			'#maxlength' => 6,
 			//'#required' => TRUE,
 			'#element_validate' => array('element_validate_numeric_positive'), 
@@ -143,6 +214,7 @@
 			$form['prrsonal_info']['present_address']['present_street'] = array(
 				'#title' => t('Address'),
 				'#type' => 'textfield',
+				'#default_value' => $data->present_street,
 				//'#required' => TRUE,
 				'#prefix' => '<div class="row"><div class="col-md-6" id="reload_present_street"><div class="form-floating">',
 				'#suffix' => '</div></div>',
@@ -152,6 +224,7 @@
 			$form['prrsonal_info']['present_address']['present_city_town_village'] = array(
 				'#title' => t('City / Town / Village'),
 				'#type' => 'textfield',
+				'#default_value' => $data->present_city_town_village,
 				//'#required' => TRUE,
 				'#prefix' => '<div class="col-md-6" id="reload_present_city_town_village"><div class="form-floating">',
 				'#suffix' => '</div></div></div>',
@@ -161,6 +234,7 @@
 			$form['prrsonal_info']['present_address']['present_post_office'] = array(
 				'#title' => t('Post Office'),
 				'#type' => 'textfield',
+				'#default_value' => $data->present_post_office,
 				//'#required' => TRUE,
 				'#prefix' => '<div class="row"><div class="col-md-4" id="reload_present_post_office"><div class="form-floating">',
 				'#suffix' => '</div></div>',
@@ -170,6 +244,7 @@
 			$form['prrsonal_info']['present_address']['present_district'] = array(
 				'#title' => t('District'),
 				'#type' => 'select',
+				'#default_value' => $data->present_district,
 				'#options' => district_list(),
 				//'#required' => TRUE,
 				'#prefix' => '<div class="col-md-4" id="reload_present_district"><div class="form-floating">',
@@ -185,6 +260,7 @@
 			$form['prrsonal_info']['present_address']['present_pincode'] = array(
 				'#title' => t('Pincode'),
 				'#type' => 'textfield',
+				'#default_value' => $data->present_pincode,
 				'#maxlength' => 6,
 				//'#required' => TRUE,
 				'#element_validate' => array('element_validate_numeric_positive'), 
@@ -226,7 +302,7 @@
 		$form['prrsonal_info']['mobile'] = array(
 			'#title' => t('Mobile no'),
 			'#type' => 'textfield',
-			'#default_value' => '',
+			'#default_value' => $data->mobile_no,
 			'#maxlength' => 10,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
@@ -237,6 +313,7 @@
 		$form['prrsonal_info']['email'] = array(
 			'#title' => t('Email ID'),
 			'#type' => 'textfield',
+			'#default_value' => $data->mail,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_email'),
@@ -247,6 +324,7 @@
 		$form['prrsonal_info']['dob'] = array(
 			'#title' => t('Date of Birth(According to Service Book)'),
 			'#type' => 'textfield',
+			'#default_value' => $dob,
 			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dob', 'class'=>array('form-control')),
 			'#required' => TRUE,
 			//'#validated' => TRUE,
@@ -258,6 +336,7 @@
 		$form['prrsonal_info']['gender'] = array(
 			'#title' => t('Gender'),
 			'#type' => 'radios',
+			'#default_value' => $data->gender,
 			'#options' => array('M' => 'Male', 'F' => 'Female'),
 			'#attributes' => array('class' => array('gender')),
 			'#default_value' => 'M',
@@ -276,7 +355,7 @@
 		$form['official_info']['hrms_id'] = array(
 			'#title' => t('Employee HRMS ID'),
 			'#type' => 'textfield',
-			'#default_value' => '',
+			'#default_value' => $data->hrms_id,
 			'#maxlength' => 10,
 			'#attributes' => array('class' => array('numeric_positive'), 'class'=>array('form-control')),
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
@@ -287,6 +366,7 @@
 		$form['official_info']['app_designation'] = array(
 			'#title' => t('Designation'),
 			'#type' => 'textfield',
+			'#default_value' => $data->applicant_designation,
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -298,6 +378,7 @@
 		$form['official_info']['pay_band'] = array(
 			'#title' => t('Basic Pay Range'),
 			'#type' => 'select',
+			'#default_value' => $data->pay_band_id,
 			'#options' => pay_band_list(),
 			'#required' => TRUE,
 			'#validated' => TRUE,
@@ -307,6 +388,7 @@
 		$form['official_info']['pay_in'] = array(
 			'#title' => t('Basic Pay'),
 			'#type' => 'textfield',
+			'#default_value' => $data->pay_in_the_pay_band,
 			'#required' => TRUE,
 			'#element_validate' => array('element_validate_numeric_positive'), 
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
@@ -337,6 +419,7 @@
 		$form['official_info']['app_posting_place'] = array(
 			'#title' => t('Place of Posting'),
 			'#type' => 'textfield',
+			'#default_value' => $data->applicant_posting_place,
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -346,6 +429,7 @@
 		$form['official_info']['app_headquarter'] = array(
 			'#title' => t('Headquarter'),
 			'#type' => 'textfield',
+			'#default_value' => $data->applicant_headquarter,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
@@ -355,8 +439,8 @@
 		$form['official_info']['doj'] = array(
 			'#title' => t('Date of Joining'),
 			'#type' => 'textfield',
+			'#default_value' => $doj,
 			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-doj', 'class' => array('numeric_positive form-control')),
-			'#default_value' => '',
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -366,9 +450,9 @@
 		$form['official_info']['dor'] = array(
 			'#title' => t('Date of Retirement(According to Service Book)'),
 			'#type' => 'textfield',
+			'#default_value' => $dor,
 			//'#attributes' => array('readonly' => 'readonly'),
 			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dor', 'class' => array('numeric_positive form-control')),
-			'#default_value' => '',
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
@@ -386,6 +470,7 @@
 		$form['office_add']['office_name'] = array(
 			'#title' => t('Name of the Office'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_name,
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -396,6 +481,7 @@
 		$form['office_add']['office_street'] = array(
 			'#title' => t('Address'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_street,
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -405,6 +491,7 @@
 		$form['office_add']['office_city'] = array(
 			'#title' => t('City / Town / Village'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_city_town_village,
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
@@ -414,6 +501,7 @@
 		$form['office_add']['office_post_office'] = array(
 			'#title' => t('Post Office'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_post_office,
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-3"><div class="form-floating">',
 			'#suffix' => '</div></div>',
@@ -423,6 +511,7 @@
 		$form['office_add']['office_district'] = array(
 			'#title' => t('District'),
 			'#type' => 'select',
+			'#default_value' => $data->office_district,
 			'#options' => district_list(),
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-3"><div class="form-floating">',
@@ -437,6 +526,7 @@
 		$form['office_add']['office_pincode'] = array(
 			'#title' => t('Pincode'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_pin_code,
 			'#maxlength' => 6,
 			'#required' => TRUE,
 			'#element_validate' => array('element_validate_numeric_positive'), 
@@ -447,6 +537,7 @@
 		$form['office_add']['office_phone_no'] = array(
 			'#title' => t('Phone No.(With STD Code)'),
 			'#type' => 'textfield',
+			'#default_value' => $data->office_phone_no,
 			'#maxlength' => 15,
 			//'#required' => TRUE,
 			'#element_validate' => array('element_validate_telephoneno'), 
@@ -465,6 +556,7 @@
 		$form['ddo']['district'] = array(
 			'#title' => t('DDO District'),
 			'#type' => 'select',
+			'#default_value' => $data->district_code,
 			'#options' => district_list(),
 			'#ajax' => array(
 					   'event' => 'change',
@@ -486,8 +578,10 @@
 		$form['ddo']['designation'] = array(
 			'#title' => t('DDO Designation'),
 			'#type' => 'select',
+			'#default_value' => $data->ddo_id,
 			//'#options' => array('- Select -'),
-			'#options' => ddo_desig_list($district),
+			//'#options' => ddo_desig_list($district),
+			'#options' => ddo_desig_list($data->district_code),
 			'#ajax' => array(
 					   'event' => 'change',
 					   'callback' => '_reload_ddo_address',
@@ -498,7 +592,7 @@
 						  'message' => '',
 						 ),
 			 ),
-			'#default_value' => $designation,
+			//'#default_value' => $designation,
 			'#required' => TRUE,
 			'#validated' => TRUE,
 			'#prefix' => '<div id="replace_designation" class="col-md-6"><div class="form-floating">',
@@ -507,6 +601,7 @@
 		
 		$form['ddo']['address'] = array(
 			'#title' => t('DDO Address'),
+			//'#default_value' => $data->address,
 			'#type' => 'textarea',
 			'#attributes' => array('readonly' => 'readonly', 'class' => array('form-control')),
 			'#prefix' => '<div id="replace_ddo_address" class="col-md-12"><div class="form-floating">',
@@ -519,6 +614,7 @@
 		//allotment type and category
 		$form['allotment_reason'] = array(
 			'#type' => 'fieldset',
+			//'#default_value' => $data->allotment_reason,
 			'#title' => t('Allotment Category'),
 			'#collapsible' => FALSE, // Added
 			'#collapsed' => FALSE,  // Added
@@ -527,21 +623,21 @@
 		$form['allotment_reason']['rhe_flat_type'] = array(
 			'#title' => t('Flat TYPE'),
 			'#type' => 'textfield',
+			'#default_value' => $rhe_flat_type,
 			'#attributes' => array('readonly' => 'readonly', 'class' => array('form-control')),
-			'#default_value' => '',
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6" id="replace_rhe_flat_type" ><div class="form-floating">',
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_flat_type'),
 		 );
-	     // echo $rhe_flat_type;
+	     
 		 
 		 $form['allotment_reason']['reason'] = array(
 			'#title' => t('Allotment Category'),
 			'#type' => 'select',
 			//'#options' => array(''=>'- Select -'),
 			'#options' => allotment_category_list(trim($rhe_flat_type)),
-			'#default_value' => $reason,
+			'#default_value' => $data->allotment_category,
 			'#required' => TRUE,
 			'#validated' => TRUE,
 			'#prefix' => '<div id="replace_allotment_category" class="col-md-6"><div class="form-floating">',
@@ -552,6 +648,7 @@
 		 $form['allotment_reason']['doa'] = array(
 			'#title' => t('Date of Application'),
 			'#type' => 'textfield',
+			'#default_value' => $doa,
 			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-doa','class' => array('form-control')),
 			'#required' => TRUE,
 			//'#validated' => TRUE,
@@ -563,26 +660,32 @@
 		$form['allotment_reason']['computer_serial_no'] = array(
 			'#title' => t('Computer Serial No.'),
 			'#type' => 'textfield',
+			'#default_value' => $data->computer_serial_no,
 			'#required' => TRUE,
 			'#element_validate' => array('element_validate_numeric_positive'),
 			'#prefix' => '<div id="computr_serial_no" class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			'#attributes' => array('class' => array('numeric_positive form-control')),
+			'#attributes' => array('class' => array('numeric_positive form-control'), 'readonly' => 'readonly'),
 		);
 		/* added by debaleena 01-08-2024 */   
 		$form['allotment_reason']['confirm_computer_serial_no'] = array(
-			'#title' => t('Confirm Computer Serial No.'),
-			'#type' => 'password',
-			'#required' => TRUE,
-			'#element_validate' => array('element_validate_numeric_positive'),
-			'#prefix' => '<div id="confirm_computr_serial_no" class="col-md-4"><div class="form-floating">',
-			'#suffix' => '</div></div></div>',
-			'#attributes' => array('class' => array('numeric_positive form-control')),
+			// '#title' => t('Confirm Computer Serial No.'),
+			// '#type' => 'password',
+			// '#default_value' => $data->computer_serial_no,
+			// '#required' => TRUE,
+			// '#element_validate' => array('element_validate_numeric_positive'),
+			// '#prefix' => '<div id="confirm_computr_serial_no" class="col-md-4"><div class="form-floating">',
+			// '#suffix' => '</div></div></div>',
+			// '#attributes' => array('class' => array('numeric_positive form-control')),
+			'#type' => 'hidden',
+			'#value' => $data->computer_serial_no,
+			'#attributes' => array('readonly' => 'readonly'),
 		);
 		// added on 19-06-2025 by moumita
 		$form['allotment_reason']['physical_application_no'] = array(
 			'#title' => t('Physical Application Number'),
 			'#type' => 'textfield',
+			'#default_value' => $data->physical_application_no,
 			'#required' => TRUE,
 			// '#element_validate' => array('element_validate_numeric_positive'),
 			'#prefix' => '<div class="row"><div id="" class="col-md-4"><div class="form-floating">',
@@ -594,6 +697,7 @@
 		 // Message area for validation feedback
 		 $form['allotment_reason']['comp_ser_no_message'] = array(
 			'#type' => 'markup',
+			//'#default_value' => $data->comp_ser_no_message,
 			'#markup' => '<div id="comp_ser_no_message" class="form-floating"></div>', // Use form-text for styling
 			'#prefix' => '<div class="row"><div class="col-md-12">', // Ensure it aligns with the rest of the form
 			'#suffix' => '</div></div>', // Close the div properly
@@ -605,6 +709,7 @@
 		$form['allotment_reason']['remarks'] = array(
 			'#title' => t('Remarks'),
 			'#type' => 'textarea',
+			'#default_value' => $data->remarks,
 			'#prefix' => '<div class="col-md-12"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_textarea'), 
@@ -747,13 +852,9 @@
 	}
 	
 	
-	function existing_applicant_form_submit($form, &$form_state) {
+	function existing_applicant_edit_form_submit($form, &$form_state) {
 		
-		//$name = strtolower(trim($form_state['values']['applicant_name']));
-		//$name1 = str_replace(" ","",$name);
-		//$username = str_replace(".","",$name1).rand();
-		// echo "<pre>";print_r($form_state);die;
-
+		
 		$computer_serial_no = trim($form_state['values']['computer_serial_no']);
 		$confirm_computer_serial_no = trim($form_state['values']['confirm_computer_serial_no']);
 
@@ -787,7 +888,6 @@
 			// added on 19-06-2025 by moumita
 			$username = str_replace(".","",$name).'_'.$form_state['values']['physical_application_no'].'_'.$form_state['values']['computer_serial_no'];
 
-			//debaleena start 11.06.24///
 
 			if($form_state['values']['hrms_id'] != '')
 			{
@@ -812,21 +912,20 @@
 				
 			}
 
-			//end//
-			user_save(null, $newUser);
+			$hidden_users_uid = $form_state['values']['app_uid'];
+			$hidden_housing_applicant_id = $form_state['values']['housing_applicant_id'];
+			$hidden_online_application_id = $form_state['values']['housing_online_application_id'];
+			$hidden_official_detail_id = $form_state['values']['housing_official_detail_id'];
+			// echo $hidden_official_detail_id;die;
+			db_update('users')
+			->fields($newUser)
+			->condition('uid', $hidden_users_uid)
+			->execute();
 
-			
-			/*get last inserted uid*/
-			
-			$query = db_select('users','u');
-			$query->addExpression('MAX(uid)','max_uid');
-			$result = $query->execute();
-			$data = $result->fetchObject();
-			
-			/*insert into housing_applicant table*/
+			/*update into housing_applicant table*/
 			
 			$applicant_personal_detail_arr = array();
-			$applicant_personal_detail_arr['uid'] 				=  $data->max_uid;
+			$applicant_personal_detail_arr['uid'] 				=  $hidden_users_uid;
 			$applicant_personal_detail_arr['applicant_name'] 	=  trim($form_state['values']['applicant_name']);
 			$applicant_personal_detail_arr['guardian_name'] 		=  trim($form_state['values']['applicant_father_name']);
 			$applicant_personal_detail_arr['date_of_birth'] 		=  trim(implode('-', array_reverse(explode('/', $form_state['values']['dob']))));
@@ -861,50 +960,23 @@
 				$applicant_personal_detail_arr['present_district']  =  trim($form_state['values']['present_district']);
 			if($form_state['values']['present_pincode'] != '')
 				$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
-			// } else {
-			// 	$applicant_personal_detail_arr['present_street']  =  NULL;
-			// 	$applicant_personal_detail_arr['present_city_town_village']  =  NULL;
-			// 	$applicant_personal_detail_arr['present_post_office']  =  NULL;
-			// 	$applicant_personal_detail_arr['present_district']  =  NULL;
-			// 	$applicant_personal_detail_arr['present_pincode']  =  NULL;	
-			// }
 			
 			
-			$last_id = db_insert('housing_applicant')
+			db_update('housing_applicant')
 			->fields($applicant_personal_detail_arr)
+			->condition('housing_applicant_id', $hidden_housing_applicant_id)
 			->execute();
 
-			// get housing_applicant_id by uid
 			
-			$haid_query = db_select('housing_applicant','ha')->fields('ha',array('housing_applicant_id'))->condition('uid',$data->max_uid)->execute();
-			$haid_result = $haid_query->fetchObject();
-			// print_r($haid_result);
-			$housing_applicant_id = $haid_result->housing_applicant_id; 
-			/*assign user roles*/
-			
-			$arr_user_roles = array();
-			$arr_user_roles['uid'] = $applicant_personal_detail_arr['uid'];
-			$arr_user_roles['rid'] = 4;
-			
-			db_insert('users_roles')
-			->fields($arr_user_roles)
-			->execute();
-			
-			/*add applicant_official_detail  data*/
+			/*update applicant_official_detail  data*/
 			$app_off_detail_arr = array();
-			$app_off_detail_arr['uid']  =  $data->max_uid;
+			$app_off_detail_arr['uid']  =  $hidden_users_uid;
 			if($form_state['values']['hrms_id'] != '')
 				$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
 			
 			$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
 			$app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
 			$app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
-			// if($form_state['values']['grade_pay'] != '')
-			// 	$app_off_detail_arr['grade_pay']  =  trim($form_state['values']['grade_pay']);
-			
-			/*if($form_state['values']['gpf_no'] != '')
-				$app_off_detail_arr['gpf_no']  =  trim($form_state['values']['gpf_no']);*/
-			
 			$app_off_detail_arr['applicant_posting_place']  =  strtoupper(trim($form_state['values']['app_posting_place']));
 			if($form_state['values']['app_headquarter'] != '')
 				$app_off_detail_arr['applicant_headquarter']  =  strtoupper(trim($form_state['values']['app_headquarter']));
@@ -925,24 +997,19 @@
 				$app_off_detail_arr['office_phone_no']  =  trim($form_state['values']['office_phone_no']);
 			
 			$app_off_detail_arr['ddo_id']  =   trim($form_state['values']['designation']);
-			$app_off_detail_arr['housing_applicant_id'] = $housing_applicant_id;
+			//$app_off_detail_arr['housing_applicant_id'] = $housing_applicant_id;
 			
-			
-			db_insert('housing_applicant_official_detail')
+			// echo "<pre>";print_r($app_off_detail_arr);
+			db_update('housing_applicant_official_detail')
 			->fields($app_off_detail_arr)
+			->condition('applicant_official_detail_id', $hidden_official_detail_id)
 			->execute();
+
 			
-			/*fetching applicant_official_detail_id*/
-			$query1 = db_select('housing_applicant_official_detail', 'haod');
-			$query1->addExpression('MAX(applicant_official_detail_id)','id');
-			$query1->condition('haod.uid', $data->max_uid, '=');
-			$result1 =$query1->execute();
-			$data1 = $result1->fetchObject();
-			
-			/*add online application*/
+			/*update online application*/
 			
 			$online_app_arr = array();
-			$online_app_arr['applicant_official_detail_id']  =  $data1->id;
+			$online_app_arr['applicant_official_detail_id']  =  $hidden_official_detail_id;
 			$online_app_arr['status']  =  'housingapprover_approved_1';  // housing_sup_1 to change this by debaleena 04-09-2024
 			$online_app_arr['date_of_verified']  =  date('Y-m-d');
 			$online_app_arr['date_of_application']  =  trim( implode('-', array_reverse(explode('/', $form_state['values']['doa']))));
@@ -952,44 +1019,35 @@
 
 			if($form_state['values']['remarks'] != '')
 				$online_app_arr['remarks'] = $form_state['values']['remarks'];
+			// echo "<pre>";print_r($online_app_arr);		
 					
-					
-			db_insert('housing_online_application')
-			->fields($online_app_arr)
-			->execute();
-			
-			/*fetching online_application_id*/
-			$query2 = db_select('housing_online_application', 'hoa');
-			$query2->addExpression('MAX(online_application_id)','oid');
-			$query2->condition('hoa.applicant_official_detail_id', $data1->id, '=');
-			$result2 =$query2->execute();
-			$data2 = $result2->fetchObject();
-			
-			$online_app_arr_upd = array();
-			//$online_app_arr_upd['application_no']  = 'NA-'.trim( implode(explode('/', $form_state['values']['doa']))).'-'.$data2->oid;
-			$online_app_arr_upd['application_no']  = 'PA-'.trim( implode(explode('/', $form_state['values']['doa']))).'-'.$data2->oid; // by debaleena 11.06.24
-				
 			db_update('housing_online_application')
-			->fields($online_app_arr_upd)
-			->condition('online_application_id', $data2->oid)
+			->fields($online_app_arr)
+			->condition('online_application_id', $hidden_online_application_id)
 			->execute();
 			
-			/* add new alltment application*/  
-			$new_allotment_app_arr = array();
-			$new_allotment_app_arr['online_application_id']  =  $data2->oid;
 			
 			$new_allotment_app_arr['flat_type_id'] = fetch_rhe_flat_id(trim($form_state['values']['rhe_flat_type']));
 			$new_allotment_app_arr['allotment_category']  =  trim($form_state['values']['reason']);
-			
-			db_insert('housing_new_allotment_application')
+			// echo "<pre>";print_r($new_allotment_app_arr);die;
+
+			db_update('housing_new_allotment_application')
 			->fields($new_allotment_app_arr)
+			->condition('online_application_id', $hidden_online_application_id)
 			->execute();
 			
-			drupal_set_message('Data inserted successfully.');
+			drupal_set_message('Data Updated successfully.');
 		}else{
 			drupal_set_message('The Computer Serial No. and Confirm Computer Serial No. do not match.Please enter same.','error');
 		}
 			
+	}
+
+	function date_format_change($input_date = ''){
+		$input_date = $input_date;
+		$date = DateTime::createFromFormat('Y-m-d', $input_date);
+		$formatted_date = $date->format('d/m/Y');
+		return $formatted_date;
 	}
 
 

@@ -534,7 +534,7 @@
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_flat_type'),
 		 );
-	     // echo $rhe_flat_type;
+	     
 		 
 		 $form['allotment_reason']['reason'] = array(
 			'#title' => t('Allotment Category'),
@@ -579,17 +579,6 @@
 			'#suffix' => '</div></div></div>',
 			'#attributes' => array('class' => array('numeric_positive form-control')),
 		);
-		// added on 19-06-2025 by moumita
-		$form['allotment_reason']['physical_application_no'] = array(
-			'#title' => t('Physical Application Number'),
-			'#type' => 'textfield',
-			'#required' => TRUE,
-			// '#element_validate' => array('element_validate_numeric_positive'),
-			'#prefix' => '<div class="row"><div id="" class="col-md-4"><div class="form-floating">',
-			'#suffix' => '</div></div></div>',
-			'#attributes' => array('class' => array('numeric_positive form-control')),
-		);
-
 
 		 // Message area for validation feedback
 		 $form['allotment_reason']['comp_ser_no_message'] = array(
@@ -752,7 +741,7 @@
 		//$name = strtolower(trim($form_state['values']['applicant_name']));
 		//$name1 = str_replace(" ","",$name);
 		//$username = str_replace(".","",$name1).rand();
-		// echo "<pre>";print_r($form_state);die;
+		//echo "<pre>";print_r($form_state);die;
 
 		$computer_serial_no = trim($form_state['values']['computer_serial_no']);
 		$confirm_computer_serial_no = trim($form_state['values']['confirm_computer_serial_no']);
@@ -783,9 +772,7 @@
 				}
 			}
 			
-			// $username = str_replace(".","",$name).rand(1, 100000); // off on 19-06-2025 by moumita
-			// added on 19-06-2025 by moumita
-			$username = str_replace(".","",$name).'_'.$form_state['values']['physical_application_no'].'_'.$form_state['values']['computer_serial_no'];
+			$username = str_replace(".","",$name).rand(1, 100000);
 
 			//debaleena start 11.06.24///
 
@@ -795,21 +782,25 @@
 				$newUser['name']   = trim($form_state['values']['hrms_id']);
 				$newUser['pass']   = trim($form_state['values']['hrms_id']);
 				/*$str[0].$str[1].trim($form_state['values']['username']).'@'.$dob_t.strrev($str1[0].$str1[1]);*/
-				if($form_state['values']['email'] !=''){										
+				if($form_state['values']['email'] != '')																																																						
 					$newUser['mail']   = trim($form_state['values']['email']);
-				}	
+					
 				$newUser['status'] = 1;
+
+
 			}else{
 				/*insert into user table*/
 				$newUser	   	   = array();
 				$newUser['name']   = $username;
 				$newUser['pass']   = $username;
 				/*$str[0].$str[1].trim($form_state['values']['username']).'@'.$dob_t.strrev($str1[0].$str1[1]);*/
-				if($form_state['values']['email'] != ''){
+				if($form_state['values']['email'] != '')																																																						
 					$newUser['mail']   = trim($form_state['values']['email']);
-				}
+					
 				$newUser['status'] = 1;
 				
+				
+
 			}
 
 			//end//
@@ -948,8 +939,6 @@
 			$online_app_arr['date_of_application']  =  trim( implode('-', array_reverse(explode('/', $form_state['values']['doa']))));
 			$online_app_arr['is_backlog_applicant']  =  1;
 			$online_app_arr['computer_serial_no']  =  $form_state['values']['computer_serial_no'];
-			$online_app_arr['physical_application_no']  =  $form_state['values']['physical_application_no'];
-
 			if($form_state['values']['remarks'] != '')
 				$online_app_arr['remarks'] = $form_state['values']['remarks'];
 					
