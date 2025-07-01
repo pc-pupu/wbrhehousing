@@ -58,3 +58,7 @@ xmlrpc.php
 #Ignore ALL LOG files
 *.log
 *.log
+
+
+sites/all/themes/housingtheme/templates/includes/live/
+sites/all/modules/custom/existing_applicant/existing_applicant_bkp.module

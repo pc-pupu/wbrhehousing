@@ -127,11 +127,17 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 	$result_tag = $query_tag->fetchObject();
 	// print_r($result_tag);
 
+	$license_no_tag = ($result_tag->license_no !='') ? $result_tag->license_no : 'N/A';
+
 	// get user info by flat_id from draft table
 
 	$query_draft = db_select('housing_existing_occupant_draft','heod')->fields('heod',array())->condition('heod.flat_id', $flat_id)->execute();
 	$result_draft = $query_draft->fetchObject();
 	// print_r($result_draft); die;
+
+	$license_no_draft = ($result_draft->license_no !='') ? $result_draft->license_no : 'N/A';
+
+
 
 	$flat_info = get_flat_info_by_id(encrypt_url($flat_id));
 
@@ -160,15 +166,19 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 					</tr>
 					<tr>
 						<td>Date of Birth </td>
-						<td>Nite hobe</td> 
+						<td>'.$result_tag->dob.'</td> 
 						<td>'.$result_draft->date_of_birth.'</td> 
 					</tr>
-		           <tr>
+		           	<tr>
 						<td>Flat Information</td>
-						<td>'.$flat_info.'</td> 
-						<td>'.$flat_info.'</td> 
+						<td colspan="2" style="text-align: center;">'.$flat_info.'</td> 
+						 
 					</tr>
-
+					<tr>
+						<td>License Information</td>
+						<td>'.$license_no_tag.'</td> 
+						<td>'.$license_no_draft.'</td> 
+					</tr>
 		          
 		        </table>
 		    </div>';
@@ -185,6 +195,18 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 							Action Taken
 						</div>
 						<div class="card-body">'
+	);
+
+	$info_array = array(
+		'name' => $result_tag->applicant_name,
+		'dob' => $result_tag->dob,
+		'mobile' => $result_tag->mobile_no,
+		'hrmsid' => $result_tag->hrms_id
+	);
+
+	$form['form_info_array'] = array(
+		'#type' => 'hidden',
+		'#value' => serialize($info_array)
 	);
 
 	$form['action'] = array(
@@ -236,14 +258,19 @@ function flat_wise_user_details_submit($form, $form_state){
 	$val = $form_state['values'];
 
 	$action_type = $val['action'];
+
+	$form_info_array = unserialize($val['form_info_array']);
+
+	// print_r($form_info_array); die;
+
 	if($action_type=='tagged'){
 		// set uid in housing_applicant, housing_applicant_official_details, update tagging table with remarks
 		// housing_applicant
 		$housingAppliArr = array(
 			'uid' => $user->uid,
-			'applicant_name' => '',
-			'date_of_birth' => '',
-			'mobile_no' => '',
+			'applicant_name' => $form_info_array['name'],
+			'date_of_birth' => $form_info_array['dob'],
+			'mobile_no' => $form_info_array['mobile'],
 		);
 		$housing_applicant_id = db_insert('housing_applicant')->fields($housingAppliArr)->execute();
 		// housing_applicant_official_details
