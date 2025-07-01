@@ -908,4 +908,3 @@
 		drupal_goto('rhewise_flatlist_draft');
 	}
 	
-	

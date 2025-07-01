@@ -60,17 +60,7 @@
 			//'access callback'=>TRUE
 		);
 		/* end */
-		// off on 25-06-2025 by Moumita
-		// $items['rhewise_occupant_draft_list'] = array(
-		// 	'title' => 'Existing Occupant List Without HRMS ID',
-		// 	'page callback'=>'rhewise_occupant_draft_list',
-		// 	//'page arguments'=> array('rhewise_occupant_draft_list_form'),
-		// 	'file' => 'include/rhewise_occupant_draft_list.inc',
-		// 	'access arguments' => array('administer Existing Occupant Draft List')
-		// 	// 'access arguments' => array('administer Existing Occupant List')
-		// );
 
-		// Done by Subham dt.24-06-2025
 		$items['rhewise_occupant_draft_list'] = array(
 			'title' => 'Existing Occupant List Without HRMS ID',
 			'page callback'=>'drupal_get_form',
@@ -105,14 +95,6 @@
 		);
 
 		/*Done by Subham*/
-		// $items['view-occupant-list'] = array(
-		// 	'title' => 'Existing Occupant List',
-		// 	'page callback' => 'view_occupant_list_form',
-		// 	'page arguments' => array(),
-		// 	'access arguments' => array('access content')
-		// );
-
-		/*Done by Subham dt.24-06-2025*/
 		$items['view-occupant-list'] = array(
 			'title' => 'Existing Occupant List With HRMS ID',
 			'page callback'=>'drupal_get_form',
@@ -159,6 +141,33 @@
 			// 'file' => 'include/rhewise_occupant_draft_list.inc',
 			'access arguments' => array('administer RHE wise flat list Master'),
 		);
+
+		// added by Subham 19-06-2025
+		$items['existing-occupant-edit/%'] = array(
+	  		'title' => 'Edit Existing Occupant Data',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('existing_occupant_edit_form',1),
+	  		'file' => 'include/existing_occupant_edit_form.inc',
+	  		'access arguments' => array('administer Existing Occupant Edit'),
+		);
+
+		// added on 26-06-2025 by Moumita
+		$items['existing-occupant-draft-edit/%'] = array(
+	  		'title' => 'Edit Existing Occupant Data (without HRMS)',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('existing_occupant_draft_edit_form',1),
+	  		'file' => 'include/existing_occupant_draft_list_form.inc',
+	  		'access arguments' => array('access content'),
+		);
+		$items['unauthorized-occupant'] = array(
+	  		'title' => 'Unauthorised Occupant List (without HRMS)',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('unauthorized_occupant_draft_list'),
+	  		'file' => 'include/view_unauthorised_occupants_list.inc',
+	  		'access arguments' => array('access content'),
+		);
+		// ennd moumita
+
 
 		// added by Subham 19-06-2025
 		$items['existing-occupant-edit/%'] = array(
@@ -234,6 +243,11 @@
 			'administer Existing Occupant Draft List' => array(
 				'title' => t('Administer Existing Occupant Draft List View'),
 				'description' => t('Perform Administer to see existing occupant draft list.'),
+			),
+
+			'administer Existing Occupant Edit' => array(
+				'title' => t('Administer Existing Occupant Edit'),
+				'description' => t('Perform Administer to Edit Existing Occupant Data.'),
 			),
 
 			'administer Existing Occupant Edit' => array(
@@ -602,179 +616,202 @@
 	}
 
 	/*Done by Subham*/
-	function view_occupant_list_form() {  
-		global $base_root, $base_path,$user,$user_role;
-		$output = '';
+	// change it to existing_occupant_list_form.inc on 30-06-2025
+	// function view_occupant_list_form() {  
+	// 	global $base_root, $base_path,$user,$user_role;
+	// 	$output = '';
 
-			/* Done by Subham 30-12-2024*/
-			$query_dtls = db_select('users_details', 'ud'); 
-			$query_dtls->fields('ud');
-			$query_dtls->condition('uid',$user->uid,'=');
-			$rsult = $query_dtls->execute();
-			$data_fetch = $rsult->fetchObject();
-			/* End */
+	// 		/* Done by Subham 30-12-2024*/
+	// 		$query_dtls = db_select('users_details', 'ud'); 
+	// 		$query_dtls->fields('ud');
+	// 		$query_dtls->condition('uid',$user->uid,'=');
+	// 		$rsult = $query_dtls->execute();
+	// 		$data_fetch = $rsult->fetchObject();
+	// 		/* End */
 
-			if($data_fetch->division_id != '' && $data_fetch->subdiv_id != '') { // Added by Subham 30-12-2024
-				if($data_fetch->subdiv_id != 0) {								// Added by Subham 30-12-2024
-					$query = db_select('housing_applicant', 'ha');
+	// 		if($data_fetch->division_id != '' && $data_fetch->subdiv_id != '') { // Added by Subham 30-12-2024
+	// 			if($data_fetch->subdiv_id != 0) {								// Added by Subham 30-12-2024
+	// 				$query = db_select('housing_applicant', 'ha');
 
-					// $query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');  //off by dg 30-12-2024
-					$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');  //added by dg 30-12-2024 
-					$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
-					$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
-					$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
-					$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
-					$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
-					$query->innerJoin('users', 'u', 'u.uid = haod.uid');
-					// $query->leftJoin('users', 'u', 'u.uid = haod.uid');
+	// 				// $query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');  //off by dg 30-12-2024
+	// 				$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');  //added by dg 30-12-2024 
+	// 				$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+	// 				$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+	// 				$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+	// 				$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+	// 				$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+	// 				$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+	// 				// $query->leftJoin('users', 'u', 'u.uid = haod.uid');
 
-					$query->condition('hoa.status', 'existing_occupant', '=');
-					// $query->condition('haod.is_active', 1, '=');
+	// 				$query->condition('hoa.status', 'existing_occupant', '=');
+	// 				// $query->condition('haod.is_active', 1, '=');
 
 
-					$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
+					// $query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
 					
 
-					$query->addField('ha', 'applicant_name');
-					$query->addField('he', 'estate_name');
-					$query->addField('hft', 'flat_type');
-					$query->addField('haod', 'hrms_id');
-					$query->addField('u', 'status');
-					$query->addField('haod', 'uid');
-					$query->addField('hf', 'flat_id');
+					// $query->addField('ha', 'applicant_name');
+					// $query->addField('he', 'estate_name');
+					// $query->addField('hft', 'flat_type');
+					// $query->addField('haod', 'hrms_id');
+					// $query->addField('u', 'status');
+					// $query->addField('haod', 'uid');
+					// $query->addField('hf', 'flat_id');
 
-					$db_and = db_and();														// Added by Subham 30-12-2024
-					$db_and->condition('he.division_id', $data_fetch->division_id, '=');	// Added by Subham 30-12-2024
-					$db_and->condition('he.subdiv_id', $data_fetch->subdiv_id, '=');		// Added by Subham 30-12-2024
-					$query->condition($db_and);												// Added by Subham 30-12-2024
-
-					$result =$query->execute();
-
-				} else{																		// Added by Subham 30-12-2024
-					$query = db_select('housing_applicant', 'ha');
-
-					// $query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');  //off by dg 30-12-2024
-					$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');  //added by dg 30-12-2024 
-					$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
-					$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
-					$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
-					$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
-					$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
-					$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+	// 				$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
 					
-					$query->condition('hoa.status', 'existing_occupant', '=');
-					// $query->condition('haod.is_active', 1, '=');
 
-					$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
+	// 				$query->addField('ha', 'applicant_name');
+	// 				$query->addField('he', 'estate_name');
+	// 				$query->addField('hft', 'flat_type');
+	// 				$query->addField('haod', 'hrms_id');
+	// 				$query->addField('u', 'status');
+	// 				$query->addField('haod', 'uid');
+	// 				$query->addField('hf', 'flat_id');
 
-					$query->addField('ha', 'applicant_name');
-					$query->addField('he', 'estate_name');
-					$query->addField('hft', 'flat_type');
-					$query->addField('haod', 'hrms_id');
-					$query->addField('u', 'status');
-					$query->addField('haod', 'uid');
-					$query->addField('hf', 'flat_id');
+	// 				$db_and = db_and();														// Added by Subham 30-12-2024
+	// 				$db_and->condition('he.division_id', $data_fetch->division_id, '=');	// Added by Subham 30-12-2024
+	// 				$db_and->condition('he.subdiv_id', $data_fetch->subdiv_id, '=');		// Added by Subham 30-12-2024
+	// 				$query->condition($db_and);												// Added by Subham 30-12-2024
 
-					$query->condition('he.division_id', $data_fetch->division_id, '=');		// Added by Subham 30-12-2024
-					$result =$query->execute();
-				}
-			}
+	// 				$result =$query->execute();
+
+	// 			} else{																		// Added by Subham 30-12-2024
+	// 				$query = db_select('housing_applicant', 'ha');
+
+	// 				// $query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');  //off by dg 30-12-2024
+	// 				$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');  //added by dg 30-12-2024 
+	// 				$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+	// 				$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+	// 				$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+	// 				$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+	// 				$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+	// 				$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+					
+	// 				$query->condition('hoa.status', 'existing_occupant', '=');
+	// 				// $query->condition('haod.is_active', 1, '=');
+
+					// $query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
+
+	// 				$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
+
+	// 				$query->addField('ha', 'applicant_name');
+	// 				$query->addField('he', 'estate_name');
+	// 				$query->addField('hft', 'flat_type');
+	// 				$query->addField('haod', 'hrms_id');
+	// 				$query->addField('u', 'status');
+	// 				$query->addField('haod', 'uid');
+	// 				$query->addField('hf', 'flat_id');
+
+	// 				$query->condition('he.division_id', $data_fetch->division_id, '=');		// Added by Subham 30-12-2024
+	// 				$result =$query->execute();
+	// 			}
+	// 		}
 			
 
-			$header['Serial No.'] = array('data' => 'Serial No.');
-			$header['Applicant Name'] = array('data' => 'Applicant Name');
-			$header['HRMS Code'] = array('data' => 'HRMS Code');
-			$header['Estate Name'] = array('data' => 'Estate Name');
-			$header['Flat Type'] = array('data' => 'Flat Type');
-			$header['Approval Status'] = array('data' => 'Approval Status');
-			$header['Details'] = array('data' => 'Details');
-			$header['Edit'] = array('data' => 'Edit');
-            // Added 22-05-2025 by Subham
-			if($user_role == 8){
-				$header['Action'] = array('data' => 'Action');
-			}
+			// $header['Serial No.'] = array('data' => 'Serial No.');
+			// $header['Applicant Name'] = array('data' => 'Applicant Name');
+			// $header['HRMS Code'] = array('data' => 'HRMS Code');
+			// $header['Estate Name'] = array('data' => 'Estate Name');
+			// $header['Flat Type'] = array('data' => 'Flat Type');
+			// $header['Approval Status'] = array('data' => 'Approval Status');
+			// $header['Details'] = array('data' => 'Details');
+			// $header['Edit'] = array('data' => 'Edit');
+            // // Added 22-05-2025 by Subham
+			// if($user_role == 8){
+			// 	$header['Action'] = array('data' => 'Action');
+			// }
+	// 		$header['Serial No.'] = array('data' => 'Serial No.');
+	// 		$header['Applicant Name'] = array('data' => 'Applicant Name');
+	// 		$header['HRMS Code'] = array('data' => 'HRMS Code');
+	// 		$header['Estate Name'] = array('data' => 'Estate Name');
+	// 		$header['Flat Type'] = array('data' => 'Flat Type');
+	// 		$header['Approval Status'] = array('data' => 'Approval Status');
+	// 		$header['Details'] = array('data' => 'Details');
+	// 		$header['Edit'] = array('data' => 'Edit');
+    //         // Added 22-05-2025 by Subham
+	// 		if($user_role == 8){
+	// 			$header['Action'] = array('data' => 'Action');
+	// 		}
 
-			$rows =array();
-			$output = '';
-			$serialNumber = 1;
+	// 		$rows =array();
+	// 		$output = '';
+	// 		$serialNumber = 1;
 		
-		while($data = $result->fetchObject()) {
-			$fields = array();
+	// 	while($data = $result->fetchObject()) {
+	// 		$fields = array();
       
-			$fields[] = $serialNumber;
-			$fields[] = $data->applicant_name;
-			$fields[] = $data->hrms_id;
-			$fields[] = $data->estate_name;
-			$fields[] = $data->flat_type;
-			if($data->status == 0){
-				$fields[] = 'Pending Approval at Division Level';
-			}else{
-				$fields[] = 'Approved by Division';
-			}
-			$fields[] = l(
-            'View Details',
-            'existing-occupant-view-det/'. encrypt_url($data->uid),
-            array(
-                'html'=>TRUE,
-                'attributes'=> array('class'=>array('btn bg-success btn-sm px-4 rounded-pill text-white fw-bolder')),
-            ));
-			// Added 22-05-2025
-			if($user_role == 8){
-				/*Added by Moumita 21-05-2025  ~~~~~~ Flat id added in link by Subham dt.22-05-2025*/
-				$fields[] = l('<i class="fa fa-trash"></i> Delete', 'rhe-wise-flat-occupant-delete/legacy/'.encrypt_url($data->housing_existing_occupant_draft_id).'/'.encrypt_url($data->flat_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
-				/*end*/	
-			}
+			// $fields[] = $serialNumber;
+			// $fields[] = $data->applicant_name;
+			// $fields[] = $data->hrms_id;
+			// $fields[] = $data->estate_name;
+			// $fields[] = $data->flat_type;
+			// if($data->status == 0){
+			// 	$fields[] = 'Pending Approval at Division Level';
+			// }else{
+			// 	$fields[] = 'Approved by Division';
+			// }
+			// $fields[] = l(
+            // 'View Details',
+            // 'existing-occupant-view-det/'. encrypt_url($data->uid),
+            // array(
+            //     'html'=>TRUE,
+            //     'attributes'=> array('class'=>array('btn bg-success btn-sm px-4 rounded-pill text-white fw-bolder')),
+            // ));
+			// // Added 22-05-2025
+			// if($user_role == 8){
+			// 	/*Added by Moumita 21-05-2025  ~~~~~~ Flat id added in link by Subham dt.22-05-2025*/
+			// 	$fields[] = l('<i class="fa fa-trash"></i> Delete', 'rhe-wise-flat-occupant-delete/draft/'.encrypt_url($data->housing_existing_occupant_draft_id).'/'.encrypt_url($data->flat_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
+			// 	/*end*/	
+			// }
+			// $serialNumber++;
 
-			$fields[] = l('<i class="fa fa-edit"></i> Edit Details', 'existing-occupant-edit/'. encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+	// 		$rows[] = $fields;
 			
-			$serialNumber++;
+	// 	}
 
-			$rows[] = $fields;
-			
-		}
+	// 	$variables = array(
+	// 		'attributes' => array('class'=>array('table table-list table-striped')),
+	// 		'header' => $header,
+	// 		'rows' => $rows,
+	// 		'sticky' => true,
+	// 		'empty' => t("No data found!") // The message to be displayed if table is empty
+	// 	  );
+  	// 	//end
 
-		$variables = array(
-			'attributes' => array('class'=>array('table table-list table-striped')),
-			'header' => $header,
-			'rows' => $rows,
-			'sticky' => true,
-			'empty' => t("No data found!") // The message to be displayed if table is empty
-		  );
-  		//end
-
-		if(count($rows) > 0) {
-			// Render using Drupal's render API.
-			$build['datatable'] = array(
-			  '#theme' => 'datatable',
-			  '#header' => $header,
-			  '#rows' => $rows,
-			  '#attributes' => array(),
-			);
+	// 	if(count($rows) > 0) {
+	// 		// Render using Drupal's render API.
+	// 		$build['datatable'] = array(
+	// 		  '#theme' => 'datatable',
+	// 		  '#header' => $header,
+	// 		  '#rows' => $rows,
+	// 		  '#attributes' => array(),
+	// 		);
 			
-			// Or, render using a theme function.
-			$variables = array(
-			  'attributes' => array('class'=>array('table table-list table-striped')),
-			  'header' => $header,
-			  'rows' => $rows,
-			);
+	// 		// Or, render using a theme function.
+	// 		$variables = array(
+	// 		  'attributes' => array('class'=>array('table table-list table-striped')),
+	// 		  'header' => $header,
+	// 		  'rows' => $rows,
+	// 		);
 			
-			$output = theme('datatable', $variables);
-		}
-		else {
-			$output = '<div>
-							<table class="datatable_no_data_found table table-list">
-								<tr class="tr_no_data_found">
-									<th class="th_no_data_found"></th>
-								</tr>
-								<tr class="tr_no_data_found">
-									<td class="td_no_data_found">No data found!</td>
-								</tr>
-							</table>
-						</div>';
-		}
+	// 		$output = theme('datatable', $variables);
+	// 	}
+	// 	else {
+	// 		$output = '<div>
+	// 						<table class="datatable_no_data_found table table-list">
+	// 							<tr class="tr_no_data_found">
+	// 								<th class="th_no_data_found"></th>
+	// 							</tr>
+	// 							<tr class="tr_no_data_found">
+	// 								<td class="td_no_data_found">No data found!</td>
+	// 							</tr>
+	// 						</table>
+	// 					</div>';
+	// 	}
 	
-		return $output;
-	}
+	// 	return $output;
+	// }
 
 
 	function existing_occupant_view_details($uid = ''){
@@ -822,6 +859,7 @@
 
 		$result =$query->execute();
 		$data = $result->fetchObject();
+		
 		
 
 		$present_address_parts = array_filter([

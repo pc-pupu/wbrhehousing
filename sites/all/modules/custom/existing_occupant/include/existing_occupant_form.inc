@@ -442,6 +442,7 @@
 			'#suffix' => '</div></div>',
 			'#validated' => TRUE,
 			'#attributes' => array('class'=>array('form-control')),
+			'#default_value' => '1',
 			
 		);
 		$form['official_info']['pay_in'] = array(
