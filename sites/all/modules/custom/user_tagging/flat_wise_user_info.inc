@@ -3,9 +3,13 @@
 function flat_wise_user_info(){
     // list all request for user tagging
 
-    $query = db_select('housing_user_tagging', 'hut');
-    $query->fields('hut',array());
     
+	$query = db_select('housing_user_tagging', 'hut');
+    $query->fields('hut',array());
+
+	$query->innerJoin('housing_existing_occupant_draft','heod','heod.flat_id = hut.flat_id');
+    $query->fields('heod',array());
+
     $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hut.flat_id');
     $query->fields('hf',array('floor','flat_no','flat_id'));
 
@@ -22,6 +26,7 @@ function flat_wise_user_info(){
     $inarr = array('new','pending');
     
     $query->condition('hut.flag',$inarr, 'in');
+	$query->condition('hf.flat_status_id',2);
 	
     $result = $query->execute();
 
@@ -127,7 +132,7 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 	$result_tag = $query_tag->fetchObject();
 	// print_r($result_tag);
 
-	$license_no_tag = ($result_tag->license_no !='') ? $result_tag->license_no : 'N/A';
+	$license_no_tag = ($result_tag->license_no !='') ? $result_tag->license_no : 'Not Available';
 
 	// get user info by flat_id from draft table
 
@@ -135,7 +140,7 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 	$result_draft = $query_draft->fetchObject();
 	// print_r($result_draft); die;
 
-	$license_no_draft = ($result_draft->license_no !='') ? $result_draft->license_no : 'N/A';
+	$license_no_draft = ($result_draft->license_no !='') ? $result_draft->license_no : 'Not Available';
 
 
 
@@ -151,33 +156,32 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 					</tr>
 					<tr>
 						<td>Applicant Name </td>
-						<td>'.$result_tag->applicant_name.'</td> 
-						<td>'.$result_draft->applicant_name.'</td> 
+						<td align="center">'.$result_tag->applicant_name.'</td> 
+						<td align="center">'.$result_draft->applicant_name.'</td> 
 					</tr>
 					<tr>
 						<td>HRMS </td>
-						<td>'.$result_tag->hrms_id.'</td> 
-						<td>'.$result_draft->hrms_id.'</td> 
+						<td align="center">'.$result_tag->hrms_id.'</td> 
+						<td align="center">'.$result_draft->hrms_id.'</td> 
 					</tr>
 					<tr>
 						<td>Contact Number </td>
-						<td>'.$result_tag->mobile_no.'</td> 
-						<td>'.$result_draft->mobile_no.'</td> 
+						<td align="center">'.$result_tag->mobile_no.'</td> 
+						<td align="center">'.$result_draft->mobile_no.'</td> 
 					</tr>
 					<tr>
 						<td>Date of Birth </td>
-						<td>'.$result_tag->dob.'</td> 
-						<td>'.$result_draft->date_of_birth.'</td> 
+						<td align="center">'.$result_tag->dob.'</td> 
+						<td align="center">'.$result_draft->date_of_birth.'</td> 
 					</tr>
 		           	<tr>
-						<td>Flat Information</td>
-						<td colspan="2" style="text-align: center;">'.$flat_info.'</td> 
-						 
+						<td>License Information</td>
+						<td align="center">'.$license_no_tag.'</td> 
+						<td align="center">'.$license_no_draft.'</td> 
 					</tr>
 					<tr>
-						<td>License Information</td>
-						<td>'.$license_no_tag.'</td> 
-						<td>'.$license_no_draft.'</td> 
+						<td>Flat Information</td>
+						<td colspan="2" align="center">'.$flat_info.'</td>  
 					</tr>
 		          
 		        </table>
@@ -201,7 +205,8 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 		'name' => $result_tag->applicant_name,
 		'dob' => $result_tag->dob,
 		'mobile' => $result_tag->mobile_no,
-		'hrmsid' => $result_tag->hrms_id
+		'hrmsid' => $result_tag->hrms_id,
+		'user_id' => $result_tag->uid
 	);
 
 	$form['form_info_array'] = array(
@@ -267,7 +272,7 @@ function flat_wise_user_details_submit($form, $form_state){
 		// set uid in housing_applicant, housing_applicant_official_details, update tagging table with remarks
 		// housing_applicant
 		$housingAppliArr = array(
-			'uid' => $user->uid,
+			'uid' => $form_info_array['user_id'],
 			'applicant_name' => $form_info_array['name'],
 			'date_of_birth' => $form_info_array['dob'],
 			'mobile_no' => $form_info_array['mobile'],
@@ -275,18 +280,21 @@ function flat_wise_user_details_submit($form, $form_state){
 		$housing_applicant_id = db_insert('housing_applicant')->fields($housingAppliArr)->execute();
 		// housing_applicant_official_details
 		$housingAppliOffic = array(
-			'uid' => $user->uid,
+			'uid' => $form_info_array['user_id'],
 			'housing_applicant_id' => $housing_applicant_id
 		);
-		$applicant_official_detail_id = db_insert('housing_applicant_official_detail')->fields($housingAppliArr)->execute();
+		$applicant_official_detail_id = db_insert('housing_applicant_official_detail')->fields($housingAppliOffic)->execute();
 
 		// housing_online_application
 		$housing_online_applicationArr = array(
 			'applicant_official_detail_id' => $applicant_official_detail_id,
-			'status' => '',
-			'application_no' => 'EO'
+			'status' => 'existing_occupant',
+			'is_backlog_applicant' => 2
 		);
 		$online_application_id = db_insert('housing_online_application')->fields($housing_online_applicationArr)->execute();
+
+		// update for application_no generation
+		db_update('housing_online_application')->fields(array('application_no' => 'EO-'.trim(date('dmY')).'-'.$online_application_id))->condition('online_application_id', $online_application_id)->execute();
 
 		// housing_flat_occupant
 		$housing_flat_occupantArr = array(
@@ -300,14 +308,14 @@ function flat_wise_user_details_submit($form, $form_state){
 		db_update('housing_flat')->fields(array('flat_status_id' => 2))->condition('flat_id', $val['flat_id_hidden'])->execute();
 		
 		// update housing_user_tagging by flat_id 
-		db_update('housing_flat')->fields(array('flag' => 'tagged'))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
+		db_update('housing_user_tagging')->fields(array('flag' => 'tagged'))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
 
 	}elseif($action_type=='pending'){
 		// update housing_user_tagging by flat_id 
-		db_update('housing_flat')->fields(array('flag' => 'pending'))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
+		db_update('housing_user_tagging')->fields(array('flag' => 'pending'))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
 
 	}elseif($action_type=='reject'){
 		// update housing_user_tagging by flat_id 
-		db_update('housing_flat')->fields(array('flag' => 'reject', 'status' => 0))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
+		db_update('housing_user_tagging')->fields(array('flag' => 'reject', 'status' => 0))->condition('housing_user_tagging_id', $val['housing_user_tagging_id_hidden'])->execute();
 	}
 }

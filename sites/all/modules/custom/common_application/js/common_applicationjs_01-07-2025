@@ -210,20 +210,6 @@ jQuery(document).ready(function(){
 });
 /*End*/
 
-/*Done by Subham 30-06-2025*/
-jQuery(document).ready(function(){
-    jQuery("#edit-license-renewal-date").datepicker({
-        dateFormat: "dd/mm/yy",
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "1947:" + new Date().getFullYear(),
-        minDate: new Date(1947, 0, 1),
-        maxDate: new Date(),
-        autoSize: true
-    }); 
-});
-/*End*/
-
 
 jQuery(document).ready(function () {
 	

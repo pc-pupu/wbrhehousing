@@ -64,11 +64,7 @@ global $user, $user_role,$base_path,$base_root;
                     
                     
                 </ul>
-<<<<<<< HEAD
-            </li>
-=======
             </li> 
->>>>>>> 3ab3d01921b29297572ffdd72bd3808a945a8072
 
             <?php // added by moumita on 26-06-2025 
             }

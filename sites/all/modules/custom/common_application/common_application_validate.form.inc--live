@@ -18,11 +18,7 @@
 	
 	function element_validate_alphabatic_fullstop($element, &$form_state) {
 		$value = trim($element['#value']);
-		// if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.]*$/",$value)) {
-		// 	form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
-		// }
-		// changed on 08-07-2025 by Moumita
-		if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.\(\)\&_]*$/", $value)) {
+		if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.]*$/",$value)) {
 			form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
 		}
 	}
@@ -43,8 +39,7 @@
 	
 	function element_validate_streetaddress($element, &$form_state) {
 		$value = trim($element['#value']);
-	//	if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\w\s]+[a-zA-Z0-9]*$/",$value)) {
-		if($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\(\)\w\s]+[a-zA-Z0-9]*$/",$value)){
+		if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\w\s]+[a-zA-Z0-9]*$/",$value)) {
 			form_set_error($element['#name'], t('" %name " must be alphanumeric. Only special characters . , - / allowed.', array('%name' => $element['#title'])));
 		}
 	}

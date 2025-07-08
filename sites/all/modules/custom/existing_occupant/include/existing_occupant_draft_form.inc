@@ -642,7 +642,7 @@
 				'#title' => t('License No.'),
 				'#type' => 'textfield',
 				// '#required' => TRUE,
-				'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+				'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 				'#suffix' => '</div></div>',
 				//'#element_validate' => array('element_validate_alphabatic_text'), 
 				'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()",'class'=>array('form-control')), 
@@ -654,10 +654,21 @@
 				'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dol','class'=>array('form-control')),
 				// '#required' => TRUE,
 				//'#validated' => TRUE,
-				'#prefix' => '<div class="col-md-6"><div class="form-floating">',
+				'#prefix' => '<div class="col-md-4"><div class="form-floating">',
+				'#suffix' => '</div></div>',
+				//'#element_validate' => array('element_validate_date', 'element_validate_age'),
+			);
+			/*Added by Subham 30-06-2025*/
+			$form['license']['license_last_renewal'] = array(
+				'#title' => t('Last License Renewal Date'),
+				'#type' => 'textfield',
+				'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-license-renewal-date','class'=>array('form-control')),
+				// '#required' => TRUE,
+				'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 				'#suffix' => '</div></div></div>',
 				//'#element_validate' => array('element_validate_date', 'element_validate_age'),
 			);
+			/*End*/
 
 			$form['license']['authorised_or_not'] = array(
 				'#title' => t('Occupant Status'),
@@ -873,6 +884,7 @@
 		$applicant_personal_detail_arr['license_issue_date']  = !empty(trim($license_issue_date)) ? trim($license_issue_date) : NULL; 
 		$applicant_personal_detail_arr['authorised_or_not']  = !empty(trim($form_state['values']['authorised_or_not'])) ? trim($form_state['values']['authorised_or_not']) : NULL; 
 		$applicant_personal_detail_arr['license_expiry_date']  =isset($license_expiry_date) ? $license_expiry_date : null;
+		$applicant_personal_detail_arr['last_license_renewal_date']  =  !empty($form_state['values']['license_last_renewal']) ? trim(implode('-', array_reverse(explode('/', $form_state['values']['license_last_renewal'])))) : NULL;
 
 		if($form_state['values']['uploaded_licence'] != 0) {
 			$file_licence = file_load($form_state['values']['uploaded_licence']);
