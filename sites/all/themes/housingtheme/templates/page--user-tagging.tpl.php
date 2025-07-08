@@ -1,5 +1,5 @@
 <?php
-    global $user;
+    global $user, $base_root, $base_path;
     // check hrms exist in user-tagging table
     $checkExist = 0;
     $query = db_query("select housing_user_tagging_id from housing_user_tagging where hrms_id= '".$user->name."'");
@@ -14,8 +14,8 @@
 
 <div class="dashboard">
     <div class="sidebar d-flex flex-column p-3">
-        <a href="http://localhost/housing/" class="d-flex flex-column align-items-center mb-5 text-center">
-            <img src="http://localhost/housing/sites/all/themes/housingtheme/images/wb-logo.png" class="img-fluid" alt="e-Allotment of Rental Housing Estate">
+        <a href="<?= $base_root.$base_path ?>" class="d-flex flex-column align-items-center mb-5 text-center">
+            <img src="<?= $base_root.$base_path?>sites/all/themes/housingtheme/images/wb-logo.png" class="img-fluid" alt="e-Allotment of Rental Housing Estate">
             <div class="dashboard-logo">
                 <div class="fs-5 fw-semibold lh-1">e-Allotment of Rental Housing Estate</div>
                 <small>Housing Department <br> Government of West Bengal</small>
