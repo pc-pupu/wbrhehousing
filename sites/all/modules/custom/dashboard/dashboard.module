@@ -64,9 +64,38 @@ function dashboard_content() {
   //     $verified_status_app = 'housingapprover_approved_2';
   //     $rejected_status_app = 'housingapprover_reject2';
   // }
+<<<<<<< HEAD
   
 
   if($user_role == 4 || $user_role == 5){
+=======
+   
+
+  if($user_role == 4 || $user_role == 5){
+
+    if($user_role == 4){
+
+      $check_user_login_type = $_COOKIE['user_type'];
+
+      if($check_user_login_type =='new'){
+        unset($_COOKIE['user_type']);
+        return theme('custom_dashboard_template', array('output' => $output));
+      }else{
+        // checking hrms exist or not
+        $queryhrms = db_query("select flag from housing_user_tagging where hrms_id = '".$user->name."' ");
+        $resulthrms = $queryhrms->fetchObject();
+        if(empty($resulthrms)){
+          drupal_goto('user-tagging');
+        }else{
+          if($resulthrms->flag =='new'){
+            drupal_set_message('Please wait for the departmental approval.');
+            drupal_goto('user-tagging');
+          }
+        }
+      }
+    }
+    unset($_COOKIE['user_type']);
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     
     $output['user_info'] = getHRMSUserData($user->name); 
     $output['user_info']['email'] = isset($output['user_info']['email'])? $output['user_info']['email'] : (($user->mail!='') ? $user->mail : 'N/A');
@@ -119,15 +148,20 @@ function dashboard_content() {
     $output['fetch_license_status'] = $query2->execute()->fetchObject();
 
 
+<<<<<<< HEAD
 		
     // print_r($output['fetch_license_status']);die;
     //print_r($output);die;
     ////end////
+=======
+   
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
   }else if($user_role == 6 || $user_role == 7 || $user_role == 8 || $user_role == 10 || $user_role == 11 || $user_role == 13 || $user_role == 17){   //user role 13 added by debaleena 04-09-2024
 
     $roleArr = $user->roles; 
 
+<<<<<<< HEAD
     //05-07-2025 start
     if($user_role==11){
       $result = db_query("select hrms_id from  housing_ddo_hrms_mapping where  ddo_code=:ddo_code and is_active = 'Y' ", array(':ddo_code'=> $user->name));
@@ -151,6 +185,12 @@ function dashboard_content() {
 
 
     
+=======
+    $output['user_info']['applicantName'] = $user->name;
+    $output['user_info']['mobileNo'] = 'N/A';
+    $output['user_info']['applicantDesignation'] = $roleArr[$user_role];
+    $output['user_info']['email'] = $user->mail;
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
     /////added by dg 23-12-2024//////////
 

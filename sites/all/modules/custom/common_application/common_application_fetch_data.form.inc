@@ -47,6 +47,7 @@ function redir( $checkingUrl = '', $Entity = '', $db_and = '', $online_applicati
 /* fetch rhe flat_type corresponding to payband*/
   function rhe_flat_type_rst_pay_band_id($pay_band_id) {
 
+<<<<<<< HEAD
   // echo "lll"."<br>".$pay_band_id;
 	//$query = db_select('housing_pay_band', 'hpb');  //off by dg 20-06-2025
   $query = db_select('housing_pay_band_categories', 'hpbc');  //added by dg 20-06-2025
@@ -54,6 +55,13 @@ function redir( $checkingUrl = '', $Entity = '', $db_and = '', $online_applicati
 	'hft.flat_type_id = hpbc.flat_type_id');
 	$query->addField('hft', 'flat_type');
 	$query->condition('hpbc.pay_band_id', $pay_band_id, '=');
+=======
+	$query = db_select('housing_pay_band', 'hpb');
+	$query->innerJoin('housing_flat_type', 'hft',
+	'hft.flat_type_id = hpb.flat_type_id');
+	$query->addField('hft', 'flat_type');
+	$query->condition('hpb.pay_band_id', $pay_band_id, '=');
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	$result = $query->execute();
 	$str = '';
 	if($result->rowcount() > 0){

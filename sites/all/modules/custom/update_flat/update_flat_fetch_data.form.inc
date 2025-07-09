@@ -207,13 +207,18 @@
 		$query->addField('he', 'estate_name');
 		$query->addField('he', 'estate_address');
 		$query->addField('hd', 'district_name');
+<<<<<<< HEAD
 		$query->addField('hb', 'block_name');
+=======
+		$query->addField('hb', 'block_name');	
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		$query->addField('hfs', 'flat_status');
 		$query->addField('hfs', 'flat_status_code');
 		$query->addField('hfs', 'is_occupied');
 		$query->addField('hft', 'flat_type');
 		$query->addField('hf', 'remarks');
 
+<<<<<<< HEAD
 		// Complex expression to handle mixed flat_no values for sorting
 		// This uses PostgreSQL's REGEXP_REPLACE to extract leading digits
 		// and then tries to cast them to INTEGER.
@@ -307,5 +312,41 @@
 		
 		// // echo $query;die;
 		// return $query->execute();	
+=======
+		/*Added by Moumita 21-05-2025 ~~~~~~~ Turned off by Subham dt.22-05-2025*/
+		// $floor_order_alias = "CASE 
+		// 	WHEN hf.floor = 'Ground' THEN 0
+		// 	WHEN hf.floor = 'First' THEN 1
+		// 	WHEN hf.floor = 'Second' THEN 2
+		// 	WHEN hf.floor = 'Third' THEN 3
+		// 	WHEN hf.floor = 'Fourth' THEN 4
+		// 	WHEN hf.floor = 'Fifth' THEN 5
+		// 	WHEN hf.floor = 'Sixth' THEN 6
+		// 	WHEN hf.floor = 'Seventh' THEN 7
+		// 	WHEN hf.floor = 'Eighth' THEN 8
+		// 	WHEN hf.floor = 'Top' THEN 9
+		// 	ELSE 10
+		// END"; 
+
+		$query->addExpression('CAST(hf.flat_no AS INTEGER)', 'flat_no_numeric');  //added by dg as dept requirement23-05-2025
+		$query->orderBy('hb.block_name', 'ASC');
+		$query->orderBy('flat_no_numeric', 'ASC');
+		//$query->orderBy('block_name', 'ASC');
+
+		//$query->orderBy('flat_no', 'ASC');
+		// $query->orderBy($floor_order_alias, 'ASC');   // Turned off by Subham dt.22-05-2025
+		/*END*/
+		
+		if($rhe_name != 0){
+			$db_and = db_and();
+			$db_and->condition('he.estate_id',$rhe_name,'=');
+			$query->condition($db_and);
+		}
+		
+		// $query->orderBy('flat_id', 'ASC');
+		
+		// echo $query;die;
+		return $query->execute();	
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		
 	}

@@ -3,6 +3,7 @@ function cms_content_menu() {
     $items = array();
 
     $items['cms-content-add'] = array(
+<<<<<<< HEAD
       'title' => 'Add CMS Content',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('cms_content_add_form'),
@@ -30,6 +31,16 @@ function cms_content_menu() {
       'access arguments' => array('administer CMS Content Management')
     );
     
+=======
+        'title' => 'Add CMS Content',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('cms_content_form'),
+        'file' => 'cms_content_form.inc',
+        'access arguments' => array('access content'),
+        // 'access arguments' => array('administer CMS Content Management')
+        );
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     return $items;
 }
 
@@ -42,6 +53,7 @@ function cms_content_permission() {
   );	
 }
 
+<<<<<<< HEAD
 function cms_content_list_view() {
   global $base_root, $base_path;
   $output = '';
@@ -162,3 +174,5 @@ function cms_content_validate($form, &$form_state) {
         }
     }
 }
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2

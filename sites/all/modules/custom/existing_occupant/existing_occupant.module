@@ -60,6 +60,7 @@
 			//'access callback'=>TRUE
 		);
 		/* end */
+<<<<<<< HEAD
         // off on 25-06-2025 by Moumita
 		// $items['rhewise_occupant_draft_list'] = array(
 		// 	'title' => 'Existing Occupant List Without HRMS ID',
@@ -77,6 +78,15 @@
 			'page arguments'=> array('existing_occupant_draft_list_form'),   // updated by Subham dt.24-06-2025
 			'file' => 'include/existing_occupant_draft_list_form.inc',  	 // updated by Subham dt.24-06-2025
 			'access arguments' => array('administer Existing Occupant')
+=======
+
+		$items['rhewise_occupant_draft_list'] = array(
+			'title' => 'Existing Occupant List Without HRMS ID',
+			'page callback'=>'rhewise_occupant_draft_list',
+			//'page arguments'=> array('rhewise_occupant_draft_list_form'),
+			'file' => 'include/rhewise_occupant_draft_list.inc',
+			'access arguments' => array('administer Existing Occupant Draft List')
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			// 'access arguments' => array('administer Existing Occupant List')
 		);
 
@@ -105,6 +115,7 @@
 		);
 
 		/*Done by Subham*/
+<<<<<<< HEAD
 		// $items['view-occupant-list'] = array(
 		// 	'title' => 'Existing Occupant List',
 		// 	'page callback' => 'view_occupant_list_form',
@@ -120,6 +131,13 @@
 			'file' => 'include/existing_occupant_list_form.inc',  	   // updated by Subham dt.24-06-2025
 			'access arguments' => array('administer Existing Occupant')
 			// 'access arguments' => array('administer Existing Occupant List')
+=======
+		$items['view-occupant-list'] = array(
+			'title' => 'Existing Occupant List',
+			'page callback' => 'view_occupant_list_form',
+			'page arguments' => array(),
+			'access arguments' => array('access content')
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		);
 
 		$items['view-unauthorised-occupants'] = array(
@@ -160,6 +178,7 @@
 			'access arguments' => array('administer RHE wise flat list Master'),
 		);
 
+<<<<<<< HEAD
 		// added by Subham 19-06-2025
 		$items['existing-occupant-edit/%'] = array(
 	  		'title' => 'Edit Existing Occupant Data',
@@ -187,6 +206,8 @@
 		// ennd moumita
 
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		return $items;
 	}
 	
@@ -235,11 +256,14 @@
 				'title' => t('Administer Existing Occupant Draft List View'),
 				'description' => t('Perform Administer to see existing occupant draft list.'),
 			),
+<<<<<<< HEAD
 
 			'administer Existing Occupant Edit' => array(
 				'title' => t('Administer Existing Occupant Edit'),
 				'description' => t('Perform Administer to Edit Existing Occupant Data.'),
 			),
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		);	
 	}
 	
@@ -631,10 +655,13 @@
 					$query->condition('hoa.status', 'existing_occupant', '=');
 					// $query->condition('haod.is_active', 1, '=');
 
+<<<<<<< HEAD
 
 					$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
 					
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 					$query->addField('ha', 'applicant_name');
 					$query->addField('he', 'estate_name');
 					$query->addField('hft', 'flat_type');
@@ -665,8 +692,11 @@
 					$query->condition('hoa.status', 'existing_occupant', '=');
 					// $query->condition('haod.is_active', 1, '=');
 
+<<<<<<< HEAD
 					$query->addField('hoa', 'online_application_id'); // added by Moumita on 24-06-2025
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 					$query->addField('ha', 'applicant_name');
 					$query->addField('he', 'estate_name');
 					$query->addField('hft', 'flat_type');
@@ -688,8 +718,13 @@
 			$header['Flat Type'] = array('data' => 'Flat Type');
 			$header['Approval Status'] = array('data' => 'Approval Status');
 			$header['Details'] = array('data' => 'Details');
+<<<<<<< HEAD
 			$header['Edit'] = array('data' => 'Edit');
             // Added 22-05-2025 by Subham
+=======
+			$header['Details'] = array('data' => 'Details');
+			// Added 22-05-2025
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			if($user_role == 8){
 				$header['Action'] = array('data' => 'Action');
 			}
@@ -721,12 +756,18 @@
 			// Added 22-05-2025
 			if($user_role == 8){
 				/*Added by Moumita 21-05-2025  ~~~~~~ Flat id added in link by Subham dt.22-05-2025*/
+<<<<<<< HEAD
 				$fields[] = l('<i class="fa fa-trash"></i> Delete', 'rhe-wise-flat-occupant-delete/legacy/'.encrypt_url($data->housing_existing_occupant_draft_id).'/'.encrypt_url($data->flat_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
 				/*end*/	
 			}
 
 			$fields[] = l('<i class="fa fa-edit"></i> Edit Details', 'existing-occupant-edit/'. encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
 			
+=======
+				$fields[] = l('<i class="fa fa-trash"></i> Delete', 'rhe-wise-flat-occupant-delete/draft/'.encrypt_url($data->housing_existing_occupant_draft_id).'/'.encrypt_url($data->flat_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
+				/*end*/	
+			}
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			$serialNumber++;
 
 			$rows[] = $fields;
@@ -822,7 +863,11 @@
 
 		$result =$query->execute();
 		$data = $result->fetchObject();
+<<<<<<< HEAD
 		
+=======
+		//print_r($data);die;
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 		$present_address_parts = array_filter([
 			$data->present_street ?? '',
@@ -1024,7 +1069,12 @@
 
 
 
+<<<<<<< HEAD
 	function existing_occupant_view_details_draft($housing_existing_occupant_draft_id = '')	{
+=======
+	function existing_occupant_view_details_draft($housing_existing_occupant_draft_id = '')
+	{
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		$housing_existing_occupant_draft_id = decrypt_url($housing_existing_occupant_draft_id);
 
 		$query = db_select('housing_existing_occupant_draft', 'heod');
@@ -1251,7 +1301,11 @@
 	}
 
 	// Done by Moumita 21-05-2025
+<<<<<<< HEAD
 function rhe_wise_flat_occupant_delete($val = '', $occupant_id_enc = '', $flat_id_enc = ''){
+=======
+	function rhe_wise_flat_occupant_delete($val = '', $occupant_id_enc = '', $flat_id_enc = ''){
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	$occupant_id = decrypt_url($occupant_id_enc);
 	$flat_id = decrypt_url($flat_id_enc);
 

@@ -34,6 +34,7 @@
 					$db_and->condition('he.subdiv_id', $data_fetch->subdiv_id, '=');		
 					$query->condition($db_and);
 
+<<<<<<< HEAD
 					/* added by dg 11-06-2025 */
 					$query->addExpression(
 					    "CASE
@@ -49,13 +50,18 @@
 					$query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
 					$query->orderBy('hf.flat_no', 'ASC');
 					/* end */
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 					$result =$query->execute();
 
 				} else{																		
 					$query = db_select('housing_existing_occupant_draft', 'heod');
                     
                     $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+<<<<<<< HEAD
 					$query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
                     $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
 					$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
                     $query->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
@@ -65,6 +71,7 @@
 					$query->addField('hft', 'flat_type');
 					$query->fields('hf', array('floor', 'flat_no'));
                     $query->addField('hd', 'district_name');
+<<<<<<< HEAD
 					$query->addField('hb', 'block_name');
 					$query->fields('heod', array('housing_existing_occupant_draft_id','flat_id'));
 
@@ -86,6 +93,11 @@
 					$query->orderBy('hf.flat_no', 'ASC');
 
 					/* end */
+=======
+					$query->fields('heod', array('housing_existing_occupant_draft_id','flat_id'));
+
+					$query->condition('he.division_id', $data_fetch->division_id, '=');
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 					$result =$query->execute();
 				}
 			}
@@ -95,7 +107,10 @@
 			$header['Applicant Name'] = array('data' => 'Applicant Name');
             $header['District'] = array('data' => 'District');
 			$header['Estate Name'] = array('data' => 'Estate Name');
+<<<<<<< HEAD
 			$header['Block Name'] = array('data' => 'Block Name');
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			$header['Flat Type'] = array('data' => 'Flat Type');
 			$header['Flat No.'] = array('data' => 'Flat No.');
 			$header['Floor'] = array('data' => 'Floor');
@@ -117,7 +132,10 @@
 			$fields[] = $data->applicant_name;
             $fields[] = $data->district_name;
 			$fields[] = $data->estate_name;
+<<<<<<< HEAD
 			$fields[] = $data->block_name;
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			$fields[] = $data->flat_type;
 			$fields[] = $data->flat_no;
 			$fields[] = $data->floor;

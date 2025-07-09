@@ -519,7 +519,11 @@
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
 		//'#element_validate' => array('element_validate_streetaddress'), 
+<<<<<<< HEAD
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()" ,'class' => array('form-control')),
+=======
+		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()"),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		
 	);
 	$form['office_add']['office_city'] = array(

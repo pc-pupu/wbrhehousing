@@ -24,6 +24,7 @@
     </div>
     <div id="content-wrapper" class="content-wrapper">
         <div class="main-content p-5 min-vh-100">
+<<<<<<< HEAD
             <?php 
             if($checkExist == 0){
             ?>
@@ -44,6 +45,20 @@
             ?> 
             <div class="pt-5">
                 <h5><b>If you are currently occupying in a rental housing flat alloted by the Housing Department Govt. of WB, please fill the form for verification.</b></h5>
+=======
+        <?php 
+        if($checkExist == 0){
+            ?>
+            <h3 class = "" style="padding-top:10%;">
+                If you are a new applicant please click to continue button. 
+                <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success'), 'id' => 'my-button' ))); ?>
+            </h3>
+            <?php
+        }
+        ?>    
+            <div class="" style="padding-top:5%;">
+                <h3>If you are an existing occupant, please fill the form for verification.</h3>
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
                 <?php print $messages; ?>
                 <?php print render($page['content']); ?>
             </div>

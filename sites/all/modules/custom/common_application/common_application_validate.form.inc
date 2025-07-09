@@ -18,11 +18,15 @@
 	
 	function element_validate_alphabatic_fullstop($element, &$form_state) {
 		$value = trim($element['#value']);
+<<<<<<< HEAD
 		// if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.]*$/",$value)) {
 		// 	form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
 		// }
 		// changed on 08-07-2025 by Moumita
 		if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.\(\)\&_]*$/", $value)) {
+=======
+		if ($value !== '' && !preg_match("/^[A-Z]+[a-zA-Z\s\.]*$/",$value)) {
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
 		}
 	}
@@ -43,8 +47,12 @@
 	
 	function element_validate_streetaddress($element, &$form_state) {
 		$value = trim($element['#value']);
+<<<<<<< HEAD
 	//	if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\w\s]+[a-zA-Z0-9]*$/",$value)) {
 		if($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\(\)\w\s]+[a-zA-Z0-9]*$/",$value)){
+=======
+		if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\w\s]+[a-zA-Z0-9]*$/",$value)) {
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			form_set_error($element['#name'], t('" %name " must be alphanumeric. Only special characters . , - / allowed.', array('%name' => $element['#title'])));
 		}
 	}

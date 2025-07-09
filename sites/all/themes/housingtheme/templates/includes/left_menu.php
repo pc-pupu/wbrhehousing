@@ -49,6 +49,7 @@ global $user, $user_role,$base_path,$base_root;
 
         if($user_role == 7){ //Done by Subham 08-01-2025 ?>
 
+<<<<<<< HEAD
             <li class="nav-item has-submenu">
                 <a class="nav-link" href="#">
                     <i class="fa fa-user-times" aria-hidden="true"></i>  Unauthorised Occupant List <i class="fa fa-angle-down fa-lg float-end mt-1" aria-hidden="true"></i>
@@ -68,6 +69,16 @@ global $user, $user_role,$base_path,$base_root;
 
             <?php // added by moumita on 26-06-2025 
             }
+=======
+            <li class="nav-item">
+                <a href="<?= $base_root.$base_path.'view-unauthorised-occupants' ?>" class="nav-link ">
+                    <i class="fa fa-user-times" aria-hidden="true"></i>
+                    Unauthorised Occupant List
+                </a>
+            </li>
+
+            <?php }
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 
 
@@ -281,7 +292,11 @@ global $user, $user_role,$base_path,$base_root;
 
         <?php
             }
+<<<<<<< HEAD
             if($user_role == 6 || $user_role == 7){  // by dg 2025
+=======
+            if($user_role == 6){
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
         ?>
         <!-- <li class="nav-item has-submenu">
             <a class="nav-link" href="#">
@@ -297,8 +312,11 @@ global $user, $user_role,$base_path,$base_root;
                 <li class=""><?= l('Allotment List','allotment_list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
             </ul>
         </li> --> 
+<<<<<<< HEAD
 
         <?php if($user_role == 7){   // added by dg 16-06-2025?>
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
         <li class="nav-item has-submenu">
             <a class="nav-link" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-database-add" viewBox="0 0 16 16">
@@ -316,6 +334,7 @@ global $user, $user_role,$base_path,$base_root;
 
             </ul>
         </li>
+<<<<<<< HEAD
     <?php } ?>
 
         <li class="nav-item has-submenu">
@@ -334,6 +353,14 @@ global $user, $user_role,$base_path,$base_root;
                 <li class=""><?= l('Treasury Estate Mapping List','estate-treasury-selection',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
             </ul>
         </li> 
+=======
+        <li class="nav-item">
+            <?= l('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-building-gear" viewBox="0 0 16 16">
+            <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
+            <path d="M4.5 2a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.386 1.46c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+            </svg> Treasury Estate Mapping','estate-treasury-selection',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+        </li>
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
                
 
         
@@ -419,6 +446,7 @@ global $user, $user_role,$base_path,$base_root;
             </li>
         </ul>
         </li> 
+<<<<<<< HEAD
         <?php } 
         if($user_role == 18 ){
             ?>
@@ -438,6 +466,9 @@ global $user, $user_role,$base_path,$base_root;
         }
         
         ?>
+=======
+        <?php } ?>
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
         <?php if($user_role != 4 && $user_role != 11 ){ ?>
         <li class="nav-item">

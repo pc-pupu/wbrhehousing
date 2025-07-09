@@ -109,6 +109,7 @@ function unauthorised_occupants_list_store($flat_occupant_id) {
     drupal_set_message(t('Successfully marked as Unauthorised!'));
     drupal_goto('view-unauthorised-occupants');
 }
+<<<<<<< HEAD
 
 function unauthorized_occupant_draft_list($form, $form_state){
 
@@ -310,3 +311,5 @@ function view_unauthorized_list($rhe_id = 0, $flat_type_id = 0, $block_id = 0){
     return $output;
 }
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2

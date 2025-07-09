@@ -29,6 +29,10 @@ function estate_treasury_mapping_menu() {
     'page callback' => 'estate_treasury_mapping_delete',
     'page arguments' => array(2),
     'access arguments' => array('administer_estate_treasury_mapping_list'),
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
   );
 
   return $items;
@@ -50,6 +54,10 @@ function estate_treasury_mapping_form($form, &$form_state) {
   $opts = array();
   foreach ($query as $data) {
     $opts[$data->estate_id] = $data->estate_name;
+<<<<<<< HEAD
+=======
+    // print_r($opts);die;
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
   }
 
   $queryt = db_select('housing_treasury', 'ht')->fields('ht', array('treasury_id', 'treasury_name'))->orderBy('treasury_name','asc')->execute();
@@ -57,6 +65,7 @@ function estate_treasury_mapping_form($form, &$form_state) {
   $optst = array();
   foreach ($queryt as $data) {
     $optst[$data->treasury_id] = $data->treasury_name;
+<<<<<<< HEAD
   }
 
   $form['wrapper_row_info'] = array(
@@ -78,28 +87,58 @@ function estate_treasury_mapping_form($form, &$form_state) {
     '#title' => 'Select respective treasury',
     '#prefix' => '<div class="col-md-4"><div class="form-floating">',
     '#suffix' => '</div></div>',
+=======
+    // print_r($opts);die;
+  }
+
+  $form['estate_dropdown'] = array(
+    '#type' => 'select',
+    '#title' => 'Select housing estate',
+    '#options' => $opts,
+    '#prefix' => '<div id="dropdown-wrapper">',
+    '#suffix' => '</div>',
+    '#required' => TRUE,
+  );
+
+  $form['treasury_dropdown'] = array(
+    '#type' => 'select',
+    '#title' => 'Select respective treasury',
+    '#prefix' => '<div id="dropdown-wrapper">',
+    '#suffix' => '</div>',
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     '#options' => $optst,
     '#required' => TRUE,
   );
 
+<<<<<<< HEAD
   $form['wrapper_row_info']['is_active_button'] = array(
+=======
+  $form['is_active_button'] = array(
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     '#type' => 'radios',
     '#title' => t('Activation Status'),
     '#options' => array(
       1 => t('Active'),
       0 => t('Inactive'),
     ),
+<<<<<<< HEAD
     '#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
     '#suffix' => '</div></div></div>',
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     '#default_value' => 1
   );
 
   $form['submit'] = array(
     '#type' => 'submit',
+<<<<<<< HEAD
     '#value' => t('Save'),
     '#prefix' => '<div class="col-md-6"><div class="form-floating"><br><br>',
     '#suffix' => '</div></div>',
     '#attributes' => array('class'=>array('btn bg-primary btn-sm px-5 rounded-pill text-white fw-bolder')),
+=======
+    '#value' => t('Submit'),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
     '#submit' => array('estate_treasury_select_submit')
   );
 
@@ -136,7 +175,10 @@ function estate_treasury_mapping_view(){
     
     $query->addField('he', 'estate_name');
     $query->addField('ht', 'treasury_name');
+<<<<<<< HEAD
     $query->orderBy('housing_treasury_estate_mapping_id', 'ASC');
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
     $result = db_query($query);
 
@@ -144,7 +186,14 @@ function estate_treasury_mapping_view(){
     $header['estate_name'] = array('data' => 'Estate Name');
     $header['treasury_name'] = array('data' => 'Treasury Name');
     $header['is_active'] = array('data' => 'Activation Status');
+<<<<<<< HEAD
     $header['action'] = array('data' => 'Action');
+=======
+    $header['edit'] = array('data' => 'Edit');
+    $header['delete'] = array('data' => 'Delete');
+		
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		
 		$rows =array();
 		$output = '';
@@ -155,6 +204,7 @@ function estate_treasury_mapping_view(){
 			$fields[] = $data->estate_name;
 			$fields[] = $data->treasury_name;
       $fields[] = ($data->is_active == 1) ? 'Active' : 'Inactive';;
+<<<<<<< HEAD
 			
 			$onclick="return confirm('Are you sure you want to Delete?')";
 
@@ -166,16 +216,48 @@ function estate_treasury_mapping_view(){
 			$rows[] = $fields;
 		}
 
+=======
+      //$fields[] = $data->treasury_name;	
+			
+			$onclick="return confirm('Are you sure you want to Delete?')";
+			
+			$fields[] = l(
+					'<span class="btn bg-success btn-sm fa fa-edit text-white rounded" style="font-size:12px" ></span>' ,
+					'estate-treasury-selection/edit/'.encrypt_url($data->housing_treasury_estate_mapping_id).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+          
+				);
+        $fields[] = l(
+					'<span class="btn bg-danger btn-sm fa fa-trash text-white rounded" style="font-size:12px" ></span>' ,
+					'estate-treasury-selection/delete/'.encrypt_url($data->housing_treasury_estate_mapping_id).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank','onclick' => $onclick))
+				);
+      
+			$rows[] = $fields;
+		}
+
+		
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		$variables = array(
 			'attributes' => array('class'=>array('table table-list table-striped')),
 			'header' => $header,
 			'rows' => $rows,
 			'sticky' => true,
+<<<<<<< HEAD
 			'empty' => t("No data found!")
 		  );
 
 		if(count($rows) > 0) {
 
+=======
+			'empty' => t("No data found!") // The message to be displayed if table is empty
+		  );
+  		//end
+		//sd turned off 21-06-2024
+		if(count($rows) > 0) {
+			// Render using Drupal's render API.
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			$build['datatable'] = array(
 			  '#theme' => 'datatable',
 			  '#header' => $header,
@@ -183,7 +265,11 @@ function estate_treasury_mapping_view(){
 			  '#attributes' => array(),
 			);
 			
+<<<<<<< HEAD
 
+=======
+			// Or, render using a theme function.
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			$variables = array(
 			  'attributes' => array('class'=>array('table table-list table-striped')),
 			  'header' => $header,
@@ -204,10 +290,45 @@ function estate_treasury_mapping_view(){
 							</table>
 						</div>';
 		}
+<<<<<<< HEAD
     ///////////////////debaleena 23-09-2024////////////////////////
 	
 	return $output;
   }
+=======
+	
+	return $output;
+  }
+/////////////////////////////////subham////////////////////////////////////////////////
+
+  //   if ($result->rowCount() > 0) {
+  //     $output .= '<table class = "table table-list">';
+  //     $output .= '<tr><th>Serial No.</th><th>Estate Name</th><th>Treasury Name</th><th>Activation Status</th><th>Action</th></tr>';
+  //     $serialNumber = 1;
+  //     foreach ($result as $row) {
+  //       $output .= '<tr>';
+  //       $output .= '<td>' . $serialNumber . '</td>';
+  //       $output .= '<td>' . $row->estate_name . '</td>';
+  //       $output .= '<td>' . $row->treasury_name . '</td>';
+  //       $output .= '<td>' . ($row->is_active ? 'Active' : 'Inactive') . '</td>';
+  //       $output .= '<td>'.l(t('Edit'), $base_root.$base_path.'estate-treasury-selection/edit/'. $row->housing_treasury_estate_mapping_id, 
+  //       array('html' => true, 'attributes' => array('class' => array('btn bg-success btn-sm px-4 rounded-pill text-white fw-bolder')))).
+  //      '<br><hr>'.l(t('Delete'), $base_root.$base_path.'estate-treasury-selection/delete/'. $row->housing_treasury_estate_mapping_id,
+  //       array('html' => true, 'attributes' => array('class' => array('btn bg-danger btn-sm px-3 rounded-pill text-white fw-bolder'), 
+  //      'onclick' => $onclick))).'</td>';
+  //       $output .= '</tr>';
+  //       $serialNumber++;
+  //     }
+  //     $output .= '</table>';
+  //   } else {
+  //     $output .= '<p>No data found!</p>';
+  //   }
+  // } else {
+  //   $output .= '<p>The table housing_treasury_estate_mapping does not exist!</p>';
+  // }
+
+  // return $output;
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 }
 
 function getEstateList($estate_id = 0){
@@ -245,6 +366,10 @@ function estate_treasury_mapping_delete($housing_treasury_estate_mapping_id) {
   db_delete('housing_treasury_estate_mapping')
     ->condition('housing_treasury_estate_mapping_id', $housing_treasury_estate_mapping_id)
     ->execute();
+<<<<<<< HEAD
   drupal_set_message('Data Deleted successfully.');
+=======
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
   drupal_goto('estate-treasury-selection');
 }

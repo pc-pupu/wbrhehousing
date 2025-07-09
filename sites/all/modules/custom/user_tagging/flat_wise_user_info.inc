@@ -127,18 +127,24 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 	$result_tag = $query_tag->fetchObject();
 	// print_r($result_tag);
 
+<<<<<<< HEAD
 	$license_no_tag = ($result_tag->license_no !='') ? $result_tag->license_no : 'N/A';
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	// get user info by flat_id from draft table
 
 	$query_draft = db_select('housing_existing_occupant_draft','heod')->fields('heod',array())->condition('heod.flat_id', $flat_id)->execute();
 	$result_draft = $query_draft->fetchObject();
 	// print_r($result_draft); die;
 
+<<<<<<< HEAD
 	$license_no_draft = ($result_draft->license_no !='') ? $result_draft->license_no : 'N/A';
 
 
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	$flat_info = get_flat_info_by_id(encrypt_url($flat_id));
 
 	$display_output1 = '
@@ -166,6 +172,7 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 					</tr>
 					<tr>
 						<td>Date of Birth </td>
+<<<<<<< HEAD
 						<td>'.$result_tag->dob.'</td> 
 						<td>'.$result_draft->date_of_birth.'</td> 
 					</tr>
@@ -179,6 +186,17 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 						<td>'.$license_no_tag.'</td> 
 						<td>'.$license_no_draft.'</td> 
 					</tr>
+=======
+						<td>Nite hobe</td> 
+						<td>'.$result_draft->date_of_birth.'</td> 
+					</tr>
+		           <tr>
+						<td>Flat Information</td>
+						<td>'.$flat_info.'</td> 
+						<td>'.$flat_info.'</td> 
+					</tr>
+
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		          
 		        </table>
 		    </div>';
@@ -197,6 +215,7 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 						<div class="card-body">'
 	);
 
+<<<<<<< HEAD
 	$info_array = array(
 		'name' => $result_tag->applicant_name,
 		'dob' => $result_tag->dob,
@@ -209,6 +228,8 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 		'#value' => serialize($info_array)
 	);
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	$form['action'] = array(
 		'#prefix' => '<div class="col-md-6 mx-auto">',
 		'#suffix' => '</div>',
@@ -258,19 +279,28 @@ function flat_wise_user_details_submit($form, $form_state){
 	$val = $form_state['values'];
 
 	$action_type = $val['action'];
+<<<<<<< HEAD
 
 	$form_info_array = unserialize($val['form_info_array']);
 
 	// print_r($form_info_array); die;
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	if($action_type=='tagged'){
 		// set uid in housing_applicant, housing_applicant_official_details, update tagging table with remarks
 		// housing_applicant
 		$housingAppliArr = array(
 			'uid' => $user->uid,
+<<<<<<< HEAD
 			'applicant_name' => $form_info_array['name'],
 			'date_of_birth' => $form_info_array['dob'],
 			'mobile_no' => $form_info_array['mobile'],
+=======
+			'applicant_name' => '',
+			'date_of_birth' => '',
+			'mobile_no' => '',
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		);
 		$housing_applicant_id = db_insert('housing_applicant')->fields($housingAppliArr)->execute();
 		// housing_applicant_official_details

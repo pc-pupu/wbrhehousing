@@ -24,4 +24,21 @@ document.addEventListener("DOMContentLoaded", function(){
           }
       }); // addEventListener
     }) // forEach
+<<<<<<< HEAD
   }); 
+=======
+  }); 
+
+  (function ($) {
+  Drupal.behaviors.setCookieAlert = {
+    attach: function (context, settings) {
+      $('#my-button', context).once('set-cookie-alert').click(function () {
+        // Set cookie (simple way)
+        document.cookie = "user_type=new; max-age=30;"; 
+        // Show alert
+        // alert('Cookie has been set!');
+      });
+    }
+  };
+})(jQuery);
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2

@@ -247,7 +247,11 @@
 		$form['prrsonal_info']['dob'] = array(
 			'#title' => t('Date of Birth(According to Service Book)'),
 			'#type' => 'textfield',
+<<<<<<< HEAD
 			'#attributes' => array('autocomplete' => 'off', 'id' => 'edit-dob', 'class'=>array('form-control')),
+=======
+			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dob', 'class'=>array('form-control')),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#required' => TRUE,
 			//'#validated' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
@@ -290,7 +294,11 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
+<<<<<<< HEAD
 			// '#element_validate' => array('element_validate_textarea'), 
+=======
+			'#element_validate' => array('element_validate_textarea'), 
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 			//'#attributes' => array('id' => 'edit-app-designation', 'oncopy' => "return false", 'onpaste' => "return false"),
 		);
@@ -355,7 +363,11 @@
 		$form['official_info']['doj'] = array(
 			'#title' => t('Date of Joining'),
 			'#type' => 'textfield',
+<<<<<<< HEAD
 			'#attributes' => array('autocomplete' => 'off', 'id' => 'edit-doj', 'class' => array('numeric_positive form-control')),
+=======
+			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-doj', 'class' => array('numeric_positive form-control')),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#default_value' => '',
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
@@ -367,7 +379,11 @@
 			'#title' => t('Date of Retirement(According to Service Book)'),
 			'#type' => 'textfield',
 			//'#attributes' => array('readonly' => 'readonly'),
+<<<<<<< HEAD
 			'#attributes' => array('autocomplete' => 'off', 'id' => 'edit-dor', 'class' => array('numeric_positive form-control')),
+=======
+			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dor', 'class' => array('numeric_positive form-control')),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#default_value' => '',
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
@@ -389,7 +405,11 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
+<<<<<<< HEAD
 			// '#element_validate' => array('element_validate_textarea'), 
+=======
+			'#element_validate' => array('element_validate_textarea'), 
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')),
 		);
 		
@@ -399,7 +419,11 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
+<<<<<<< HEAD
 			// '#element_validate' => array('element_validate_streetaddress'),
+=======
+			'#element_validate' => array('element_validate_streetaddress'),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')), 
 		);
 		$form['office_add']['office_city'] = array(
@@ -505,7 +529,11 @@
 			'#suffix' => '</div></div>',
 		);
 		
+<<<<<<< HEAD
 		/*$form['ddo']['address'] = array(
+=======
+		$form['ddo']['address'] = array(
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#title' => t('DDO Address'),
 			'#type' => 'textarea',
 			'#attributes' => array('readonly' => 'readonly', 'class' => array('form-control')),
@@ -514,7 +542,11 @@
 			
 			//'#required' => TRUE,
 			//'#validated' => TRUE,
+<<<<<<< HEAD
 		);*/
+=======
+		);
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		
 		//allotment type and category
 		$form['allotment_reason'] = array(
@@ -534,7 +566,11 @@
 			'#suffix' => '</div></div>',
 			'#element_validate' => array('element_validate_flat_type'),
 		 );
+<<<<<<< HEAD
 	     // echo $rhe_flat_type;
+=======
+	     
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 		 
 		 $form['allotment_reason']['reason'] = array(
 			'#title' => t('Allotment Category'),
@@ -552,7 +588,11 @@
 		 $form['allotment_reason']['doa'] = array(
 			'#title' => t('Date of Application'),
 			'#type' => 'textfield',
+<<<<<<< HEAD
 			'#attributes' => array('autocomplete' => 'off', 'id' => 'edit-doa','class' => array('form-control')),
+=======
+			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-doa','class' => array('form-control')),
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 			'#required' => TRUE,
 			//'#validated' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
@@ -579,6 +619,7 @@
 			'#suffix' => '</div></div></div>',
 			'#attributes' => array('class' => array('numeric_positive form-control')),
 		);
+<<<<<<< HEAD
 		// added on 19-06-2025 by moumita
 		$form['allotment_reason']['physical_application_no'] = array(
 			'#title' => t('Physical Application Number'),
@@ -590,6 +631,8 @@
 			'#attributes' => array('class' => array('form-control')),
 		);
 
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 		 // Message area for validation feedback
 		 $form['allotment_reason']['comp_ser_no_message'] = array(
@@ -752,13 +795,18 @@
 		//$name = strtolower(trim($form_state['values']['applicant_name']));
 		//$name1 = str_replace(" ","",$name);
 		//$username = str_replace(".","",$name1).rand();
+<<<<<<< HEAD
 		// echo "<pre>";print_r($form_state);die;
 
 		$physical_application_no = $form_state['values']['physical_application_no']; // by dg 01-07-2025
+=======
+		//echo "<pre>";print_r($form_state);die;
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 		$computer_serial_no = trim($form_state['values']['computer_serial_no']);
 		$confirm_computer_serial_no = trim($form_state['values']['confirm_computer_serial_no']);
 
+<<<<<<< HEAD
 		/* by dg 01-07-2025 */ 
 		$query_4 = db_select('housing_online_application', 'hoa');
 		$query_4->fields('hoa',array('computer_serial_no'));
@@ -1022,6 +1070,241 @@
 			drupal_set_message('This Computer Serial No. is already Exist.','error');   //added by dg 01-07-2025
 			
 		}
+=======
+		if($computer_serial_no == $confirm_computer_serial_no)
+		{
+			$word_c = str_word_count(trim($form_state['values']['applicant_name']));
+			$splitter = " ";
+			$pieces = explode($splitter, trim($form_state['values']['applicant_name']));
+			
+			if($word_c < 2) {
+				$name = strtolower(substr($pieces[0], 0, 3));
+			}
+			else if($word_c == 2) {
+				if($pieces[0] == 'Dr.' || $pieces[0] == 'Dr' || $pieces[0] == 'dr.' || $pieces[0] == 'dr' || $pieces[0] == 'DR.' || $pieces[0] == 'DR') {
+					$name = strtolower(substr($pieces[1], 0, 3));
+				}
+				else {
+					$name = strtolower(substr($pieces[0], 0, 3)).strtolower(substr($pieces[1], 0, 3));
+				}
+			}
+			else {
+				if($pieces[0] == 'Dr.' || $pieces[0] == 'Dr' || $pieces[0] == 'dr.' || $pieces[0] == 'dr' || $pieces[0] == 'DR.' || $pieces[0] == 'DR') {
+					$name = strtolower(substr($pieces[1], 0, 3)).strtolower(substr($pieces[2], 0, 3));
+				}
+				else {
+					$name = strtolower(substr($pieces[0], 0, 3)).strtolower(substr($pieces[1], 0, 3));
+				}
+			}
+			
+			$username = str_replace(".","",$name).rand(1, 100000);
+
+			//debaleena start 11.06.24///
+
+			if($form_state['values']['hrms_id'] != '')
+			{
+				$newUser	   	   = array();
+				$newUser['name']   = trim($form_state['values']['hrms_id']);
+				$newUser['pass']   = trim($form_state['values']['hrms_id']);
+				/*$str[0].$str[1].trim($form_state['values']['username']).'@'.$dob_t.strrev($str1[0].$str1[1]);*/
+				if($form_state['values']['email'] != '')																																																						
+					$newUser['mail']   = trim($form_state['values']['email']);
+					
+				$newUser['status'] = 1;
+
+
+			}else{
+				/*insert into user table*/
+				$newUser	   	   = array();
+				$newUser['name']   = $username;
+				$newUser['pass']   = $username;
+				/*$str[0].$str[1].trim($form_state['values']['username']).'@'.$dob_t.strrev($str1[0].$str1[1]);*/
+				if($form_state['values']['email'] != '')																																																						
+					$newUser['mail']   = trim($form_state['values']['email']);
+					
+				$newUser['status'] = 1;
+				
+				
+
+			}
+
+			//end//
+			user_save(null, $newUser);
+
+			
+			/*get last inserted uid*/
+			
+			$query = db_select('users','u');
+			$query->addExpression('MAX(uid)','max_uid');
+			$result = $query->execute();
+			$data = $result->fetchObject();
+			
+			/*insert into housing_applicant table*/
+			
+			$applicant_personal_detail_arr = array();
+			$applicant_personal_detail_arr['uid'] 				=  $data->max_uid;
+			$applicant_personal_detail_arr['applicant_name'] 	=  trim($form_state['values']['applicant_name']);
+			$applicant_personal_detail_arr['guardian_name'] 		=  trim($form_state['values']['applicant_father_name']);
+			$applicant_personal_detail_arr['date_of_birth'] 		=  trim(implode('-', array_reverse(explode('/', $form_state['values']['dob']))));
+			$applicant_personal_detail_arr['gender'] 			=  trim($form_state['values']['gender']);
+			
+			if($form_state['values']['mobile'] != '')
+				$applicant_personal_detail_arr['mobile_no'] 			=  trim($form_state['values']['mobile']);
+			
+			if($form_state['values']['permanent_street'] != '')	
+				$applicant_personal_detail_arr['permanent_street']  =  strtoupper(trim($form_state['values']['permanent_street']));
+			if($form_state['values']['permanent_city_town_village'] != '')
+				$applicant_personal_detail_arr['permanent_city_town_village']  =  strtoupper(trim($form_state['values']['permanent_city_town_village']));
+			if($form_state['values']['permanent_post_office'] != '')
+				$applicant_personal_detail_arr['permanent_post_office']  =  strtoupper(trim($form_state['values']['permanent_post_office']));
+			if($form_state['values']['permanent_district'] != '')
+				$applicant_personal_detail_arr['permanent_district']  =  trim($form_state['values']['permanent_district']);
+			if($form_state['values']['permanent_pincode'] != '')
+				$applicant_personal_detail_arr['permanent_pincode']  =  trim($form_state['values']['permanent_pincode']);
+			
+			if(($form_state['values']['permanent_street'] != '') && ($form_state['values']['permanent_city_town_village'] != '') && ($form_state['values']['permanent_post_office'] != '') && ($form_state['values']['permanent_district'] != '') && ($form_state['values']['permanent_pincode'] != ''))
+				// $applicant_personal_detail_arr['permanent_present_same']  =  trim($form_state['values']['chk_permanent_address']);
+			
+			// if(trim($form_state['values']['chk_permanent_address']) != 1) {   // // Turned off 23-04-2025	
+				//$applicant_personal_detail_arr['permanent_present_same'] = 0;
+			if($form_state['values']['present_street'] != '')
+				$applicant_personal_detail_arr['present_street']  =  strtoupper(trim($form_state['values']['present_street']));
+			if($form_state['values']['present_city_town_village'] != '')
+				$applicant_personal_detail_arr['present_city_town_village']  =  strtoupper(trim($form_state['values']['present_city_town_village']));
+			if($form_state['values']['present_post_office'] != '')
+				$applicant_personal_detail_arr['present_post_office']  =  strtoupper(trim($form_state['values']['present_post_office']));
+			if($form_state['values']['present_district'] != '')
+				$applicant_personal_detail_arr['present_district']  =  trim($form_state['values']['present_district']);
+			if($form_state['values']['present_pincode'] != '')
+				$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
+			// } else {
+			// 	$applicant_personal_detail_arr['present_street']  =  NULL;
+			// 	$applicant_personal_detail_arr['present_city_town_village']  =  NULL;
+			// 	$applicant_personal_detail_arr['present_post_office']  =  NULL;
+			// 	$applicant_personal_detail_arr['present_district']  =  NULL;
+			// 	$applicant_personal_detail_arr['present_pincode']  =  NULL;	
+			// }
+			
+			
+			$last_id = db_insert('housing_applicant')
+			->fields($applicant_personal_detail_arr)
+			->execute();
+
+			// get housing_applicant_id by uid
+			
+			$haid_query = db_select('housing_applicant','ha')->fields('ha',array('housing_applicant_id'))->condition('uid',$data->max_uid)->execute();
+			$haid_result = $haid_query->fetchObject();
+			// print_r($haid_result);
+			$housing_applicant_id = $haid_result->housing_applicant_id; 
+			/*assign user roles*/
+			
+			$arr_user_roles = array();
+			$arr_user_roles['uid'] = $applicant_personal_detail_arr['uid'];
+			$arr_user_roles['rid'] = 4;
+			
+			db_insert('users_roles')
+			->fields($arr_user_roles)
+			->execute();
+			
+			/*add applicant_official_detail  data*/
+			$app_off_detail_arr = array();
+			$app_off_detail_arr['uid']  =  $data->max_uid;
+			if($form_state['values']['hrms_id'] != '')
+				$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
+			
+			$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
+			$app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
+			$app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
+			// if($form_state['values']['grade_pay'] != '')
+			// 	$app_off_detail_arr['grade_pay']  =  trim($form_state['values']['grade_pay']);
+			
+			/*if($form_state['values']['gpf_no'] != '')
+				$app_off_detail_arr['gpf_no']  =  trim($form_state['values']['gpf_no']);*/
+			
+			$app_off_detail_arr['applicant_posting_place']  =  strtoupper(trim($form_state['values']['app_posting_place']));
+			if($form_state['values']['app_headquarter'] != '')
+				$app_off_detail_arr['applicant_headquarter']  =  strtoupper(trim($form_state['values']['app_headquarter']));
+			
+			if($form_state['values']['doj'] != '')
+				$app_off_detail_arr['date_of_joining']  =  trim( implode('-', array_reverse(explode('/', $form_state['values']['doj']))));
+			
+			$app_off_detail_arr['date_of_retirement']  =  trim( implode('-', array_reverse(explode('/', $form_state['values']['dor']))));
+			$app_off_detail_arr['office_name']  =  strtoupper(trim($form_state['values']['office_name']));
+			$app_off_detail_arr['office_street']  =  strtoupper(trim($form_state['values']['office_street']));
+			$app_off_detail_arr['office_city_town_village']  =  strtoupper(trim($form_state['values']['office_city']));
+			if($form_state['values']['office_post_office'] != '')
+				$app_off_detail_arr['office_post_office']  =  strtoupper(trim($form_state['values']['office_post_office']));
+			
+			$app_off_detail_arr['office_district']  =  trim($form_state['values']['office_district']);
+			$app_off_detail_arr['office_pin_code']  =  trim($form_state['values']['office_pincode']);
+			if($form_state['values']['office_phone_no'] != '')
+				$app_off_detail_arr['office_phone_no']  =  trim($form_state['values']['office_phone_no']);
+			
+			$app_off_detail_arr['ddo_id']  =   trim($form_state['values']['designation']);
+			$app_off_detail_arr['housing_applicant_id'] = $housing_applicant_id;
+			
+			
+			db_insert('housing_applicant_official_detail')
+			->fields($app_off_detail_arr)
+			->execute();
+			
+			/*fetching applicant_official_detail_id*/
+			$query1 = db_select('housing_applicant_official_detail', 'haod');
+			$query1->addExpression('MAX(applicant_official_detail_id)','id');
+			$query1->condition('haod.uid', $data->max_uid, '=');
+			$result1 =$query1->execute();
+			$data1 = $result1->fetchObject();
+			
+			/*add online application*/
+			
+			$online_app_arr = array();
+			$online_app_arr['applicant_official_detail_id']  =  $data1->id;
+			$online_app_arr['status']  =  'housingapprover_approved_1';  // housing_sup_1 to change this by debaleena 04-09-2024
+			$online_app_arr['date_of_verified']  =  date('Y-m-d');
+			$online_app_arr['date_of_application']  =  trim( implode('-', array_reverse(explode('/', $form_state['values']['doa']))));
+			$online_app_arr['is_backlog_applicant']  =  1;
+			$online_app_arr['computer_serial_no']  =  $form_state['values']['computer_serial_no'];
+			if($form_state['values']['remarks'] != '')
+				$online_app_arr['remarks'] = $form_state['values']['remarks'];
+					
+					
+			db_insert('housing_online_application')
+			->fields($online_app_arr)
+			->execute();
+			
+			/*fetching online_application_id*/
+			$query2 = db_select('housing_online_application', 'hoa');
+			$query2->addExpression('MAX(online_application_id)','oid');
+			$query2->condition('hoa.applicant_official_detail_id', $data1->id, '=');
+			$result2 =$query2->execute();
+			$data2 = $result2->fetchObject();
+			
+			$online_app_arr_upd = array();
+			//$online_app_arr_upd['application_no']  = 'NA-'.trim( implode(explode('/', $form_state['values']['doa']))).'-'.$data2->oid;
+			$online_app_arr_upd['application_no']  = 'PA-'.trim( implode(explode('/', $form_state['values']['doa']))).'-'.$data2->oid; // by debaleena 11.06.24
+				
+			db_update('housing_online_application')
+			->fields($online_app_arr_upd)
+			->condition('online_application_id', $data2->oid)
+			->execute();
+			
+			/* add new alltment application*/  
+			$new_allotment_app_arr = array();
+			$new_allotment_app_arr['online_application_id']  =  $data2->oid;
+			
+			$new_allotment_app_arr['flat_type_id'] = fetch_rhe_flat_id(trim($form_state['values']['rhe_flat_type']));
+			$new_allotment_app_arr['allotment_category']  =  trim($form_state['values']['reason']);
+			
+			db_insert('housing_new_allotment_application')
+			->fields($new_allotment_app_arr)
+			->execute();
+			
+			drupal_set_message('Data inserted successfully.');
+		}else{
+			drupal_set_message('The Computer Serial No. and Confirm Computer Serial No. do not match.Please enter same.','error');
+		}
+			
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	}
 
 

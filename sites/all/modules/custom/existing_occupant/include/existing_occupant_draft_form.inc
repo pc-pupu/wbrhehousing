@@ -642,7 +642,11 @@
 				'#title' => t('License No.'),
 				'#type' => 'textfield',
 				// '#required' => TRUE,
+<<<<<<< HEAD
 				'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
+=======
+				'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 				'#suffix' => '</div></div>',
 				//'#element_validate' => array('element_validate_alphabatic_text'), 
 				'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()",'class'=>array('form-control')), 
@@ -654,6 +658,7 @@
 				'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-dol','class'=>array('form-control')),
 				// '#required' => TRUE,
 				//'#validated' => TRUE,
+<<<<<<< HEAD
 				'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 				'#suffix' => '</div></div>',
 				//'#element_validate' => array('element_validate_date', 'element_validate_age'),
@@ -669,6 +674,12 @@
 				//'#element_validate' => array('element_validate_date', 'element_validate_age'),
 			);
 			/*End*/
+=======
+				'#prefix' => '<div class="col-md-6"><div class="form-floating">',
+				'#suffix' => '</div></div></div>',
+				//'#element_validate' => array('element_validate_date', 'element_validate_age'),
+			);
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 			$form['license']['authorised_or_not'] = array(
 				'#title' => t('Occupant Status'),
@@ -884,7 +895,10 @@
 		$applicant_personal_detail_arr['license_issue_date']  = !empty(trim($license_issue_date)) ? trim($license_issue_date) : NULL; 
 		$applicant_personal_detail_arr['authorised_or_not']  = !empty(trim($form_state['values']['authorised_or_not'])) ? trim($form_state['values']['authorised_or_not']) : NULL; 
 		$applicant_personal_detail_arr['license_expiry_date']  =isset($license_expiry_date) ? $license_expiry_date : null;
+<<<<<<< HEAD
 		$applicant_personal_detail_arr['last_license_renewal_date']  =  !empty($form_state['values']['license_last_renewal']) ? trim(implode('-', array_reverse(explode('/', $form_state['values']['license_last_renewal'])))) : NULL;
+=======
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 
 		if($form_state['values']['uploaded_licence'] != 0) {
 			$file_licence = file_load($form_state['values']['uploaded_licence']);
@@ -919,4 +933,8 @@
 		drupal_set_message('Occupant Data for Flat No.- '.$flatno.' Inserted Successfully.');
 		drupal_goto('rhewise_flatlist_draft');
 	}
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 0cb717b8a54072318052f16c41c9f9bccf5211e2
 	
