@@ -87,178 +87,178 @@ owasp_dependency_check:
 
 
 
-# # ======================================================
-# # 2. Code Quality
-# # ======================================================
+# ======================================================
+# 2. Code Quality
+# ======================================================
 
-# # 🗂️ Cache to speed up subsequent jobs
-# # - vendor/ (PHP dependencies installed via Composer)
-# # - $HOME/.composer/cache (Composer’s download cache)
-# cache:
-#   paths:
-#     - vendor/
-#     - $HOME/.composer/cache
-
-
-# # 📦 Tools Install
-# # Prepares the PHP environment and installs dependencies.
-# # - Installs system libraries required for PHP extensions
-# # - Builds common extensions (gd, intl, zip, xml, pdo_mysql)
-# # - Installs Composer and downloads project dependencies
-# # - Creates report directory for static analysis outputs
-# # - Triggered manually by developers/security reviewers
-# tools_install:
-#   stage: code_quality
-#   image: php:8.2-cli
-#   tags: [gitlabwb-php-docker-154]
-#   variables:
-#     COMPOSER_ALLOW_SUPERUSER: "1"
-#     PHP_MEMORY_LIMIT: "1024M"
-#     REPORT_DIR: "reports/static-analysis"
-#   before_script:
-#     - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev libonig-dev xsltproc
-#     - docker-php-ext-configure gd --with-freetype --with-jpeg
-#     - docker-php-ext-install gd intl zip xml pdo_mysql
-#     - php -m | grep -E 'gd|zip|xml|intl|pdo_mysql'
-#     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-#     - composer --version
-#     # - mkdir -p $REPORT_DIR/html
-#   script:
-#     - echo "▶ Installing project dependencies..."
-#     - if [ -f composer.json ]; then
-#         composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader;
-#       else
-#         echo "No composer.json found, skipping composer install";
-#       fi
-#   artifacts:
-#     paths: [vendor/, $REPORT_DIR/]
-#     expire_in: 7 days
-#     when: always
-#   allow_failure: false
-#   when: manual
+# 🗂️ Cache to speed up subsequent jobs
+# - vendor/ (PHP dependencies installed via Composer)
+# - $HOME/.composer/cache (Composer’s download cache)
+cache:
+  paths:
+    - vendor/
+    - $HOME/.composer/cache
 
 
-# # 🧐 PHPStan (Static Analysis)
-# # - Detects potential bugs and weak type issues
-# # - Exports results in both raw text and JSON format
-# # - Allows failure so pipeline continues on warnings/errors
-# # - Triggered manually by developers/security reviewers
-# phpstan:
-#   stage: code_quality
-#   image: php:8.2-cli
-#   tags: [gitlabwb-php-docker-154]
-#   needs: ["tools_install"]
-#   before_script:
-#     - mkdir -p $REPORT_DIR
-#     # Link or install phpstan
-#     - if [ -f vendor/bin/phpstan ]; then ln -s $(pwd)/vendor/bin/phpstan /usr/local/bin/phpstan; fi
-#     - if ! command -v phpstan >/dev/null 2>&1; then
-#         echo "phpstan not found, installing fallback...";
-#         curl -fsSL https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar -o /usr/local/bin/phpstan;
-#         chmod +x /usr/local/bin/phpstan;
-#       fi
-#   script:
-#     - echo "▶ PHPStan analyze"
-#     - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=raw | tee $REPORT_DIR/phpstan-raw.txt || true
-#     - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=json > $REPORT_DIR/phpstan.json || true
-#   artifacts:
-#     paths: [$REPORT_DIR/]
-#     expire_in: 7 days
-#     when: always
-#   allow_failure: true
-#   when: manual
+# 📦 Tools Install
+# Prepares the PHP environment and installs dependencies.
+# - Installs system libraries required for PHP extensions
+# - Builds common extensions (gd, intl, zip, xml, pdo_mysql)
+# - Installs Composer and downloads project dependencies
+# - Creates report directory for static analysis outputs
+# - Triggered manually by developers/security reviewers
+tools_install:
+  stage: code_quality
+  image: php:8.2-cli
+  tags: [gitlabwb-php-docker-154]
+  variables:
+    COMPOSER_ALLOW_SUPERUSER: "1"
+    PHP_MEMORY_LIMIT: "1024M"
+    REPORT_DIR: "reports/static-analysis"
+  before_script:
+    - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev libonig-dev xsltproc
+    - docker-php-ext-configure gd --with-freetype --with-jpeg
+    - docker-php-ext-install gd intl zip xml pdo_mysql
+    - php -m | grep -E 'gd|zip|xml|intl|pdo_mysql'
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer --version
+    # - mkdir -p $REPORT_DIR/html
+  script:
+    - echo "▶ Installing project dependencies..."
+    - if [ -f composer.json ]; then
+        composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader;
+      else
+        echo "No composer.json found, skipping composer install";
+      fi
+  artifacts:
+    paths: [vendor/, $REPORT_DIR/]
+    expire_in: 7 days
+    when: always
+  allow_failure: false
+  when: manual
 
 
-# # 🔍 PHPMD (PHP Mess Detector)
-# # - Identifies unused code, naming violations, and complexity issues
-# # - Exports both XML and text reports
-# # - Triggered manually by developers/security reviewers
-# phpmd:
-#   stage: code_quality
-#   image: php:8.2-cli
-#   tags: [gitlabwb-php-docker-154]
-#   needs: ["tools_install"]
-#   before_script:
-#     - mkdir -p $REPORT_DIR
-#     # Link or install phpmd
-#     - if [ -f vendor/bin/phpmd ]; then ln -s $(pwd)/vendor/bin/phpmd /usr/local/bin/phpmd; fi
-#     - if ! command -v phpmd >/dev/null 2>&1; then
-#         curl -L https://github.com/phpmd/phpmd/releases/latest/download/phpmd.phar -o /usr/local/bin/phpmd;
-#         chmod +x /usr/local/bin/phpmd;
-#       fi
-#   script:
-#     - echo "▶ PHPMD analyze"
-#     - phpmd . xml codesize,unusedcode,naming --reportfile $REPORT_DIR/phpmd.xml || true
-#     - phpmd . text codesize,unusedcode,naming > $REPORT_DIR/phpmd.txt || true
-#   artifacts:
-#     paths: [$REPORT_DIR/]
-#     expire_in: 7 days
-#     when: always
-#   allow_failure: true
-#   when: manual
+# 🧐 PHPStan (Static Analysis)
+# - Detects potential bugs and weak type issues
+# - Exports results in both raw text and JSON format
+# - Allows failure so pipeline continues on warnings/errors
+# - Triggered manually by developers/security reviewers
+phpstan:
+  stage: code_quality
+  image: php:8.2-cli
+  tags: [gitlabwb-php-docker-154]
+  needs: ["tools_install"]
+  before_script:
+    - mkdir -p $REPORT_DIR
+    # Link or install phpstan
+    - if [ -f vendor/bin/phpstan ]; then ln -s $(pwd)/vendor/bin/phpstan /usr/local/bin/phpstan; fi
+    - if ! command -v phpstan >/dev/null 2>&1; then
+        echo "phpstan not found, installing fallback...";
+        curl -fsSL https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar -o /usr/local/bin/phpstan;
+        chmod +x /usr/local/bin/phpstan;
+      fi
+  script:
+    - echo "▶ PHPStan analyze"
+    - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=raw | tee $REPORT_DIR/phpstan-raw.txt || true
+    - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=json > $REPORT_DIR/phpstan.json || true
+  artifacts:
+    paths: [$REPORT_DIR/]
+    expire_in: 7 days
+    when: always
+  allow_failure: true
+  when: manual
 
 
-# # 🎨 PHPCS (PHP CodeSniffer)
-# # - Enforces PSR-12 coding standards
-# # - Generates reports in XML, HTML, full text, and summary formats
-# # - Triggered manually by developers/security reviewers
-# phpcs:
-#   stage: code_quality
-#   image: php:8.2-cli
-#   tags: [gitlabwb-php-docker-154]
-#   variables:
-#     PHP_MEMORY_LIMIT: 1024M
-#     COMPOSER_PROCESS_TIMEOUT: 600
-#     REPORT_DIR: reports/phpcs
-#   before_script:
-#     # Install system dependencies + PHP extensions
-#     - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev
-#     - docker-php-ext-configure gd --with-freetype --with-jpeg
-#     - docker-php-ext-install gd intl zip xml
-#     - php -m | grep -E 'zip|xml'
-#     # Install PHPCS
-#     - curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
-#     - chmod +x phpcs.phar
-#     - mv phpcs.phar /usr/local/bin/phpcs
-#     # Ensure report directory exists
-#     - mkdir -p $REPORT_DIR
-#   script:
-#     # XML report (for CI integrations)
-#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=checkstyle --report-file=$REPORT_DIR/phpcs-report.xml . || true
-#     # Text-based reports
-#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=full --report-file=$REPORT_DIR/phpcs-full.txt . || true
-#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=summary --report-file=$REPORT_DIR/phpcs-summary.txt . || true
-#   artifacts:
-#     paths: [$REPORT_DIR/]
-#     expire_in: 1 week
-#     when: always
-#   allow_failure: true
-#   when: manual
+# 🔍 PHPMD (PHP Mess Detector)
+# - Identifies unused code, naming violations, and complexity issues
+# - Exports both XML and text reports
+# - Triggered manually by developers/security reviewers
+phpmd:
+  stage: code_quality
+  image: php:8.2-cli
+  tags: [gitlabwb-php-docker-154]
+  needs: ["tools_install"]
+  before_script:
+    - mkdir -p $REPORT_DIR
+    # Link or install phpmd
+    - if [ -f vendor/bin/phpmd ]; then ln -s $(pwd)/vendor/bin/phpmd /usr/local/bin/phpmd; fi
+    - if ! command -v phpmd >/dev/null 2>&1; then
+        curl -L https://github.com/phpmd/phpmd/releases/latest/download/phpmd.phar -o /usr/local/bin/phpmd;
+        chmod +x /usr/local/bin/phpmd;
+      fi
+  script:
+    - echo "▶ PHPMD analyze"
+    - phpmd . xml codesize,unusedcode,naming --reportfile $REPORT_DIR/phpmd.xml || true
+    - phpmd . text codesize,unusedcode,naming > $REPORT_DIR/phpmd.txt || true
+  artifacts:
+    paths: [$REPORT_DIR/]
+    expire_in: 7 days
+    when: always
+  allow_failure: true
+  when: manual
+
+
+# 🎨 PHPCS (PHP CodeSniffer)
+# - Enforces PSR-12 coding standards
+# - Generates reports in XML, HTML, full text, and summary formats
+# - Triggered manually by developers/security reviewers
+phpcs:
+  stage: code_quality
+  image: php:8.2-cli
+  tags: [gitlabwb-php-docker-154]
+  variables:
+    PHP_MEMORY_LIMIT: 1024M
+    COMPOSER_PROCESS_TIMEOUT: 600
+    REPORT_DIR: reports/phpcs
+  before_script:
+    # Install system dependencies + PHP extensions
+    - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev
+    - docker-php-ext-configure gd --with-freetype --with-jpeg
+    - docker-php-ext-install gd intl zip xml
+    - php -m | grep -E 'zip|xml'
+    # Install PHPCS
+    - curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+    - chmod +x phpcs.phar
+    - mv phpcs.phar /usr/local/bin/phpcs
+    # Ensure report directory exists
+    - mkdir -p $REPORT_DIR
+  script:
+    # XML report (for CI integrations)
+    - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=checkstyle --report-file=$REPORT_DIR/phpcs-report.xml . || true
+    # Text-based reports
+    - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=full --report-file=$REPORT_DIR/phpcs-full.txt . || true
+    - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=summary --report-file=$REPORT_DIR/phpcs-summary.txt . || true
+  artifacts:
+    paths: [$REPORT_DIR/]
+    expire_in: 1 week
+    when: always
+  allow_failure: true
+  when: manual
   
 
-# # 📊 SonarQube Analysis
-# # - Runs sonar-scanner using project key = repo name
-# # - Stores scanner cache to improve performance
-# # - Only runs on main branch
-# # - Triggered manually by developers/security reviewers
-# sonarqube_check:
-#   stage: code_quality
-#   image:
-#     name: sonarsource/sonar-scanner-cli:latest
-#     entrypoint: [""]
-#   variables:
-#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-#     GIT_DEPTH: "0"
-#   cache:
-#     key: "${CI_JOB_NAME}"
-#     paths: [.sonar/cache]
-#   script:
-#     - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME
-#     - echo $SONAR_HOST_URL/dashboard?id=$CI_PROJECT_PATH
-#   allow_failure: true
-#   when: manual
-#   only: [main]
-#   tags: [gitlabwb-php-docker-154]
+# 📊 SonarQube Analysis
+# - Runs sonar-scanner using project key = repo name
+# - Stores scanner cache to improve performance
+# - Only runs on main branch
+# - Triggered manually by developers/security reviewers
+sonarqube_check:
+  stage: code_quality
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths: [.sonar/cache]
+  script:
+    - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME
+    - echo $SONAR_HOST_URL/dashboard?id=$CI_PROJECT_PATH
+  allow_failure: true
+  when: manual
+  only: [main]
+  tags: [gitlabwb-php-docker-154]
 
 
 # ======================================================
@@ -336,14 +336,16 @@ zap_scan:
 # - Runs manually on main branch only, does not block pipeline
 nikto_scan:
   stage: dast
+  before_script:
+    - mkdir -p ~/.ssh
+    - cp /secrets/runner_privatekey.txt ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $STAGING_VM >> ~/.ssh/known_hosts
   script:
     # Connect to staging VM and run Nikto in Docker
-    - ssh $SSH_USERID@$STAGING_VM "
-        mkdir -p /tmp/nikto_scan &&
-        docker pull hysnsec/nikto &&
-        docker run --rm --network=host -v /tmp/nikto_scan:/tmp hysnsec/nikto \
-          -h $DEPLOYED_URL -o /tmp/nikto-output.html -Format htm -maxtime 600 -evasion 1 -nolookup -nointeractive
-      "
+    - ssh -o StrictHostKeyChecking=no $SSH_USERID@$STAGING_VM "
+      mkdir -p /tmp/nikto_scan &&
+      docker pull hysnsec/nikto &&
+      docker run --rm --network=host -v /tmp/nikto_scan:/tmp hysnsec/nikto -h $DEPLOYED_URL -o /tmp/nikto-output.html -Format htm -maxtime 600 -evasion 1 -nolookup -nointeractive"
     # Copy report from remote staging VM to local job workspace
     - scp $SSH_USERID@$STAGING_VM:/tmp/nikto_scan/nikto-output.html .
   artifacts:
@@ -352,7 +354,7 @@ nikto_scan:
     expire_in: 1 week
   allow_failure: true
   only: [main]
-  when: manual
+  # when: manual
   tags: [gitlabwb-php-docker-154]
 
 # ======================================================
