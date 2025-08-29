@@ -354,7 +354,7 @@ nikto_scan:
     expire_in: 1 week
   allow_failure: true
   only: [main]
-  # when: manual
+  when: manual
   tags: [gitlabwb-php-docker-154]
 
 # ======================================================
