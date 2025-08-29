@@ -315,6 +315,7 @@ zap_scan:
     # -I   → Ignore SSL certificate warnings
     # -r   → Generate HTML report
     - zap-full-scan.py -t $DEPLOYED_URL -m 1 -d -I -r zap-report.html
+    - cp /zap/wrk/zap-report.html zap-report.html
   artifacts:
     paths: [zap-report.html]
     when: always
