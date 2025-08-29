@@ -1,0 +1,106 @@
+# ======================================================
+# PHP Generic .gitignore
+# Covers PHP + Laravel + Node.js/Next.js (for full-stack apps)
+# ======================================================
+
+# ----------------------------
+# Composer Dependencies (PHP)
+# ----------------------------
+/vendor/                  # All composer dependencies (regenerated via composer install)
+composer.lock             # Lock file (optional: commit if you want deterministic builds)
+
+# ----------------------------
+# Environment & Config
+# ----------------------------
+.env                      # Main environment file (secrets should never be committed)
+.env.*                    # Environment-specific overrides (e.g., .env.local, .env.testing)
+*.local                   # Local config files
+*.ini                     # PHP configuration overrides
+.phpunit.result.cache     # PHPUnit cache file
+
+# ----------------------------
+# Logs & Runtime Files
+# ----------------------------
+/*.log                    # Any log file at root
+logs/                     # Custom log directory
+storage/                  # Laravel/Symfony/CI runtime storage
+storage/*.key             # Application keys
+bootstrap/cache/          # Laravel bootstrap cache
+runtime/                  # Generic runtime folder
+cache/                    # General cache directory
+tmp/                      # Temporary files
+*.pid                     # Process ID files
+*.seed                    # Database seed dumps
+*.cover                   # Code coverage artifacts
+
+# ----------------------------
+# Laravel Specific
+# ----------------------------
+/storage/*                # Ignore everything in storage
+!/storage/app/.gitignore  # But keep default gitignore placeholder
+!/storage/framework/.gitignore
+!/storage/logs/.gitignore
+/public/storage           # Laravel public storage symlink
+/node_modules             # Node.js dependencies (frontend in Laravel Mix/Vite)
+/public/hot               # Hot reloading indicator (Laravel Mix)
+/public/mix-manifest.json # Mix/Vite build manifest
+Homestead.yaml            # Laravel Homestead config
+Homestead.json            # Laravel Homestead config
+
+# ----------------------------
+# Node.js / Yarn / NPM
+# ----------------------------
+npm                       # Accidental npm file/directory
+/.pnp                     # Yarn Plug'n'Play
+.pnp.*                    # Yarn Plug'n'Play artifacts
+.yarn/*                   # Ignore Yarn internals
+!.yarn/patches            # Keep Yarn patches
+!.yarn/plugins            # Keep Yarn plugins
+!.yarn/releases           # Keep Yarn release binaries
+!.yarn/versions           # Keep Yarn versioning info
+
+# ----------------------------
+# Testing & Coverage
+# ----------------------------
+/coverage                 # Coverage reports (Jest, Mocha, PHPUnit, etc.)
+
+# ----------------------------
+# Next.js Specific
+# ----------------------------
+/.next/                   # Next.js build output
+/out/                     # Next.js static export
+
+# ----------------------------
+# Production Build Output
+# ----------------------------
+/build                    # Generic production build folder (React, Next.js, etc.)
+
+# ----------------------------
+# Miscellaneous
+# ----------------------------
+.DS_Store                 # macOS system files
+*.pem                     # SSL/TLS keys or certs
+
+# ----------------------------
+# Debug / Error Logs
+# ----------------------------
+npm-debug.log*            # NPM debug logs
+yarn-debug.log*           # Yarn debug logs
+yarn-error.log*           # Yarn error logs
+.pnpm-debug.log*          # PNPM debug logs
+
+# ----------------------------
+# Deployment Platforms
+# ----------------------------
+.vercel                   # Vercel deployment folder
+
+# ----------------------------
+# TypeScript
+# ----------------------------
+*.tsbuildinfo             # TS incremental build info
+next-env.d.ts             # Next.js auto-generated types
+
+# ----------------------------
+# Prisma
+# ----------------------------
+/app/generated/prisma     # Prisma generated client (rebuild with `prisma generate`)

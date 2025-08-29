@@ -1,0 +1,471 @@
+# =========================================================
+# GitLab CI/CD Pipeline for PHP Application (VM Deployment)
+# =========================================================
+
+
+# =========================================================
+# Global Variables
+# =========================================================
+variables:
+  # Deployment Configuration
+  STAGING_PORT: "8080"                           # Port exposed by web server (Apache/Nginx default port)
+  DOC_ROOT: "/home/rp_3_0/"                    # Apache web root path
+  DEPLOYED_URL: "http://${STAGING_VM}:${STAGING_PORT}"   # Public URL for deployed application
+  LOAD_TEST_URL: "http://${STAGING_VM}:${STAGING_PORT}"  # Base URL used for performance/load tests
+
+  # Load Test Configuration
+  LOAD_TEST_USERNAME: "cloudsupport-wb@nic.in" # Username for load test authentication
+  LOAD_TEST_PASSWORD: "admin@wbgit"            # Password for load test authentication
+  LOAD_TEST_VIRTUAL_USERS: "500"               # Number of virtual users to simulate in load test
+  LOAD_TEST_DURATION: "1m"                     # Duration of load test (e.g., 1 minute)
+  LOAD_TEST_P95_THRESHOLD: "10000"             # Max acceptable 95th percentile response time (in ms)
+
+  # API Test Parameters
+  API_ITERATION_COUNT: "1000"                  # Number of times each API test case should run
+
+  # PHP Runtime / Reporting
+  PHP_MEMORY_LIMIT: "1024M"                    # Memory limit for PHP processes during analysis/tests
+  REPORT_DIR: "reports"                        # Directory to store generated reports (linting, tests, etc.)
+  
+
+
+# ======================================================
+# Stages - Execution Order (as per predefined pipeline)
+# ======================================================
+stages:
+  - security_precheck      # 1. Detect secrets & vulnerable dependencies
+  - code_quality           # 2. Ensure code quality & maintainability
+  - deploy                 # 3. Deploy to staging
+  - dast                   # 4. Runtime security testing (DAST)
+  - performance_test       # 5. Load & performance testing
+  - api_test               # 6. API correctness testing
+  - observability          # 7. Monitoring & logging stack
+
+
+# ======================================================
+# Includes - GitLab Default Templates
+# ======================================================
+include:
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+
+# ======================================================
+# 1. Security Precheck
+# ======================================================
+
+# 🔐 Secret Detection
+# Runs GitLab’s built-in secret detection to scan for accidentally
+# committed sensitive information (API keys, tokens, passwords, etc.)
+# This job is manual so that it can be triggered when required.
+secret_detection:
+  stage: security_precheck
+  tags: [gitlabwb-php-docker-154]
+  when: manual
+
+# 🛡️ OWASP Dependency Check
+# Runs OWASP Dependency-Check to identify known vulnerabilities (CVEs)
+# in project dependencies. Generates both HTML and JSON reports.
+# - Scans the entire project directory
+# - Fails the pipeline only if CVSS score ≥ 10 (set high to avoid false positives)
+# - Reports are stored as artifacts for 1 week
+# - Marked as "allow_failure" so pipeline does not block critical builds
+# - Triggered manually by developers/security reviewers
+owasp_dependency_check:
+  stage: security_precheck
+  image:
+    name: registry.gitlab.com/gitlab-ci-utils/docker-dependency-check:latest
+    entrypoint: [""]
+  script:
+    - /usr/share/dependency-check/bin/dependency-check.sh --scan "./" --format ALL --project "$CI_PROJECT_NAME" --failOnCVSS 100
+  artifacts:
+    paths: [dependency-check-report.html, dependency-check-report.json]
+    when: always
+    expire_in: 1 week
+  allow_failure: true
+  when: manual
+  tags: [gitlabwb-php-docker-154]
+
+
+
+# # ======================================================
+# # 2. Code Quality
+# # ======================================================
+
+# # 🗂️ Cache to speed up subsequent jobs
+# # - vendor/ (PHP dependencies installed via Composer)
+# # - $HOME/.composer/cache (Composer’s download cache)
+# cache:
+#   paths:
+#     - vendor/
+#     - $HOME/.composer/cache
+
+
+# # 📦 Tools Install
+# # Prepares the PHP environment and installs dependencies.
+# # - Installs system libraries required for PHP extensions
+# # - Builds common extensions (gd, intl, zip, xml, pdo_mysql)
+# # - Installs Composer and downloads project dependencies
+# # - Creates report directory for static analysis outputs
+# # - Triggered manually by developers/security reviewers
+# tools_install:
+#   stage: code_quality
+#   image: php:8.2-cli
+#   tags: [gitlabwb-php-docker-154]
+#   variables:
+#     COMPOSER_ALLOW_SUPERUSER: "1"
+#     PHP_MEMORY_LIMIT: "1024M"
+#     REPORT_DIR: "reports/static-analysis"
+#   before_script:
+#     - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev libonig-dev xsltproc
+#     - docker-php-ext-configure gd --with-freetype --with-jpeg
+#     - docker-php-ext-install gd intl zip xml pdo_mysql
+#     - php -m | grep -E 'gd|zip|xml|intl|pdo_mysql'
+#     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#     - composer --version
+#     # - mkdir -p $REPORT_DIR/html
+#   script:
+#     - echo "▶ Installing project dependencies..."
+#     - if [ -f composer.json ]; then
+#         composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader;
+#       else
+#         echo "No composer.json found, skipping composer install";
+#       fi
+#   artifacts:
+#     paths: [vendor/, $REPORT_DIR/]
+#     expire_in: 7 days
+#     when: always
+#   allow_failure: false
+#   when: manual
+
+
+# # 🧐 PHPStan (Static Analysis)
+# # - Detects potential bugs and weak type issues
+# # - Exports results in both raw text and JSON format
+# # - Allows failure so pipeline continues on warnings/errors
+# # - Triggered manually by developers/security reviewers
+# phpstan:
+#   stage: code_quality
+#   image: php:8.2-cli
+#   tags: [gitlabwb-php-docker-154]
+#   needs: ["tools_install"]
+#   before_script:
+#     - mkdir -p $REPORT_DIR
+#     # Link or install phpstan
+#     - if [ -f vendor/bin/phpstan ]; then ln -s $(pwd)/vendor/bin/phpstan /usr/local/bin/phpstan; fi
+#     - if ! command -v phpstan >/dev/null 2>&1; then
+#         echo "phpstan not found, installing fallback...";
+#         curl -fsSL https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar -o /usr/local/bin/phpstan;
+#         chmod +x /usr/local/bin/phpstan;
+#       fi
+#   script:
+#     - echo "▶ PHPStan analyze"
+#     - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=raw | tee $REPORT_DIR/phpstan-raw.txt || true
+#     - phpstan analyse . --no-progress --memory-limit=$PHP_MEMORY_LIMIT --error-format=json > $REPORT_DIR/phpstan.json || true
+#   artifacts:
+#     paths: [$REPORT_DIR/]
+#     expire_in: 7 days
+#     when: always
+#   allow_failure: true
+#   when: manual
+
+
+# # 🔍 PHPMD (PHP Mess Detector)
+# # - Identifies unused code, naming violations, and complexity issues
+# # - Exports both XML and text reports
+# # - Triggered manually by developers/security reviewers
+# phpmd:
+#   stage: code_quality
+#   image: php:8.2-cli
+#   tags: [gitlabwb-php-docker-154]
+#   needs: ["tools_install"]
+#   before_script:
+#     - mkdir -p $REPORT_DIR
+#     # Link or install phpmd
+#     - if [ -f vendor/bin/phpmd ]; then ln -s $(pwd)/vendor/bin/phpmd /usr/local/bin/phpmd; fi
+#     - if ! command -v phpmd >/dev/null 2>&1; then
+#         curl -L https://github.com/phpmd/phpmd/releases/latest/download/phpmd.phar -o /usr/local/bin/phpmd;
+#         chmod +x /usr/local/bin/phpmd;
+#       fi
+#   script:
+#     - echo "▶ PHPMD analyze"
+#     - phpmd . xml codesize,unusedcode,naming --reportfile $REPORT_DIR/phpmd.xml || true
+#     - phpmd . text codesize,unusedcode,naming > $REPORT_DIR/phpmd.txt || true
+#   artifacts:
+#     paths: [$REPORT_DIR/]
+#     expire_in: 7 days
+#     when: always
+#   allow_failure: true
+#   when: manual
+
+
+# # 🎨 PHPCS (PHP CodeSniffer)
+# # - Enforces PSR-12 coding standards
+# # - Generates reports in XML, HTML, full text, and summary formats
+# # - Triggered manually by developers/security reviewers
+# phpcs:
+#   stage: code_quality
+#   image: php:8.2-cli
+#   tags: [gitlabwb-php-docker-154]
+#   variables:
+#     PHP_MEMORY_LIMIT: 1024M
+#     COMPOSER_PROCESS_TIMEOUT: 600
+#     REPORT_DIR: reports/phpcs
+#   before_script:
+#     # Install system dependencies + PHP extensions
+#     - apt-get update && apt-get install -y unzip git curl wget zip libzip-dev libicu-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev
+#     - docker-php-ext-configure gd --with-freetype --with-jpeg
+#     - docker-php-ext-install gd intl zip xml
+#     - php -m | grep -E 'zip|xml'
+#     # Install PHPCS
+#     - curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+#     - chmod +x phpcs.phar
+#     - mv phpcs.phar /usr/local/bin/phpcs
+#     # Ensure report directory exists
+#     - mkdir -p $REPORT_DIR
+#   script:
+#     # XML report (for CI integrations)
+#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=checkstyle --report-file=$REPORT_DIR/phpcs-report.xml . || true
+#     # Text-based reports
+#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=full --report-file=$REPORT_DIR/phpcs-full.txt . || true
+#     - phpcs -d memory_limit=$PHP_MEMORY_LIMIT --standard=PSR12 --report=summary --report-file=$REPORT_DIR/phpcs-summary.txt . || true
+#   artifacts:
+#     paths: [$REPORT_DIR/]
+#     expire_in: 1 week
+#     when: always
+#   allow_failure: true
+#   when: manual
+  
+
+# # 📊 SonarQube Analysis
+# # - Runs sonar-scanner using project key = repo name
+# # - Stores scanner cache to improve performance
+# # - Only runs on main branch
+# # - Triggered manually by developers/security reviewers
+# sonarqube_check:
+#   stage: code_quality
+#   image:
+#     name: sonarsource/sonar-scanner-cli:latest
+#     entrypoint: [""]
+#   variables:
+#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+#     GIT_DEPTH: "0"
+#   cache:
+#     key: "${CI_JOB_NAME}"
+#     paths: [.sonar/cache]
+#   script:
+#     - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME
+#     - echo $SONAR_HOST_URL/dashboard?id=$CI_PROJECT_PATH
+#   allow_failure: true
+#   when: manual
+#   only: [main]
+#   tags: [gitlabwb-php-docker-154]
+
+
+# ======================================================
+# 3. Deploy to Staging
+# ======================================================
+
+# 🚀 Deploys the PHP application to the staging server
+# - Copies project files from runner to $STAGING_VM at $DOC_ROOT
+# - Clears Laravel cache and regenerates Composer autoload
+# - Fixes file permissions for Apache
+# - Restricted to `main` branch to prevent accidental deployments
+deploy_app:
+  stage: deploy
+  script:
+    - echo $DOC_ROOT
+    - echo $STAGING_VM
+    - echo "Copying project to remote server..."
+    # Copy project files from runner to remote server
+    - scp -r ./* $SSH_USERID@$STAGING_VM:$DOC_ROOT
+    # SSH into remote server and run deployment tasks
+    - ssh $SSH_USERID@$STAGING_VM "
+        cd $DOC_ROOT  &&
+        php artisan cache:clear &&
+        composer dumpautoload &&
+        chown -R apache:apache . &&
+        chmod -R 755 .
+      "
+    - echo "Application Deployed successfully"
+  # when: manual
+  only: [main]
+  tags: [gitlabwb-php-shell-154]
+
+
+# ======================================================
+# 4. Dynamic Application Security Testing (DAST)
+# ======================================================
+
+# 🕷️ OWASP ZAP Scan
+# - Runs OWASP ZAP full scan against the deployed application
+# - Uses `$DEPLOYED_URL` as the scan target
+# - Outputs an HTML vulnerability report (artifact)
+# - Runs manually on main branch only to avoid unnecessary scans
+# - `allow_failure: true` so findings do not block pipeline execution
+zap_scan:
+  stage: dast
+  image: zaproxy/zap-stable
+  before_script:
+    # Create working directory for ZAP inside container
+    - mkdir -p /zap/wrk
+  script:
+    # Run ZAP full scan with:
+    # -m 1 → Max one attack per URL (faster scan)
+    # -d   → Debug mode
+    # -I   → Ignore SSL certificate warnings
+    # -r   → Generate HTML report
+    - zap-full-scan.py -t $DEPLOYED_URL -m 1 -d -I -r zap-report.html
+  artifacts:
+    paths: [zap-report.html]
+    when: always
+  allow_failure: true
+  only: [main]
+  when: manual
+  tags: [gitlabwb-php-docker-154]
+
+
+# 🛡️ Nikto Web Server Scan
+# - Runs Nikto (open-source web server scanner) against deployed app
+# - Executes scan in a remote staging VM (via SSH + Docker run)
+# - Scan parameters:
+#   • Output in HTML format
+#   • Max runtime = 600s (10 min)
+#   • Evasion mode enabled (-evasion 1)
+#   • No DNS lookup, no interactive prompts
+# - Retrieves report back via SCP and stores as artifact
+# - Runs manually on main branch only, does not block pipeline
+nikto_scan:
+  stage: dast
+  script:
+    # Connect to staging VM and run Nikto in Docker
+    - ssh $SSH_USERID@$STAGING_VM "
+        mkdir -p /tmp/nikto_scan &&
+        docker pull hysnsec/nikto &&
+        docker run --rm --network=host -v /tmp/nikto_scan:/tmp hysnsec/nikto \
+          -h $DEPLOYED_URL -o /tmp/nikto-output.html -Format htm -maxtime 600 -evasion 1 -nolookup -nointeractive
+      "
+    # Copy report from remote staging VM to local job workspace
+    - scp $SSH_USERID@$STAGING_VM:/tmp/nikto_scan/nikto-output.html .
+  artifacts:
+    paths: [nikto-output.html]
+    when: always
+    expire_in: 1 week
+  allow_failure: true
+  only: [main]
+  when: manual
+  tags: [gitlabwb-php-docker-154]
+
+# ======================================================
+# 5. Performance Testing (k6)
+# ======================================================
+
+# ⚡ K6 Load / Performance Test
+# - Runs performance tests using Grafana k6 against the deployed application
+# - Test script is defined in `common_config/performance-test.js`
+# - Uses `--insecure-skip-tls-verify` to bypass TLS certificate errors (if self-signed/invalid certs)
+# - Exports raw results in JSON format for further analysis
+# - Intended to generate summary reports (e.g., summary.html) for visualization
+# - Artifacts are kept for 1 week for review
+# - Runs manually and marked as allow_failure so it won’t block pipeline
+k6_loadtest:
+  stage: performance_test
+  image:
+    name: grafana/k6:latest
+    entrypoint: [""]
+  script:
+    # Run k6 performance test
+    - k6 run --insecure-skip-tls-verify --out json=k6-results.json common_config/performance-test.js
+  artifacts:
+    paths: [k6-results.json, summary.html]
+    expire_in: 1 week
+  allow_failure: true
+  when: manual
+  tags: [gitlabwb-php-docker-154]
+
+
+
+# ======================================================
+# 6. API Testing (Postman/Newman)
+# ======================================================
+
+# 🔗 Postman API Tests (via Newman)
+# - Executes API tests using Postman collection with Newman CLI
+# - Collection file: common_config/PostmanCrowd.postman_collection.json
+# - Runs multiple iterations (count controlled by $API_ITERATION_COUNT)
+# - Generates detailed HTML report using htmlextra reporter
+# - Report is stored as an artifact (postman_report.html) for review
+# - Restricted to `main` branch; 
+# - Runs manually and marked as allow_failure so it won’t block pipeline
+postman_api_test:
+  stage: api_test
+  image:
+    name: postman/newman
+    entrypoint: [""]
+  script:
+    # Install Newman HTML reporter
+    - npm install -g newman-reporter-htmlextra
+    # Run Postman tests with CLI + HTML report
+    - newman run common_config/PostmanCrowd.postman_collection.json \
+        -n $API_ITERATION_COUNT \
+        --reporters cli,htmlextra \
+        --reporter-htmlextra-export postman_report.html
+  artifacts:
+    paths: [postman_report.html]
+  allow_failure: true
+  only: [main]
+  tags: [gitlabwb-php-docker-154]
+  when: manual
+
+
+
+# ======================================================
+# 7. Observability (Grafana + Prometheus + Loki)
+# ======================================================
+
+# 📊 Observability Stack Deployment / Health Check
+# - Ensures the observability stack (Loki, Prometheus, Node Exporter, Grafana, Promtail) 
+#   is running on the staging VM
+# - Copies monitoring configuration files (`loki-config.yaml`, `prometheus.yml`, etc.) 
+#   from repo → remote staging server
+# - Verifies if required containers are already running:
+#     • If all running → skips restart
+#     • If any missing/stopped → restarts stack via docker-compose
+# - Runs only on `main` branch and triggered manually
+# - Non-blocking job intended for DevOps/SRE visibility and reliability
+observability_stack:
+  stage: observability
+  before_script:
+    # Create target directory for observability configs on staging VM
+    - ssh -o StrictHostKeyChecking=no $SSH_USERID@$STAGING_VM "mkdir -p ~/loki/"
+    # Copy local observability config files to staging VM
+    - scp -r common_config/observability/* "$SSH_USERID@$STAGING_VM:~/loki/"
+  script:
+    - |
+      ssh -o StrictHostKeyChecking=no "$SSH_USERID@$STAGING_VM" '
+        set -e
+        cd ~/loki
+        # Ensure config files are readable
+        chmod 755 loki-config.yaml prometheus.yml
+        # List of required observability containers
+        REQUIRED_CONTAINERS="loki prometheus node-exporter grafana promtail"
+        ALL_RUNNING=true
+        # Check if all required containers are up & running
+        for container in $REQUIRED_CONTAINERS; do
+          if ! docker ps --filter "name=^/${container}$" --filter "status=running" \
+              --format "{{.Names}}" | grep -q "^${container}$"; then
+            ALL_RUNNING=false
+            break
+          fi
+        done
+        if [ "$ALL_RUNNING" = true ]; then
+          echo "✅ All observability containers are running. Skipping restart."
+        else
+          echo "❌ Restarting observability stack..."
+          docker-compose down --volumes --remove-orphans
+          docker-compose -f docker-compose.yaml up --build -d
+        fi
+      '
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  when: manual
+  tags: [gitlabwb-php-shell-154]
