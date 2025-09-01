@@ -1,6 +1,11 @@
 # PHP-DevSecOps-VM-Template
 
 
+# SonarQube-ReportLink
+
+
+## 🔍 **[View the Latest SonarQube Code Quality Report](http://sonar-gitlab.wb.nic.in/)**
+
 
 ## Getting started
 
