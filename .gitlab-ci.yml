@@ -14,14 +14,14 @@ variables:
   LOAD_TEST_URL: "http://${STAGING_VM}:${STAGING_PORT}"  # Base URL used for performance/load tests
 
   # Load Test Configuration
-  LOAD_TEST_USERNAME: "cloudsupport-wb@nic.in" # Username for load test authentication
-  LOAD_TEST_PASSWORD: "admin@wbgit"            # Password for load test authentication
-  LOAD_TEST_VIRTUAL_USERS: "500"               # Number of virtual users to simulate in load test
-  LOAD_TEST_DURATION: "1m"                     # Duration of load test (e.g., 1 minute)
-  LOAD_TEST_P95_THRESHOLD: "10000"             # Max acceptable 95th percentile response time (in ms)
+  LOAD_TEST_USERNAME: "<username>"              # Username for load test authentication
+  LOAD_TEST_PASSWORD: "<pwd>"                   # Password for load test authentication
+  LOAD_TEST_VIRTUAL_USERS: "500"                # Number of virtual users to simulate in load test
+  LOAD_TEST_DURATION: "1m"                      # Duration of load test (e.g., 1 minute)
+  LOAD_TEST_P95_THRESHOLD: "10000"              # Max acceptable 95th percentile response time (in ms)
 
   # API Test Parameters
-  API_ITERATION_COUNT: "1000"                  # Number of times each API test case should run
+  API_ITERATION_COUNT: "1000"                   # Number of times each API test case should run
 
   # PHP Runtime / Reporting
   PHP_MEMORY_LIMIT: "1024M"                    # Memory limit for PHP processes during analysis/tests
