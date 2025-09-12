@@ -1,6 +1,3 @@
-# PHP-DevSecOps-VM-Template
-
-
 # SonarQube-ReportLink
 
 
