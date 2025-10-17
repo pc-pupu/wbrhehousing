@@ -61,6 +61,7 @@ secret_detection:
   stage: security_precheck
   tags: [gitlabwb-php-docker-154]
   when: manual
+  allow_failure: true
 
 # 🛡️ OWASP Dependency Check
 # Runs OWASP Dependency-Check to identify known vulnerabilities (CVEs)
