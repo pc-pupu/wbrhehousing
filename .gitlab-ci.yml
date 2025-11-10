@@ -135,7 +135,7 @@ tools_install:
     paths: [vendor/, $REPORT_DIR/]
     expire_in: 7 days
     when: always
-  allow_failure: false
+  allow_failure: true
   when: manual
 
 
