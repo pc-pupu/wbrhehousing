@@ -1,0 +1,588 @@
+<?php
+
+	function waiting_list_menu() {
+		$items=array();
+		
+		$items['waiting_list']=array(       // applicant sees waitling list
+			'title' => 'View Waiting List Status',
+			//'page callback' => 'waiting_list_page',
+			'page callback' => 'drupal_get_form',
+      		'page arguments' => array('waiting_list_form'),
+			'file' => 'include/waiting_list_page.inc',
+			'access arguments' => array('administer Waiting List'),
+		);
+		
+		$items['view_waiting_list']=array(
+			'title' => 'View Waiting List',
+			'page callback' => 'view_waiting_list_page',
+			'file' => 'include/view_waiting_list_page.inc',
+			'access arguments' => array('administer View Waiting List'),
+		);
+		
+		$items['view_waiting_list_pdf/%']=array(
+			'title' => 'View Waiting List PDF',
+			'page callback' => 'view_waiting_list_page_pdf',
+			'page arguments' => array(1),
+			'file' => 'include/view_waiting_list_page_pdf.inc',
+			'access arguments' => array('administer View Waiting List PDF'),
+		);
+		
+		$items['flat_type_waiting_list']=array(
+			'title' => 'Flat Type Wise Waiting List',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('flat_type_waiting_list_form'),
+			'file' => 'include/flat_type_waiting_list_page.inc',
+			'access arguments' => array('administer View Waiting List'),
+		);
+		
+		$items['flat_type_waiting_list_pdf/%/%']=array(
+			'title' => 'Flat Type Wise Waiting List PDF',
+			'page callback' => 'flat_type_waiting_list_page_pdf',
+			'page arguments' => array(1, 2),
+			'file' => 'include/flat_type_waiting_list_page_pdf.inc',
+			'access arguments' => array('administer View Waiting List PDF'),
+		);
+		
+		//for housing official
+		$items['flattype_applicant_vacancy']=array(
+			'title' => 'Flat Type Wise Waiting Applicant and Flat Vacancy',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('flattype_applicant_vacancy_form'),
+			'file' => 'include/flattype_applicant_vacancy_page.inc',
+			'access arguments' => array('administer Waiting Applicant and Flat Vacancy'),
+		);
+		
+		$items['flattype_applicant_vacancy_pdf/%/%/%']=array(
+			'title' => 'Flat Type Wise Waiting Applicant and Flat Vacancy PDF',
+			'page callback' => 'flattype_applicant_vacancy_page_pdf',
+			'page arguments' => array(1, 2, 3),
+			'file' => 'include/flattype_applicant_vacancy_page_pdf.inc',
+			'access arguments' => array('administer Waiting Applicant and Flat Vacancy'),
+		);
+		
+		return $items;
+	}
+	
+	
+	function waiting_list_permission() {
+		return array(
+			'administer Waiting List' => array(
+				'title' => t('administer Waiting List'),
+      			'description' => t('Perform administer Waiting List.'),
+			),
+			
+			'administer View Waiting List' => array(
+				'title' => t('administer View Waiting List'),
+      			'description' => t('Perform administer View Waiting List.'),
+			),
+			
+			'administer View Waiting List PDF' => array(
+				'title' => t('administer View Waiting List PDF'),
+      			'description' => t('Perform administer View Waiting List PDF.'),
+			),
+			
+			'administer Waiting Applicant and Flat Vacancy' => array(
+				'title' => t('administer Waiting Applicant and Flat Vacancy'),
+      			'description' => t('Perform administer Waiting Applicant and Flat Vacancy.'),
+			),
+		);	
+	}
+	
+
+//fetch application details for waiting list page	
+	function application_fetch_detail($online_application_id = 0, $application_no = ''){
+		// echo $application_no.'hello'; die();
+		global $user;
+		
+		$app_type_arr = explode('-', $application_no);
+		$app_type = $app_type_arr[0];
+
+
+		
+		// $query = db_select('housing_applicant_official_detail', 'haod');
+		// $query->innerJoin('housing_online_application', 'hoa','hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		// $query->innerJoin('housing_ddo', 'hd','hd.ddo_id = haod.ddo_id');
+		// $query->innerJoin('housing_pay_band', 'hpb','hpb.pay_band_id = haod.pay_band_id');
+		// $query->leftJoin('housing_new_allotment_application', 'hna','hna.online_application_id = hoa.online_application_id');
+		// $query->leftJoin('housing_vs_application', 'hva','hva.online_application_id = hoa.online_application_id');
+		// $query->leftJoin('housing_cs_application', 'hca','hca.online_application_id = hoa.online_application_id');
+		
+		// if($app_type == 'NA'){
+		// 	$query->leftJoin('housing_flat_type', 'hft','hna.flat_type_id = hft.flat_type_id');
+		// }else if($app_type == 'VS'){
+		// 	$query->leftJoin('housing_flat_type', 'hft','hva.flat_type_id = hft.flat_type_id');
+		// }else if($app_type == 'CS'){
+		// 	$query->leftJoin('housing_flat_type', 'hft','hca.flat_type_id = hft.flat_type_id');
+		// }else if($app_type == 'PA'){
+
+		// }
+		
+		
+		// $query->leftJoin('housing_flat_type', 'hft','hva.flat_type_id = hft.flat_type_id');
+		
+		
+		
+		// $query->leftJoin('housing_license_application', 'hla','hla.online_application_id = hoa.online_application_id');
+		
+		// $query->addField('hft', 'flat_type_id');
+		// $query->addField('hft', 'flat_type');
+		// $query->addField('hoa', 'online_application_id');
+		// $query->addField('hoa', 'application_no');
+		// $query->addField('hd', 'district_code');
+		// $query->addField('hd', 'ddo_designation');
+		// $query->addField('hd', 'ddo_address');
+		// $query->addField('haod', 'applicant_designation');
+		// $query->addField('haod', 'applicant_headquarter');
+		// $query->addField('haod', 'applicant_posting_place');
+		// $query->addField('hpb', 'payband');
+		// $query->addField('hpb', 'scale_from');
+		// $query->addField('hpb', 'scale_to');
+		// $query->addField('haod', 'uid');
+		// $query->addField('haod', 'pay_in_the_pay_band');
+		// $query->addField('haod', 'grade_pay');
+		// $query->addField('haod', 'date_of_joining');
+		// $query->addField('haod', 'date_of_retirement');
+		// $query->addField('haod', 'office_name');
+		// $query->addField('haod', 'office_street');
+		// $query->addField('haod', 'office_city_town_village');
+		// $query->addField('haod', 'office_post_office');
+		// $query->addField('haod', 'office_pin_code');
+		// $query->addField('hoa', 'status');
+		// $query->addField('hoa', 'date_of_application');
+		// $query->addField('hoa', 'date_of_verified');
+		
+		// $query->condition('hoa.application_no', $application_no);
+		// $query->condition('haod.is_active', 1);
+
+		//updated by dg 23-07-2025//
+		$query = db_select('housing_applicant_official_detail', 'haod');
+		$query->fields('haod');
+
+		$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->fields('hoa');
+
+		$query->innerJoin('housing_ddo', 'hd', 'hd.ddo_id = haod.ddo_id');
+		$query->fields('hd');
+
+		$query->innerJoin('housing_pay_band_categories', 'hpb', 'hpb.pay_band_id = haod.pay_band_id');
+		$query->fields('hpb');
+
+		$query->leftJoin('housing_new_allotment_application', 'hna', 'hna.online_application_id = hoa.online_application_id');
+		$query->fields('hna');
+
+		$query->leftJoin('housing_vs_application', 'hva', 'hva.online_application_id = hoa.online_application_id');
+		$query->fields('hva');
+
+		$query->leftJoin('housing_cs_application', 'hca', 'hca.online_application_id = hoa.online_application_id');
+		$query->fields('hca');
+		if($app_type == 'NA' || $app_type == 'PA'){
+			$query->leftJoin('housing_flat_type', 'hft','hna.flat_type_id = hft.flat_type_id');
+		}else if($app_type == 'VS'){
+			$query->leftJoin('housing_flat_type', 'hft','hva.flat_type_id = hft.flat_type_id');
+		}else if($app_type == 'CS'){
+			$query->leftJoin('housing_flat_type', 'hft','hca.flat_type_id = hft.flat_type_id');
+		}
+
+		//$query->leftJoin('housing_flat_type', 'hft', 'hva.flat_type_id = hft.flat_type_id');
+		$query->fields('hft');
+
+		$query->leftJoin('housing_license_application', 'hla', 'hla.online_application_id = hoa.online_application_id');
+		$query->fields('hla');
+		$query->condition('haod.is_active', 1);
+		if($online_application_id == 0){
+			$query->condition('haod.uid', $user->uid, '=');
+		}
+		else{
+			$query->condition('hoa.online_application_id', $online_application_id, '=');
+		}
+		// echo $query; die();
+		return $query->execute();
+	}
+	//end//
+	//fetch application details for view waiting list page	
+	function application_waiting_detail() {
+		
+		
+		$app_data = array();
+		
+		//$result = db_query("select online_application_id, status, application_no from housing_online_application where status='verified' and substring(application_no,1,2) = 'NA' or substring(application_no,1,4) = 'BLNA' order by online_application_id asc");
+		
+		$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
+							computer_serial_no 
+							from {housing_applicant} ha
+							inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
+							inner join {housing_online_application} hoa 
+							on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+							inner join {housing_new_allotment_application} hnaa 
+							on hnaa.online_application_id = hoa.online_application_id
+							inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+							where status= :status and substring(application_no,1,2) = :app_no
+							order by to_number(hoa.computer_serial_no, text(9999999999)) asc, hoa.computer_serial_no asc", 
+							array(':status' => 'verified', ':app_no' => 'NA'));
+		$i = 1;
+		$j = 0;
+		while($data = $result->fetchObject()) {
+			$app_data[$j]['applicant_name'] = $data->applicant_name;
+			$app_data[$j]['application_no'] = $data->application_no;
+			$app_data[$j]['flat_type'] = $data->flat_type;
+			$app_data[$j]['computer_serial_no'] = $data->computer_serial_no;
+			//$app_data[$j]['waiting_no'] = $i;
+			$i++;
+			$j++;
+		}
+		
+		
+		return $app_data;
+	}
+	
+	
+	function get_individual_waiting_no($application_no = '') {
+		
+		$app_data = array();
+		$waiting_no = 0;
+		$app_data = application_waiting_detail();
+		
+		for($i=0; $i<sizeof($app_data); $i++){
+			if($application_no == $app_data[$i]['application_no'])
+				$waiting_no = $app_data[$i]['waiting_no'];
+		}
+		
+		
+		return $waiting_no;
+	}
+	
+	//fetch application details for view waiting list flat type wise
+	function flat_type_wise_waiting_detail($flat_type_id = '', $app_type = '') {
+		$app_data = array();
+		//$app_type = 'NA';
+		// echo $flat_type_id;die;
+		if($flat_type_id == 5) {
+
+			$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
+							flat_type, computer_serial_no, allotment_category, grade_pay
+							from {housing_applicant} ha
+							inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
+							inner join {housing_online_application} hoa 
+							on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+							inner join {housing_new_allotment_application} hnaa 
+							on hnaa.online_application_id = hoa.online_application_id
+							inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+							where status = :status and hft.flat_type_id = :flat_type_id 
+							ORDER BY 
+			                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
+			                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC",   //added b dg 04-12-2025
+							//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));
+							//debaleena start//
+							//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+							array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));  //debaleena 04-09-2024
+							//end//
+		} else {
+		
+			/* Start Modified by moumita 17-10-2025*/
+
+			// $result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
+			// 				flat_type, computer_serial_no, hnaa.allotment_category, grade_pay
+			// 				from {housing_applicant} ha
+			// 				inner join {housing_applicant_official_detail} haod on haod.housing_applicant_id = ha.housing_applicant_id
+			// 				inner join {housing_online_application} hoa 
+			// 				on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+			// 				inner join {housing_new_allotment_application} hnaa 
+			// 				on hnaa.online_application_id = hoa.online_application_id
+			// 				left join {housing_vs_application} hva 
+			// 				on hva.online_application_id = hoa.online_application_id
+			// 				left join {housing_cs_application} hca 
+			// 				on hca.online_application_id = hoa.online_application_id
+			// 				inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+			// 				where status = :status and hft.flat_type_id = :flat_type_id 
+			// 				and ((substring(application_no,1,2) = :app_no)or(substring(application_no,1,2) = :app_no_pa)or(substring(application_no,1,2) = :app_no_vs)or(substring(application_no,1,2) = :app_no_cs)) 
+			// 				order by online_application_id asc", 
+			// 				//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+
+			// 				//debaleena start//
+			// 				//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+			// 				array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA', ':app_no_pa' => 'PA', ':app_no_vs' => 'VS', ':app_no_cs' => 'CS'));   //debaleena 04-09-2024
+							//end//
+				//updated by dg 23-07-2025//
+				$sql = "SELECT applicant_name, hoa.online_application_id, status, application_no, 	
+		               flat_type, computer_serial_no, hnaa.allotment_category, grade_pay
+		        FROM {housing_applicant} ha
+		        INNER JOIN {housing_applicant_official_detail} haod 
+		            ON haod.housing_applicant_id = ha.housing_applicant_id
+		        INNER JOIN {housing_online_application} hoa 
+		            ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id ";
+
+				
+				if ($app_type == 'NA' || $app_type == 'PA') {
+				    $sql .= "INNER JOIN {housing_new_allotment_application} hnaa 
+				                ON hnaa.online_application_id = hoa.online_application_id ";
+				    $sql .= "INNER JOIN {housing_flat_type} hft 
+				                ON hnaa.flat_type_id = hft.flat_type_id ";
+				    //$orderby_con = 'order by cast(hoa.computer_serial_no AS integer) ASC';
+	                $orderby_con = "ORDER BY 
+									regexp_replace(hoa.computer_serial_no, '\\D', '', 'g')::int ASC,
+									regexp_replace(hoa.computer_serial_no, '\\d', '', 'g') ASC";   //added by dg 04-12-2025
+				} elseif ($app_type == 'VS') {
+				    $sql .= "LEFT JOIN {housing_vs_application} hva 
+				                ON hva.online_application_id = hoa.online_application_id ";
+				    $sql .= "INNER JOIN {housing_flat_type} hft 
+				                ON hva.flat_type_id = hft.flat_type_id ";
+				    $sql .= "LEFT JOIN {housing_new_allotment_application} hnaa 
+				                ON hnaa.online_application_id = hoa.online_application_id "; // Needed for allotment_category and grade_pay
+				    $orderby_con = 'ORDER BY hoa.online_application_id ASC';
+				} elseif ($app_type == 'CS') {
+				    $sql .= "LEFT JOIN {housing_cs_application} hca 
+				                ON hca.online_application_id = hoa.online_application_id ";
+				    $sql .= "INNER JOIN {housing_flat_type} hft 
+				                ON hca.flat_type_id = hft.flat_type_id ";
+				    $sql .= "LEFT JOIN {housing_new_allotment_application} hnaa 
+				                ON hnaa.online_application_id = hoa.online_application_id "; // Needed for allotment_category and grade_pay
+				    $orderby_con = 'ORDER BY hoa.online_application_id ASC';
+				}
+
+				/* by dg 24-07-2025 */
+				$codn_arr = array(
+				    ':status' => 'housingapprover_approved_1',
+				    ':flat_type_id' => $flat_type_id,
+				);
+
+
+				if($app_type == 'NA' || $app_type == 'PA'){
+					$where_con = '';
+
+				}else{
+					$where_con = 'AND SUBSTRING(hoa.application_no, 1, 2) = :app_no';
+					$codn_arr[':app_no'] = $app_type;
+				}
+
+				
+				$sql .= " WHERE hoa.status = :status AND hft.flat_type_id = :flat_type_id ".$where_con." ".$orderby_con;
+
+				/* End Modified by moumita 17-10-2025*/
+
+				// Execute query
+				$result = db_query($sql, $codn_arr);
+				/* end */
+				// Execute query
+				// $result = db_query($sql, array(
+				//     ':status' => 'housingapprover_approved_1',
+				//     ':flat_type_id' => $flat_type_id,
+				//     ':app_no' => $app_type,
+				// ));
+
+				//end//
+		}
+		//$data = $result->fetchAll();
+		//echo "<pre>";print_r($sql);die;
+		$i = 1;
+		$j = 0;
+		
+
+		while($data = $result->fetchObject()) {
+			
+			$app_data[$j]['waiting_no'] = $i;
+			$app_data[$j]['applicant_name'] = $data->applicant_name;
+			$app_data[$j]['application_no'] = $data->application_no;
+			//$app_data[$j]['allotment_category'] = $data->allotment_category;
+			$app_data[$j]['flat_type'] = $data->flat_type;
+			if($flat_type_id == 5) {
+				$app_data[$j]['grade_pay'] = $data->grade_pay;
+				$app_data[$j]['computer_serial_no'] = $data->computer_serial_no;	
+			} else {
+				$app_data[$j]['computer_serial_no'] = $data->computer_serial_no;
+			}
+			//$app_data[$j]['status'] = $data->status;
+			$i++;
+			$j++;
+		}
+		// echo $i.'<br>'.$j;die;
+		 // print_r($app_data);die;
+		return $app_data;
+	}
+
+	//fetch application details for view waiting list flat type wise 19-09-2025 
+	function flat_type_wise_waiting_detail_for_competent_authority($flat_type_id = '') {
+		$app_data = array();
+
+		if($flat_type_id == 5) {
+
+			$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
+							flat_type, computer_serial_no, allotment_category, grade_pay
+							from {housing_applicant} ha
+							inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
+							inner join {housing_online_application} hoa 
+							on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+							inner join {housing_new_allotment_application} hnaa 
+							on hnaa.online_application_id = hoa.online_application_id
+							inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+							where status = :status and hft.flat_type_id = :flat_type_id 
+							ORDER BY 
+			                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
+			                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC",  
+							//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));
+							//debaleena start//
+							//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+							array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type_id));  //debaleena 04-09-2024
+							//end//
+		} else {
+		
+			// $result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
+			// 				flat_type, computer_serial_no, hnaa.allotment_category, grade_pay
+			// 				from {housing_applicant} ha
+			// 				inner join {housing_applicant_official_detail} haod on haod.housing_applicant_id = ha.housing_applicant_id
+			// 				inner join {housing_online_application} hoa 
+			// 				on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+			// 				inner join {housing_new_allotment_application} hnaa 
+			// 				on hnaa.online_application_id = hoa.online_application_id
+			// 				left join {housing_vs_application} hva 
+			// 				on hva.online_application_id = hoa.online_application_id
+			// 				left join {housing_cs_application} hca 
+			// 				on hca.online_application_id = hoa.online_application_id
+			// 				inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+			// 				where status = :status and hft.flat_type_id = :flat_type_id 
+			// 				and ((substring(application_no,1,2) = :app_no)or(substring(application_no,1,2) = :app_no_pa)or(substring(application_no,1,2) = :app_no_vs)or(substring(application_no,1,2) = :app_no_cs)) 
+			// 				order by online_application_id asc", 
+			// 				//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+
+			// 				//debaleena start//
+			// 				//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+			// 				array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA', ':app_no_pa' => 'PA', ':app_no_vs' => 'VS', ':app_no_cs' => 'CS'));   //debaleena 04-09-2024
+							//end//
+				//updated by dg 23-07-2025//
+				$sql = "SELECT applicant_name, hoa.online_application_id, status, application_no, 	
+		               flat_type, computer_serial_no, hnaa.allotment_category, grade_pay
+		        FROM {housing_applicant} ha
+		        INNER JOIN {housing_applicant_official_detail} haod 
+		            ON haod.housing_applicant_id = ha.housing_applicant_id
+		        INNER JOIN {housing_online_application} hoa 
+		            ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id ";
+
+				
+				
+				$sql .= "INNER JOIN {housing_new_allotment_application} hnaa 
+				        ON hnaa.online_application_id = hoa.online_application_id ";
+				$sql .= "INNER JOIN {housing_flat_type} hft 
+				        ON hnaa.flat_type_id = hft.flat_type_id ";
+				$sql .= "WHERE hoa.status = :status 
+				          AND hft.flat_type_id = :flat_type_id 
+				          ORDER BY 
+                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
+                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC";
+
+				/* by dg 24-07-2025 */
+				$codn_arr = array(
+				    ':status' => 'housingapprover_approved_1',
+				    ':flat_type_id' => $flat_type_id,
+				);
+
+				
+
+				// Execute query
+				$result = db_query($sql, $codn_arr);
+				/* end */
+				// Execute query
+				// $result = db_query($sql, array(
+				//     ':status' => 'housingapprover_approved_1',
+				//     ':flat_type_id' => $flat_type_id,
+				//     ':app_no' => $app_type,
+				// ));
+
+				//end//
+		}
+		// $data = $result->fetchAll();
+		// echo "<pre>";print_r($data);die;
+		$i = 1;
+		$j = 0;
+		
+
+		while($data = $result->fetchObject()) {
+			
+			$app_data[$j]['waiting_no'] = $i;
+			$app_data[$j]['applicant_name'] = $data->applicant_name;
+			$app_data[$j]['application_no'] = $data->application_no;
+			$app_data[$j]['allotment_category'] = $data->allotment_category;
+			$app_data[$j]['flat_type'] = $data->flat_type;
+			if($flat_type_id == 5) {
+				$app_data[$j]['grade_pay'] = $data->grade_pay;
+				$app_data[$j]['computer_serial_no'] = $data->computer_serial_no;	
+			} else {
+				$app_data[$j]['computer_serial_no'] = $data->computer_serial_no;
+			}
+			//$app_data[$j]['status'] = $data->status;
+			$i++;
+			$j++;
+		}
+		// echo $i.'<br>'.$j;die;
+		 // print_r($app_data);die;
+		return $app_data;
+	}
+	
+	
+	function flat_type_wise_waiting_no($application_no = '', $flat_type_id = '') {
+		// echo $application_no;die;
+
+		$app_data_arr = explode('-', $application_no);
+		$app_type = $app_data_arr[0];
+
+		$app_data = array();
+		$flat_type_waiting_no = 0;
+		/////debaleena start 11.06.24////
+		$query = db_select('housing_online_application', 'hoa');
+		$query->innerJoin('housing_allotment_status_master', 'hasm','hoa.status = hasm.short_code');
+
+
+		$query->leftJoin('housing_new_allotment_application', 'hna', 'hna.online_application_id = hoa.online_application_id');
+		$query->fields('hna');
+
+		$query->leftJoin('housing_vs_application', 'hva', 'hva.online_application_id = hoa.online_application_id');
+		$query->fields('hva');
+
+		$query->leftJoin('housing_cs_application', 'hca', 'hca.online_application_id = hoa.online_application_id');
+		$query->fields('hca');
+		if($app_type == 'NA' || $app_type == 'PA'){
+			$query->leftJoin('housing_flat_type', 'hft','hna.flat_type_id = hft.flat_type_id');
+		}else if($app_type == 'VS'){
+			$query->leftJoin('housing_flat_type', 'hft','hva.flat_type_id = hft.flat_type_id');
+		}else if($app_type == 'CS'){
+			$query->leftJoin('housing_flat_type', 'hft','hca.flat_type_id = hft.flat_type_id');
+		}
+
+		//$query->leftJoin('housing_flat_type', 'hft', 'hva.flat_type_id = hft.flat_type_id');
+		$query->fields('hft');
+
+
+		//$query->leftJoin('housing_vs_application', 'hva','hva.online_application_id = hoa.online_application_id');
+		$query->addField('hasm', 'status_description');
+		$query->addField('hoa', 'status');
+		$query->condition('hoa.application_no', $application_no);
+	 
+		$result = $query->execute();
+		$result = $result->fetchObject();
+		// echo "<pre>";print_r($result);die;
+		///end///
+		
+		//if($result->status == 'housing_sup_approved_1')   // by debaleena 11.06.24
+		if($result->status == 'housingapprover_approved_1' )
+		{
+
+			$app_data = flat_type_wise_waiting_detail($flat_type_id,$app_type);
+			// echo "<pre>";print_r($app_data);
+			for($i=0; $i<sizeof($app_data); $i++){
+				
+				if($application_no == $app_data[$i]['application_no'])
+					$flat_type_waiting_no = $app_data[$i]['waiting_no'];
+			} 
+			
+		}else{
+			$flat_type_waiting_no = $result->status_description;
+		}
+		
+		return $flat_type_waiting_no;
+	}
+	
+	//Waiting no of a particular applicant
+	/*function waiting_no_list() {
+		$result = db_query("select online_application_id, status, application_no from housing_online_application where status='verified' and substring(application_no,1,2) = 'NA' order by online_application_id asc");
+		
+		$result->fetchObject();
+		
+	}*/

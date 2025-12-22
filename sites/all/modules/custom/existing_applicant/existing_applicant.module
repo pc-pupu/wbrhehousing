@@ -1,0 +1,629 @@
+<?php
+
+	function existing_applicant_init() {
+		drupal_add_library('system','ui.datepicker');
+		
+		drupal_add_css(drupal_get_path('module', 'common_application') . '/css/select2.min.css');
+		drupal_add_js(drupal_get_path('module', 'common_application') . '/js/select2.min.js');
+	}
+	
+	function existing_applicant_menu() {
+		$items = array();
+		$items['existing_applicant_entry'] = array(
+			'title'=>'Existing Applicant(Waiting List Applicant) Data Entry',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=>array('existing_applicant_form'),
+			'file' => 'include/existing_applicant_form.inc',
+			'access arguments' => array('administer Existing Applicant Form'),
+			//'access callback'=>TRUE
+		);
+
+		/*Done by Subham dt.21-07-2025*/
+		$items['view-legacy-applicant-list-whrms'] = array(
+			'title' => 'Legacy Applicant List with HRMS ID',
+			'page callback' => 'view_legacy_applicant_list_with_hrms_form',
+			'page arguments' => array(),
+			'access arguments' => array('administer Physical Applicant List Display')
+		);
+
+		/*Done by Subham dt.21-07-2025*/
+		$items['view-legacy-applicant-list-wohrms'] = array(
+			'title' => 'Legacy Applicant List without HRMS ID',
+			'page callback' => 'view_legacy_applicant_list_without_hrms_form',
+			'page arguments' => array(),
+			'access arguments' => array('administer Physical Applicant List Display')
+		);
+
+		/*Done by Subham turned off 21-07-2025
+		$items['view-legacy-applicant-list'] = array(
+			'title' => 'Legacy Applicant List',
+			'page callback' => 'view_legacy_applicant_list_form',
+			'page arguments' => array(),
+			'access arguments' => array('access content')
+		); */
+
+		/* by dg 20-06-2025 update on 16-07-2025*/
+		$items['search-with-physical-application-no'] = array(
+			'title' => 'Legacy Applicant Details Check',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('physical_applicant_search_form'),
+			'access arguments' => array('access content')
+		);
+
+		 $items['physical-application-view/%'] = array(
+			'title' => 'View Physical Application Details',
+			'page callback' => 'search_physical_data_fetch',
+			'page arguments' => array(1),
+			'access arguments' => array('access content'),
+		);
+		$items['physical-application-edit/%'] = array(
+			'title' => 'Edit Physical Application Details',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=>array('existing_applicant_edit_form', 1),
+			'file' => 'include/existing_applicant_edit_form.inc',
+			'access arguments' => array('access content'),
+		);
+		$items['physical-application-accept-declaration/%/%/%'] = array(
+			'title' => 'Physical Application Accept Declaration',
+			'page callback' => 'search_physical_application_declaration',
+			'page arguments' => array(1,2,3),
+			'access arguments' => array('access content'),
+		);
+		return $items;	
+		
+	}
+	
+	function existing_applicant_permission() {
+		return array(
+			'administer Existing Applicant Form' => array(
+				'title' => t('administer Existing Applicant Form'),
+				'description' => t('Perform administer Existing Applicant Form.'),
+			),
+
+			'administer Physical Applicant List Display' => array(
+				'title' => t('administer Physical Applicant List Display'),
+				'description' => t('Perform administer to see Physical Applicant List.'),
+			),
+		);	
+
+	
+	}
+
+	/*Done by Subham*/
+	function view_legacy_applicant_list_with_hrms_form() {
+		global $base_root, $base_path,$user,$user_role;
+		$output = '';
+
+		if (db_table_exists('housing_applicant')) {
+			$query = db_select('housing_applicant', 'ha');
+
+			$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');
+			$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+			$query->innerJoin('housing_pay_band_categories', 'hpbc', 'hpbc.pay_band_id = haod.pay_band_id');  //added by dg on 12-11-2025
+			$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hpbc.flat_type_id');  //added by dg on 12-11-2025
+			//$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+			//$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+			//$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+			//$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+
+			$query->condition('hoa.application_no', 'PA%', 'LIKE');
+			$query->condition('hoa.is_backlog_applicant', '1', '=');
+			$query->isNotNull('haod.hrms_id');
+
+			$query->addField('ha', 'applicant_name');
+			$query->addField('ha', 'guardian_name');
+			$query->addField('ha', 'mobile_no');
+			$query->addField('ha', 'gender');
+			
+			$query->addField('ha', 'present_street');
+			$query->addField('ha', 'present_city_town_village');
+			$query->addField('ha', 'present_post_office');
+			$query->addField('ha', 'present_pincode');
+			$query->addField('ha', 'present_district');
+
+			$query->addField('ha', 'permanent_street');
+			$query->addField('ha', 'permanent_city_town_village');
+			$query->addField('ha', 'permanent_post_office');
+			$query->addField('ha', 'permanent_pincode');
+			$query->addField('ha', 'permanent_district');
+			
+			$query->addField('hoa', 'application_no');
+			$query->addField('hoa', 'date_of_application');
+			$query->addField('hoa', 'computer_serial_no');
+			$query->addField('hoa', 'online_application_id');
+			$query->addField('haod', 'hrms_id');
+			$query->addField('hpbc', 'flag');  //added by dg on 12-11-2025
+			$query->addField('hft', 'flat_type');  //added by dg on 12-11-2025
+
+			// $query->addExpression('CAST(hoa.computer_serial_no AS INTEGER)', 'serial_no_int'); //added by dg 29-07-2025
+			// $query->orderBy('serial_no_int', 'ASC');
+
+			// added by Moumita on 14-11-2025
+			// Order by numeric part first
+			$query->orderBy("regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int", 'ASC');
+
+			// Then order by alphabet part
+			$query->orderBy("regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g')", 'ASC');
+			
+			//$query->addField('he', 'estate_name');
+			//$query->addField('hft', 'flat_type');
+
+			$result =$query->execute();
+
+			///////////////////debaleena 23-09-2024////////////////////////
+			$header['sl_no'] = array('data' => 'Sl. No.'); // added on 24-06-2025 by dg
+			$header['application_no'] = array('data' => 'Application No');
+			$header['applicant_name'] = array('data' => 'Applicant Name');
+			$header['date_of_application'] = array('data' => 'Date of Application');
+			$header['computer_serial_no'] = array('data' => 'Computer Serial No');
+			$header['hrms_id'] = array('data' => 'HRMS ID');
+			$header['mobile_no'] = array('data' => 'Mobile No.');
+			$header['gender'] = array('data' => 'Gender');
+			$header['flat_type'] = [
+			    'data' => 'Flat Type <span style="color:#0394fc;">(Pay Scale)</span>'  //added by dg on 12-11-2025
+			];
+			if($user_role == 13){
+				$header['view_details'] = array('data' => 'View Details');
+			}
+			// $header['present_address'] = array('data' => 'Present Address'); // added on 24-06-2025 by dg
+			// $header['parmanent_address'] = array('data' => 'Permanent Address'); // added on 24-06-2025 by dg
+			if($user_role == 7){
+				$header['action'] = array('data' => 'Action', 'width'=>'10%'); // added on 24-06-2025 by dg
+			}
+			
+			$rows =array();
+		   	$output = '';
+		    $c= 1;
+
+		   	while($data = $result->fetchObject()) {
+			   $fields = array();
+
+			   $fields[] = $c;		
+			   $fields[] = $data->application_no;
+			   $fields[] = $data->applicant_name;
+			   $fields[] = $data->date_of_application;
+			   $fields[] = $data->computer_serial_no;
+			   $fields[] = $data->hrms_id;
+			   $fields[] = $data->mobile_no;
+			   $fields[] = $data->gender;
+			   $fields[] = $data->flat_type.'<span style="color:#0394fc;">('.$data->flag.')</span>'; //added by dg on 12-11-2025
+			   if($user_role == 13){
+					$fields[] = l('<span class="btn bg-success btn-sm fa fa-eye text-white rounded" style="font-size:12px" ></span>' ,
+					'physical-applicant-details/'.encrypt_url($data->application_no).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+				);
+				}
+			//    $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','.$data->present_district .','. $data->present_pincode;
+			//    $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.$data->permanent_district .','. $data->permanent_pincode;
+				if($user_role == 7){
+					$fields[] = l('<i class="fa fa-edit"></i> Edit', 'physical-application-edit/'.encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
+				}   
+			  
+			   $rows[] = $fields;
+			   $c++;
+		  	}
+		
+			$variables = array(
+				'attributes' => array('class'=>array('table table-list table-striped')),
+				'header' => $header,
+				'rows' => $rows,
+				'sticky' => true,
+				'empty' => t("No data found!") // The message to be displayed if table is empty
+				);
+				//end
+			//sd turned off 21-06-2024
+			if(count($rows) > 0) {
+				// Render using Drupal's render API.
+				$build['datatable'] = array(
+					'#theme' => 'datatable',
+					'#header' => $header,
+					'#rows' => $rows,
+					'#attributes' => array(),
+				);
+				
+				// Or, render using a theme function.
+				$variables = array(
+					'attributes' => array('class'=>array('table table-list table-striped')),
+					'header' => $header,
+					'rows' => $rows,
+				);
+				
+				$output = theme('datatable', $variables);
+			}
+			else {
+				$output = '<div>
+								<table class="datatable_no_data_found table table-list">
+									<tr class="tr_no_data_found">
+										<th class="th_no_data_found"></th>
+									</tr>
+									<tr class="tr_no_data_found">
+										<td class="td_no_data_found">No data found!</td>
+									</tr>
+								</table>
+							</div>';
+			}
+		
+		   return $output;
+		}
+
+	}
+
+	/*Done by Subham dt.21-07-2025*/
+	function view_legacy_applicant_list_without_hrms_form() {
+		global $base_root, $base_path,$user,$user_role;
+		$output = '';
+
+		if (db_table_exists('housing_applicant')) {
+			$query = db_select('housing_applicant', 'ha');
+
+			$query->leftJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid'); // edited by Moumita on 09-12-2025
+			$query->leftJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+			$query->leftJoin('housing_pay_band_categories', 'hpbc', 'hpbc.pay_band_id = haod.pay_band_id');  //added by dg on 12-11-2025
+			$query->leftJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hpbc.flat_type_id');  //added by dg on 12-11-2025
+			//$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+			//$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+			//$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+			//$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+
+			$query->condition('hoa.application_no', 'PA%', 'LIKE');
+			$query->condition('hoa.is_backlog_applicant', '1', '=');
+			$query->isNull('haod.hrms_id');
+
+			$query->addField('ha', 'applicant_name');
+			$query->addField('ha', 'guardian_name');
+			$query->addField('ha', 'mobile_no');
+			$query->addField('ha', 'gender');
+			
+			$query->addField('ha', 'present_street');
+			$query->addField('ha', 'present_city_town_village');
+			$query->addField('ha', 'present_post_office');
+			$query->addField('ha', 'present_pincode');
+			$query->addField('ha', 'present_district');
+
+			$query->addField('ha', 'permanent_street');
+			$query->addField('ha', 'permanent_city_town_village');
+			$query->addField('ha', 'permanent_post_office');
+			$query->addField('ha', 'permanent_pincode');
+			$query->addField('ha', 'permanent_district');
+			
+			$query->addField('hoa', 'application_no');
+			$query->addField('hoa', 'date_of_application');
+			$query->addField('hoa', 'computer_serial_no');
+			$query->addField('hoa', 'online_application_id');
+			$query->addField('hpbc', 'flag');  //added by dg on 12-11-2025
+			$query->addField('hft', 'flat_type');  //added by dg on 12-11-2025
+			//$query->addField('he', 'estate_name');
+			//$query->addField('hft', 'flat_type');
+
+			// $query->addExpression('CAST(hoa.computer_serial_no AS INTEGER)', 'serial_no_int'); //added by dg 29-07-2025
+			// $query->orderBy('serial_no_int', 'ASC');
+
+			// added by Moumita on 14-11-2025
+			// Order by numeric part first
+			$query->orderBy("regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int", 'ASC');
+
+			// Then order by alphabet part
+			$query->orderBy("regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g')", 'ASC');
+
+			$result =$query->execute();
+
+			///////////////////debaleena 23-09-2024////////////////////////
+			$header['sl_no'] = array('data' => 'Sl. No.'); // added on 24-06-2025 by dg
+			$header['application_no'] = array('data' => 'Application No');
+			$header['applicant_name'] = array('data' => 'Applicant Name');
+			$header['date_of_application'] = array('data' => 'Date of Application');
+			$header['computer_serial_no'] = array('data' => 'Computer Serial No');
+			$header['mobile_no'] = array('data' => 'Mobile No.');
+			$header['gender'] = array('data' => 'Gender');
+			$header['flat_type'] = [
+			    'data' => 'Flat Type <span style="color:#0394fc;">(Pay Scale)</span>','width'=>'10%'  //added by dg on 12-11-2025
+			];
+			if($user_role == 13){
+				$header['view_details'] = array('data' => 'View Details');
+			}
+			// $header['present_address'] = array('data' => 'Present Address'); // added on 24-06-2025 by dg
+			// $header['parmanent_address'] = array('data' => 'Permanent Address'); // added on 24-06-2025 by dg
+			if($user_role == 7){
+			$header['action'] = array('data' => 'Action', 'width'=>'10%'); // added on 24-06-2025 by dg
+			}
+			$rows =array();
+		   	$output = '';
+		    $c= 1;
+
+		   	while($data = $result->fetchObject()) {
+			   $fields = array();
+
+			   $fields[] = $c;		
+			   $fields[] = $data->application_no;
+			   $fields[] = $data->applicant_name;
+			   $fields[] = $data->date_of_application;
+			   $fields[] = $data->computer_serial_no;
+			   $fields[] = $data->mobile_no;
+			   $fields[] = $data->gender;
+			   $fields[] = $data->flat_type.'<span style="color:#0394fc;">('.$data->flag.')</span>'; //added by dg on 12-11-2025
+			   if($user_role == 13){
+					$fields[] = l('<span class="btn bg-success btn-sm fa fa-eye text-white rounded" style="font-size:12px" ></span>' ,
+					'physical-applicant-details/'.encrypt_url($data->application_no).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+				);
+				}
+			//    $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','.$data->present_district .','. $data->present_pincode;
+			//    $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.$data->permanent_district .','. $data->permanent_pincode;
+				if($user_role == 7){	
+					$fields[] = l('<i class="fa fa-edit"></i> Edit', 'physical-application-edit/'.encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
+				}   
+			  
+			   $rows[] = $fields;
+			   $c++;
+		  	}
+		
+			$variables = array(
+				'attributes' => array('class'=>array('table table-list table-striped')),
+				'header' => $header,
+				'rows' => $rows,
+				'sticky' => true,
+				'empty' => t("No data found!") // The message to be displayed if table is empty
+				);
+				//end
+			//sd turned off 21-06-2024
+			if(count($rows) > 0) {
+				// Render using Drupal's render API.
+				$build['datatable'] = array(
+					'#theme' => 'datatable',
+					'#header' => $header,
+					'#rows' => $rows,
+					'#attributes' => array(),
+				);
+				
+				// Or, render using a theme function.
+				$variables = array(
+					'attributes' => array('class'=>array('table table-list table-striped')),
+					'header' => $header,
+					'rows' => $rows,
+				);
+				
+				$output = theme('datatable', $variables);
+			}
+			else {
+				$output = '<div>
+								<table class="datatable_no_data_found table table-list">
+									<tr class="tr_no_data_found">
+										<th class="th_no_data_found"></th>
+									</tr>
+									<tr class="tr_no_data_found">
+										<td class="td_no_data_found">No data found!</td>
+									</tr>
+								</table>
+							</div>';
+			}
+		
+		   return $output;
+		}
+
+	}
+
+
+	/* by dg on 20-06-2025  update on 16-07-2025*/
+	function physical_applicant_search_form(){
+		
+		global $user_role;
+
+		$form['wrapper_row_info']['physical_computer_button'] = array(
+		    '#type' => 'radios',
+		    '#title' => t('Activation Status'),
+		    '#options' => array(
+		      1 => t('Physical Application No.'),
+		      2 => t('Computer Serial No.'),
+		    ),
+		    '#prefix' => '<div class="row"><div class="col-md-5"><div class="form-floating">',
+		    '#suffix' => '</div></div></div>',
+		    '#default_value' => 1
+		 );
+
+		$title_txt = t('Enter Your physical Application Number or Computer serial No: ');
+
+		$form['physical_application_no'] = array(
+			'#type' => 'textfield',
+			'#title' => $title_txt,
+			'#default_value' => '',
+			'#attributes' => array('placeholder' => 'Enter Your physical Application Number or Computer serial No', 'class' => array('form-control form-control-sm')),
+			'#required' => TRUE,
+			'#prefix' => '<div class="row"><div class="col-md-8"><div class="form-floating">',
+			'#suffix' => '</div></div></div>',
+		);
+
+		$form['submit_row'] = array(
+			'#prefix' => '<div class="row"><div class="col-md-12 text-center">',
+			'#suffix' => '</div></div>',
+		);
+
+		$form['submit_row']['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Submit'),
+			'#attributes' => array('class' => array('btn bg-primary btn-sm px-5 rounded-pill text-white fw-bolder')),
+		);
+
+		$form['submit_row']['exit_btn'] = array(
+			'#type' => 'markup',
+			'#markup' => l('Exit', 'user/logout', array('html'=>true, 'attributes'=>array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'))))
+		);
+
+		return $form;
+	}
+
+
+	function physical_applicant_search_form_submit($form,&$form_state){
+
+		
+		$physical_computer_button = $form_state['values']['physical_computer_button'];
+		$app_no = isset($form_state['values']['physical_application_no']) && !empty($form_state['values']['physical_application_no']) ? $form_state['values']['physical_application_no'] : '';
+
+		$online_application_id = NULL;
+
+		// echo $app_no;die;
+		$query = db_select('housing_online_application', 'hoa');
+		$query->fields('hoa', ['application_no', 'online_application_id']);
+			if(!empty($physical_computer_button) && $physical_computer_button == 1){
+				$query->condition('hoa.physical_application_no', $app_no);
+			}else if(!empty($physical_computer_button) && $physical_computer_button == 2){
+				$query->condition('hoa.computer_serial_no', $app_no);
+			}else{
+				drupal_set_message(t('The Physical Application Number or Computer Serial No. is Incorrect.'), 'error');
+		 		return;
+			}
+		$result = $query->execute()->fetchObject();
+		// echo "<pre>";print_r($result);die;
+
+
+		// if (!empty($app_no)) {
+		// 	$parts = explode('-', $app_no);
+
+		// 	$query = db_select('housing_online_application', 'hoa');
+		// 	$query->fields('hoa', ['application_no', 'online_application_id']);
+			
+		// 	if (!empty($parts[0]) && strtoupper($parts[0]) == 'PA') {
+		// 		//echo "pp";die;
+		// 		$query->condition('hoa.application_no', $app_no);
+		// 	} else if (is_numeric($parts[0])) {
+		// 		//echo "kk".$parts[0];die;
+		// 		$query->condition('hoa.computer_serial_no', $app_no);
+		// 	} else {
+		// 		//echo "aa";die;
+		// 		drupal_set_message(t('The Application Number is Incorrect.'), 'error');
+		// 		return;
+		// 	}
+
+		// 	$result = $query->execute()->fetchObject();
+
+		if ($result && isset($result->online_application_id)) {
+			$online_application_id = $result->online_application_id;
+			drupal_goto('physical-application-view/' . encrypt_url($online_application_id));
+		} else {
+			drupal_set_message(t('No matching application found.'), 'error');
+		}
+		
+
+	}
+
+	function search_physical_data_fetch($app_id = ''){
+		global $base_root,$base_path,$user;
+		// echo $user->uid; echo $user->name; die;
+		$hrmsid = $user->name;
+		$email = $user->mail;
+		$uid = $user->uid;
+		$app_id = decrypt_url($app_id);
+
+		$query = db_select('housing_applicant', 'ha');
+		$query->innerJoin('housing_applicant_official_detail','haod','haod.housing_applicant_id = ha.housing_applicant_id');
+		$query->innerJoin('housing_online_application','hoa','hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->innerjoin('users','u','u.uid = haod.uid');
+		$query->fields('ha', ['applicant_name', 'mobile_no','date_of_birth']);
+		$query->fields('hoa', ['application_no','date_of_application','online_application_id']);
+		$query->addField('u','mail');
+		$query->condition('hoa.online_application_id', $app_id);
+		$result = $query->execute();
+		$data = $result->fetchObject();
+
+		// echo "<pre>";print_r($data);die;
+
+		$display_output1 = '
+		    <div class="table-bottom">
+		        <table class="table table-list">
+		          <tr>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>
+		          </tr>
+		           <tr>
+		            <th style="background-color:#00000000" width="50%">Application Number:</th>
+		            <td width="50%">Application for Existing Occupant Without HRMS ID</td>
+		          </tr>
+		          <tr>
+		            <th style="background-color:#00000000" width="50%">Application Number:</th>
+		            <td width="50%">'.(isset($data->application_no) ? $data->application_no : 'Not Avalaible').'</td>
+		          </tr>
+				  <tr>
+		            <th style="background-color:#00000000">Email:</th>
+		            <td>'.(isset($email) ? $email : 'Not Avalaible').'</td>
+		          </tr>
+		          <tr>
+		            <th style="background-color:#00000000">Date of Application:</th>
+		            <td>'.(isset($data->date_of_application) ? $data->date_of_application : 'Not Avalaible').'</td>
+		          </tr>
+
+				  
+		         
+		        </table>
+		    </div>
+			
+			<div class="mb-3 d-flex align-items-center" style="margin-top: 50px;">
+				<label for="readonlyField" style="background-color: #473a39; color: white; padding: 8px; border-radius: 4px; min-width: 100px; text-align: center;" class="me-3">
+					HRMS ID
+				</label>
+  				<input type="text" id="readonlyField" class="form-control-plaintext" value='.$hrmsid.' readonly>
+			</div>
+			
+			 <form action='.$base_root.$base_path.'physical-application-accept-declaration'.'/'.encrypt_url($app_id).'/'.encrypt_url($hrmsid).'/'.encrypt_url($uid).' class="" method="post">
+				<div class="form-check mb-2">
+					<input class="form-check-input" type="checkbox" id="acceptCheck" required>
+					<label class="form-check-label" for="acceptCheck">
+					I accept 
+					</label>
+				</div>
+				<div class="form-text text-muted mb-3">
+					I do hearby declare that this Application bearing App No- '.(isset($data->application_no) ? $data->application_no : 'Not Avalaible').' was submitted by me to the Housing Department.
+				</div>
+
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>';
+
+    	return $display_output1;
+
+	}
+
+	function search_physical_application_declaration($app_id = '', $hrms_id = '', $uid = ''){
+		$app_id = decrypt_url($app_id);
+		$hrms_id = decrypt_url($hrms_id);
+		$uid = decrypt_url($uid);
+		
+
+		$official_detail = db_query("
+		    SELECT haod.applicant_official_detail_id, haod.housing_applicant_id ,u.uid
+		    FROM housing_applicant_official_detail haod 
+		    INNER JOIN housing_online_application hoa 
+		        ON haod.applicant_official_detail_id = hoa.applicant_official_detail_id 
+		    INNER JOIN users u 
+		        ON u.uid = haod.uid 
+		    WHERE hoa.online_application_id = :app_id", 
+		    array(':app_id' => $app_id)
+		)->fetchAssoc();
+		// echo "<pre>";print_r($official_detail);die;
+
+		$official_detail_id = $official_detail['applicant_official_detail_id'];
+		$housing_applicant_id = $official_detail['housing_applicant_id'];
+		$old_uid = $official_detail['uid'];
+		
+
+			// If found, update the official_detail table
+			if ($official_detail_id) {
+				db_update('housing_applicant_official_detail')
+					->fields(array('hrms_id' => $hrms_id,'uid' => $uid))
+					->condition('applicant_official_detail_id', $official_detail_id)
+					->execute();
+
+				db_update('housing_applicant')
+					->fields(array('uid' => $uid))
+					->condition('housing_applicant_id', $housing_applicant_id)
+					->execute();
+
+				db_update('users')
+					->fields(array('status' => '0'))
+					->condition('uid',$old_uid)
+					->execute();
+
+				drupal_set_message('HRMS ID of the physical application has been successfully updated.');
+			}
+			drupal_goto('physical-application-view/'.encrypt_url($app_id));
+		
+	}
+
+
+	/*  end  */

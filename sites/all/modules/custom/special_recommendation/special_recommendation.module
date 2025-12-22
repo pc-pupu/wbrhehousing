@@ -1,0 +1,1185 @@
+<?php
+
+function special_recommendation_menu() {
+  global $user;
+  $items = array();
+
+  $items['housing-approver-list'] = array(
+    'title' => 'List of Applications Approved by Housing Approver',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('housing_approver_list'),
+    'access arguments' => array('access content'),
+  );
+
+  // added dt.13-10-2025
+  $items['view-app-det/%'] = array(
+    'title' => 'View Application Details',	
+    'page callback' => 'spl_recommendation_view_details',
+    'page arguments' => array(1),
+    'access arguments' => array('access content')
+  );
+
+  $items['convrt-to-gen-cat/%'] = array(	
+    'page callback' => 'convert_from_recommended_to_general_category',
+    'page arguments' => array(1),
+    'access arguments' => array('administer convert from recommended to general category')
+  );
+  //end
+
+  $items['special-recommended-list'] = array(
+    'title' => 'Final List of Special Recomendation',
+    'page callback' => 'fetch_special_recommended_list',
+    'page arguments' => array(),
+    'access arguments' => array('access content'),
+
+  );
+
+  $items['special-recommendation/%/%'] = array(
+    'page callback' => 'special_recommendation',
+    'page arguments' => array(1,2),
+    'access arguments' => array('access content'),
+
+  );
+
+  $items['special-recommendation-list-view'] = array( //added 29-10-2024
+    'title' => t('Edit Special Recommendation List'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('special_recommendation_list_view_form'),
+    'access arguments' => array('administer recommendation list'),
+
+  );
+  $items['special-recommendation-remove/%'] = array( //added 30-10-2024
+    'page callback' => 'special_recommendation_remove',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+
+  );
+  $items['special-recommendation-occupant/%'] = array( //added 28-07-2025
+    'title' => t('Flat Tagging for Special Recommendation'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('special_recommendation_occupant',1),
+    'file' => 'special_recommendation_occupant.inc',
+    'access arguments' => array('administer recommendation list'),
+  );
+
+  return $items;
+}
+
+//added 29-10-2024
+function special_recommendation_permission() {
+  return array(
+    'administer recommendation list' => array(
+      'title' => t('administer Recommendation List'),
+      'description' => t('perform administer Recommendation List.'),
+    ),
+
+    'administer convert from recommended to general category' => array( // added dt.13-10-2025
+      'title' => t('administer Convert from Recommended to General Category'),
+      'description' => t('perform administer to Convert from Recommended to General Category.'),
+    ),
+  );  
+}
+
+//added 29-10-2024
+function special_recommendation_list_view_form($form, &$form_state){
+  drupal_add_js(drupal_get_path('module', 'special_recommendation') . '/js/sort.js');
+  drupal_add_js(drupal_get_path('module', 'special_recommendation') . '/js/jquery-ui.js');
+  drupal_add_css(drupal_get_path('module', 'special_recommendation') . '/css/jquery-ui.css');
+
+  global $base_root, $base_path;
+  $output = '';
+  
+  if (db_table_exists('housing_online_application')) {
+   
+    $query = db_select('housing_online_application', 'hoa');
+    //$query->fields('hoa', array());
+    
+    $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+    $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+    $query->innerJoin('housing_special_recommended', 'hsr', 'hsr.housing_online_application_id = hoa.online_application_id');
+    
+    
+    $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id','status'));
+    $query->addField('ha', 'applicant_name');
+    $query->addField('hnaa', 'allotment_category');
+    $query->addField('hft', 'flat_type');
+    $query->addField('hsr', 'priority_order');
+    
+
+    //$query->condition('hoa.status','housingapprover_approved_1','=');
+    $query->condition('haod.is_active','1','=');
+    $query->orderBy('hsr.priority_order','ASC');
+
+    $result = $query->execute();
+    //$data = $result->fetchAll();
+    //echo "<pre>";print_r($data);die;
+
+    ///////////////////debaleena 23-09-2024////////////////////////
+    $header['applicant_name'] = array('data' => 'Name');
+    $header['application_no'] = array('data' => 'Application No.');
+    $header['date_of_application'] = array('data' => 'Date of Application');
+    $header['computer_serial_no'] = array('data' => 'Computer Serial NO.');
+    $header['allotment_category'] = array('data' => 'Allotment Reason');
+    $header['flat_type'] = array('data' => 'Flat Type');
+    $header['date_of_verified'] = array('data' => 'Approval/Rejection Date');
+    $header['priority_order'] = array('data' => 'Priority Order');
+    
+    
+
+    
+    $rows =array();
+    $output = '';
+    $i=0;
+    while($data = $result->fetchObject()) {
+      $fields = array();
+      
+      $fields[] = $data->applicant_name;
+      $fields[] = $data->application_no;
+      $fields[] = date('d/m/Y', strtotime($data->date_of_application));
+      $fields[] = $data->computer_serial_no;
+      $fields[] = $data->allotment_category;  
+      $fields[] = $data->flat_type;
+      $fields[] = date('d/m/Y', strtotime($data->date_of_verified));
+      $fields[] = $data->priority_order;
+          
+      
+
+      $rows[] = array('data' => $fields, 'data-id' => $data->online_application_id);
+      $i++;
+    }
+
+    $variables = array(
+      'attributes' => array('class'=>array('table table-list table-striped')),
+      'header' => $header,
+      'rows' => $rows,
+      'sticky' => true,
+      'empty' => t("No data found!") // The message to be displayed if table is empty
+      );
+      //end
+    //sd turned off 21-06-2024
+    if(count($rows) > 0) {
+      // Render using Drupal's render API.
+      $build['datatable'] = array(
+        '#theme' => 'datatable',
+        '#header' => $header,
+        '#rows' => $rows,
+        //'#attributes' => array('id' => 'sortable'),
+       // '#id' => 'IdforRow',
+
+      );
+      
+      // Or, render using a theme function.
+      $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped'),'id'=>'sortable'),
+        'header' => $header,
+        'rows' => $rows,
+      );
+      
+      $output = theme('datatable', $variables);
+      
+    }
+    else {
+      $output = '<div>
+              <table class="datatable_no_data_found table table-list">
+                <tr class="tr_no_data_found">
+                  <th class="th_no_data_found"></th>
+                </tr>
+                <tr class="tr_no_data_found">
+                  <td class="td_no_data_found">No data found!</td>
+                </tr>
+              </table>
+            </div>';
+    }
+    // return $output;
+
+    $form = array();
+
+    $form['note'] = array(
+      '#markup' => '<span style="font-size:18px; color:blue;">*Drag applicant\'s name up or down to edit the list</span>',
+    );
+
+    $form['output'] = array(
+      '#type'     => 'markup',
+      '#markup'   => $output
+    );
+
+    $form['online_application_ids'] = array(
+        '#type' => 'hidden',
+        //'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+        //'#suffix' => '</div></div></div>',
+        '#attributes' => array('class' => array('form-control'),'id' => array('online_app_ids')),
+    );
+
+    /*$form['save_sorting'] = array(
+      // '#type' => 'markup',
+      // '#markup' => '<div class="row"><div class="col-md-6"><div class="form-floating">'.l(t('Save Sorting'),'#',array('html'=>true, 'attributes' => array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'), 'id' => array('savebtn')))).'</div></div>',
+
+      '#type' => 'button',
+      '#value' => t('Save Sorting'),
+      '#prefix' => '<br><div class="row"><div class="col-md-6"><div class="form-floating">',
+      '#suffix' => '</div></div>',
+      '#attributes' => array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'),'id' => array('savebtn'))
+    );*/
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Submit'),
+      '#prefix' => '<div class="col-md-6"><div class="form-floating">',
+      '#suffix' => '</div></div></div>',
+      '#attributes' => array('class'=>array('btn bg-primary btn-sm px-5 rounded-pill text-white fw-bolder'),'id' => array('savebtn')),
+      // '#submit' => array('special_recommendation_form_submit')
+    );
+  return $form;
+  }        
+}
+
+//added 29-10-2024
+function special_recommendation_list_view_form_submit($form, &$form_state) {
+  $online_application_ids = $form_state['values']['online_application_ids'];
+  $ids=explode(',',$online_application_ids);
+  $i=1;
+
+  foreach($ids as $online_application_id){
+    db_update('housing_special_recommended')
+    ->fields(array(
+      'priority_order' => $i,// added sd 29-10-2024
+      'updated_at' => date('Y-m-d h:i:s')
+      )
+    )
+    ->condition('housing_online_application_id', $online_application_id, '=')
+    ->execute();
+    $i++;
+  }
+
+  drupal_set_message('Data Saved successfully.');
+  drupal_goto('special-recommendation-list-view');
+} 
+
+function housing_approver_list($form, &$form_state){
+  global $base_root, $base_path;
+  $output = '';
+
+  $type_of_category = array(
+    '' => '-Select-',
+    'General'=>'General',
+    'Judicial Officer On Transfer'=>'Judicial Officer On Transfer',
+    'Transfer'=> 'Transfer',
+    'Recommended'=> 'Recommended',
+    'Physically Handicaped Or Serious Illness'=> 'Physically Handicaped Or Serious Illness',
+    'Single Earning Lady'=> 'Single Earning Lady',
+    'Legal Heir'=> 'Legal Heir',
+  );
+
+  /* Added by Subham 21-11-2025 */
+  $form['dropdown_wrapper_row'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div class="row">',
+  );
+
+  /** Added by Moumita on 30-10-2024 */
+  $form['type_of_category'] = array(
+    '#type' => 'select',
+    '#options' => $type_of_category,
+    '#title' => t('Select Allotment Reason'),
+    '#attributes' => array('class' => array('form-select')),
+    '#prefix' => '<div class="col-md-3"><div class="form-floating">',
+    '#suffix' => '</div></div>',
+    '#required' => TRUE
+  );
+
+  /* Added by Subham 21-11-2025 */
+  $flat_type = array(
+    '' => '-Select-',
+    '5'=>'A+',
+    '1'=>'A',
+    '2'=> 'B',
+    '3'=> 'C',
+    '4'=> 'D',
+  );
+
+ /* Added by Subham 21-11-2025 */
+  $form['flat_type'] = array(
+    '#type' => 'select',
+    '#options' => $flat_type,
+    '#title' => t('Select Flat Type'),
+    '#attributes' => array('class' => array('form-select')),
+    '#prefix' => '<div class="col-md-3"><div class="form-floating">',
+    '#suffix' => '</div></div>',
+    '#required' => TRUE
+  );
+
+  /* Added by Subham 21-11-2025 */
+  $form['dropdown_wrapper_row_end'] = array(
+    '#type' => 'markup',
+    '#markup' => '</div>',
+  );
+
+  $form['show_data'] = array(
+		'#type' => 'submit',
+		'#value' => 'Search',
+		'#attributes' => array('class'=>array('btn bg-primary btn-sm px-5 rounded-pill text-white mb-4 fw-bolder')),
+		'#prefix' => '<div class="row"><div class="col-md-6" >',
+		'#suffix' => '</div>',
+	);
+
+  /** End */
+
+  if(isset($form_state['values']['type_of_category'])) {
+    if (db_table_exists('housing_online_application')) {
+   
+$query = db_select('housing_online_application', 'hoa');
+//$query->fields('hoa', array());
+
+$query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+$query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+$query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+
+// $query->innerJoin('housing_vs_application', 'hva', 'hva.online_application_id = hoa.online_application_id');
+// $query->innerJoin('housing_cs_application', 'hca', 'hca.online_application_id = hoa.online_application_id');
+
+$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+
+$query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+$query->addField('ha','applicant_name');
+$query->addField('hnaa', 'allotment_category');
+$query->addField('hft', 'flat_type');
+
+$query->isNotNull('haod.hrms_id');   //added by dg 26-06-2025
+$query->condition('hoa.status','housingapprover_approved_1','=');
+$query->condition('haod.is_active','1','=');
+
+$query->condition('hnaa.allotment_category',$form_state['values']['type_of_category']);
+$query->condition('hnaa.flat_type_id', $form_state['values']['flat_type']); /* Added by Subham 21-11-2025 */
+
+$result = $query->execute();
+
+
+///////////////////debaleena 23-09-2024////////////////////////
+$header['applicant_name'] = array('data' => 'Name');
+$header['application_no'] = array('data' => 'Application No.');
+$header['date_of_application'] = array('data' => 'Date of Application');
+$header['computer_serial_no'] = array('data' => 'Computer Serial NO.');
+$header['allotment_category'] = array('data' => 'Allotment Reason');
+$header['flat_type'] = array('data' => 'Flat Type', 'width' => '8%');
+$header['date_of_verified'] = array('data' => 'Approval/Rejection Date', 'width' => '10%');
+$header['action'] = array('data' => 'Action'); //added dt.13-10-2025
+
+$rows =array();
+$output = '';
+
+while($data = $result->fetchObject()) {
+$fields = array();
+      
+$fields[] = $data->applicant_name;
+$fields[] = $data->application_no;
+$fields[] = date('d/m/Y', strtotime($data->date_of_application));
+$fields[] = $data->computer_serial_no;
+$fields[] = $data->allotment_category;  
+$fields[] = $data->flat_type;
+$fields[] = date('d/m/Y', strtotime($data->date_of_verified));
+      
+
+$query1 = db_select('housing_special_recommended', 'hsr');
+$query1->addField('hsr', 'special_recommend_id');
+$query1->condition('hsr.housing_online_application_id',$data->online_application_id,'=');
+     
+$result1 = $query1->execute();
+$data1 = $result1->fetchObject();
+
+if(isset($data1->special_recommend_id) && $data1->special_recommend_id > 0)
+{
+$fields[] = '<span style="color: blue; font-size: 15px;">Added for Special</span><br><span style="color: blue; font-size: 15px;">Recommendation</span>
+'.l(
+'<br><span class="btn bg-danger btn-sm fa fa-minus text-white rounded" style="font-size:12px" title="Remove from Special Recommendation List"> Remove</span>' , 'special-recommendation-remove/'.encrypt_url($data->online_application_id), array('html'=>TRUE)).'<br><br>'.l('View Details', 'view-app-det/'.encrypt_url($data->online_application_id), array('html'=>TRUE,'attributes'=> array('target' => '_blank', 'class' => array('btn bg-primary btn-sm px-4.5 rounded-pill text-white fw-bolder')))
+); //added 30-10-2024 ;;;; updated dt.13-10-2025
+
+//'<span  style="font-size:15px";"color:red"; > Selected for Special</span><br><span style="font-size:15px">Recommendation</span>';
+
+}else{
+$action_buttons = ''; //added dt.13-10-2025
+          $action_buttons .= l(
+            '<span class="btn bg-success btn-sm fa fa-plus text-white rounded" style="font-size:12px" title="Add to Special Recommendation List"> Add to List</span>' ,
+            'special-recommendation/'.encrypt_url($data->online_application_id).'/'.encrypt_url($data->allotment_category).'/', 
+            array('html'=>TRUE)).'<br><br>'.l('View Details', 'view-app-det/'.encrypt_url($data->online_application_id), array('html'=>TRUE,'attributes'=> array('target' => '_blank', 'class' => array('btn bg-primary btn-sm px-4.5 rounded-pill text-white fw-bolder')))
+          );
+          $action_buttons .= '<br><br>';
+          if($data->allotment_category == 'Recommended'){ //added dt.13-10-2025
+            $action_buttons .= l(
+              '<span class="btn bg-success btn-sm fa fa-hourglass-1 text-white rounded" style="font-size:12px" title="Convert to General Category with same waiting list"> Convert to General</span>' , 'convrt-to-gen-cat/'.encrypt_url($data->online_application_id), array('html'=>TRUE));
+          }
+          $fields[] = $action_buttons; //added dt.13-10-2025
+        }
+        
+        
+        //   $fields[] = l(
+        //    '<span class="btn bg-danger btn-sm fa fa-trash text-white rounded" style="font-size:12px" ></span>' ,
+        //    'estate-treasury-selection/delete/'.encrypt_url($data->housing_treasury_estate_mapping_id).'/', 
+        //    array('html'=>TRUE,'attributes'=> array('target' => '_blank','onclick' => $onclick))
+        //  );
+        
+        $rows[] = $fields;
+      }
+
+      
+
+      $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped')),
+        'header' => $header,
+        'rows' => $rows,
+        'sticky' => true,
+        'empty' => t("No data found!") // The message to be displayed if table is empty
+        );
+        //end
+      //sd turned off 21-06-2024
+      if(count($rows) > 0) {
+        // Render using Drupal's render API.
+        $build['datatable'] = array(
+          '#theme' => 'datatable',
+          '#header' => $header,
+          '#rows' => $rows,
+          '#attributes' => array(),
+        );
+        
+        // Or, render using a theme function.
+        $variables = array(
+          'attributes' => array('class'=>array('table table-list table-striped')),
+          'header' => $header,
+          'rows' => $rows,
+        );
+        
+        $output = '<div><span style="color:#ff0000" > * Only records with the HRMS id are shown in this list</span>'.theme('datatable', $variables).'</div>';
+      }
+      else {
+        $output = '<div>
+                <table class="datatable_no_data_found table table-list">
+                  <tr class="tr_no_data_found">
+                    <th class="th_no_data_found"></th>
+                  </tr>
+                  <tr class="tr_no_data_found">
+                    <td class="td_no_data_found">No data found!</td>
+                  </tr>
+                </table>
+              </div>';
+      }
+    }
+  }else{
+    if (db_table_exists('housing_online_application')) {
+   
+      $query = db_select('housing_online_application', 'hoa');
+      //$query->fields('hoa', array());
+      
+      $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+      $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+      $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+
+      // $query->innerJoin('housing_vs_application', 'hva', 'hva.online_application_id = hoa.online_application_id');
+      // $query->innerJoin('housing_cs_application', 'hca', 'hca.online_application_id = hoa.online_application_id');
+
+      $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+      
+      
+      $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+      $query->addField('ha', 'applicant_name');
+      $query->addField('hnaa', 'allotment_category');
+      $query->addField('hft', 'flat_type');
+      
+      $query->isNotNull('haod.hrms_id');   //added by dg 26-06-2025
+      $query->condition('hoa.status','housingapprover_approved_1','=');
+      $query->condition('haod.is_active','1','=');
+
+      $result = $query->execute();
+      // $data = $result->fetchAll();
+      // echo "<pre>";print_r($data);die;
+
+      ///////////////////debaleena 23-09-2024////////////////////////
+      $header['applicant_name'] = array('data' => 'Name');
+      $header['application_no'] = array('data' => 'Application No.');
+      $header['date_of_application'] = array('data' => 'Date of Application');
+      $header['computer_serial_no'] = array('data' => 'Computer Serial NO.');
+      $header['allotment_category'] = array('data' => 'Allotment Reason');
+      $header['flat_type'] = array('data' => 'Flat Type', 'width' => '8%');
+      $header['date_of_verified'] = array('data' => 'Approval/Rejection Date', 'width' => '10%');
+      $header['action'] = array('data' => 'Action'); //added dt.13-10-2025
+
+      
+      $rows =array();
+      $output = '';
+      
+      while($data = $result->fetchObject()) {
+        $fields = array();
+        
+        $fields[] = $data->applicant_name;
+        $fields[] = $data->application_no;
+        $fields[] = date('d/m/Y', strtotime($data->date_of_application));
+        $fields[] = $data->computer_serial_no;
+        $fields[] = $data->allotment_category;  
+        $fields[] = $data->flat_type;
+        $fields[] = date('d/m/Y', strtotime($data->date_of_verified));
+        
+
+        $query1 = db_select('housing_special_recommended', 'hsr');
+        $query1->addField('hsr', 'special_recommend_id');
+        $query1->condition('hsr.housing_online_application_id',$data->online_application_id,'=');
+        
+        $result1 = $query1->execute();
+        $data1 = $result1->fetchObject();
+
+        if(isset($data1->special_recommend_id) && $data1->special_recommend_id > 0)
+        {
+          $fields[] = '<span style="color: blue; font-size: 15px;">Added for Special</span><br><span style="color: blue; font-size: 15px;">Recommendation</span>
+          '.l(
+          '<br><span class="btn bg-danger btn-sm fa fa-minus text-white rounded" style="font-size:12px" title="Remove from Special Recommendation List"> Remove</span>' , 'special-recommendation-remove/'.encrypt_url($data->online_application_id), array('html'=>TRUE)).'<br><br>'.l('View Details', 'view-app-det/'.encrypt_url($data->online_application_id), array('html'=>TRUE,'attributes'=> array('target' => '_blank', 'class' => array('btn bg-primary btn-sm px-4.5 rounded-pill text-white fw-bolder')))
+          ); //added 30-10-2024 ;;;; updated dt.13-10-2025
+          
+          //'<span  style="font-size:15px";"color:red"; > Selected for Special</span><br><span style="font-size:15px">Recommendation</span>';
+      
+        }else{
+          $action_buttons = ''; //added dt.13-10-2025
+          $action_buttons .= l(
+            '<span class="btn bg-success btn-sm fa fa-plus text-white rounded" style="font-size:12px" title="Add to Special Recommendation List"> Add to List</span>' ,
+            'special-recommendation/'.encrypt_url($data->online_application_id).'/'.encrypt_url($data->allotment_category).'/', 
+            array('html'=>TRUE)).'<br><br>'.l('View Details', 'view-app-det/'.encrypt_url($data->online_application_id), array('html'=>TRUE,'attributes'=> array('target' => '_blank', 'class' => array('btn bg-primary btn-sm px-4.5 rounded-pill text-white fw-bolder')))
+          );
+          $action_buttons .= '<br><br>';
+          if($data->allotment_category == 'Recommended'){ //added dt.13-10-2025
+            $action_buttons .= l(
+              '<span class="btn bg-success btn-sm fa fa-hourglass-1 text-white rounded" style="font-size:12px" title="Convert to General Category with same waiting list"> Convert to General</span>' , 'convrt-to-gen-cat/'.encrypt_url($data->online_application_id), array('html'=>TRUE));
+          }
+          $fields[] = $action_buttons; //added dt.13-10-2025
+        }
+        
+        
+        //   $fields[] = l(
+        //    '<span class="btn bg-danger btn-sm fa fa-trash text-white rounded" style="font-size:12px" ></span>' ,
+        //    'estate-treasury-selection/delete/'.encrypt_url($data->housing_treasury_estate_mapping_id).'/', 
+        //    array('html'=>TRUE,'attributes'=> array('target' => '_blank','onclick' => $onclick))
+        //  );
+        
+        $rows[] = $fields;
+      }
+
+      
+
+      $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped')),
+        'header' => $header,
+        'rows' => $rows,
+        'sticky' => true,
+        'empty' => t("No data found!") // The message to be displayed if table is empty
+        );
+        //end
+      //sd turned off 21-06-2024
+      if(count($rows) > 0) {
+        // Render using Drupal's render API.
+        $build['datatable'] = array(
+          '#theme' => 'datatable',
+          '#header' => $header,
+          '#rows' => $rows,
+          '#attributes' => array(),
+        );
+        
+        // Or, render using a theme function.
+        $variables = array(
+          'attributes' => array('class'=>array('table table-list table-striped')),
+          'header' => $header,
+          'rows' => $rows,
+        );
+        
+        $output = '<div><span style="color:#ff0000" > * Only records with the HRMS id are shown in this list</span>'.theme('datatable', $variables).'</div>';
+      }
+      else {
+        $output = '<div>
+                <table class="datatable_no_data_found table table-list">
+                  <tr class="tr_no_data_found">
+                    <th class="th_no_data_found"></th>
+                  </tr>
+                  <tr class="tr_no_data_found">
+                    <td class="td_no_data_found">No data found!</td>
+                  </tr>
+                </table>
+              </div>';
+      }
+    }
+  }
+  
+  
+
+  $form['list_content'] = array(
+    '#type' => 'markup',
+    '#markup' => $output
+  );
+
+
+  return $form;
+
+}
+
+/** Added By Moumita on 30-10-2025 */
+function housing_approver_list_submit($form, &$form_state){
+  
+  $form_state['rebuild'] = TRUE;
+}
+
+
+function special_recommendation($online_application_id = '', $allotment_category = '')
+{
+  // echo $online_application_id;die;
+  
+  $online_application_id = decrypt_url($online_application_id);
+  $allotment_category = decrypt_url($allotment_category);
+
+
+  $query = db_select('housing_special_recommended','hsr');
+  $query->addExpression('MAX(priority_order)');
+  $max= $query->execute()->fetchField();
+  $max_order = ($max == '') ? '0' : $max;
+  
+  $special_recom_arr = array();
+  $special_recom_arr['housing_online_application_id'] = $online_application_id;
+  $special_recom_arr['old_category'] = $allotment_category;
+  $special_recom_arr['created_at'] = date('Y-m-d');
+  $special_recom_arr['new_category'] = 'special_recommended';
+  $special_recom_arr['priority_order'] =  $max_order + 1;
+
+
+  $query = db_select('housing_online_application', 'hoa');
+    //$query->fields('hoa', array());
+    //$query->innerJoin('housing_online_application', 'hoa', 'hsr.housing_online_application_id = hoa.online_application_id');
+    $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+    // $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+    // $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+    
+    
+    
+    $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+    $query->addField('ha', 'applicant_name');
+    //$query->addField('hnaa', 'allotment_category');
+    //$query->addField('hft', 'flat_type');
+    
+
+    $query->condition('hoa.status','housingapprover_approved_1','=');
+    $query->condition('haod.is_active','1','=');
+    $query->condition('hoa.online_application_id',$online_application_id,'=');
+
+    $result = $query->execute();
+    $data = $result->fetchObject();
+
+  
+    db_insert('housing_special_recommended')
+      ->fields($special_recom_arr)
+      ->execute();
+
+    //added 30-10-2024
+    $housing_new_allotment_application_upd_arr['allotment_category']  = 'Special Recommended';
+
+    db_update('housing_new_allotment_application')
+    ->fields($housing_new_allotment_application_upd_arr)
+    ->condition('online_application_id', $online_application_id)
+    ->execute();
+    //end 
+
+    drupal_set_message(t('Special Recommendation is Successful.'));
+    drupal_goto('housing-approver-list');
+
+}
+
+
+function fetch_special_recommended_list(){
+
+  global $base_root, $base_path;
+  $output = '';
+  
+  if (db_table_exists('housing_special_recommended')) {
+   
+    $query = db_select('housing_special_recommended', 'hsr');
+    //$query->fields('hoa', array());
+    $query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hsr.housing_online_application_id');
+    $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+    $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+    
+    $query->fields('hsr',array('housing_online_application_id','priority_order'));
+    $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+
+    $query->addField('ha', 'applicant_name');
+    $query->addField('hnaa', 'allotment_category');
+    $query->addField('hft', 'flat_type');
+    $query->addField('hoa', 'status');
+    
+    $query->condition('hoa.status','housingapprover_approved_1','=');
+    $query->condition('haod.is_active','1','=');
+
+    $query->orderBy('hsr.priority_order','ASC');
+
+
+    $result = $query->execute();
+    // $data = $result->fetchObject();
+    // echo "<pre>";print_r($data);die;
+
+    ///////////////////debaleena 23-09-2024////////////////////////
+    $header['applicant_name'] = array('data' => 'Name');
+    $header['application_no'] = array('data' => 'Application No.');
+    $header['date_of_application'] = array('data' => 'Date of Application');
+    $header['computer_serial_no'] = array('data' => 'Computer Serial NO.');
+    $header['allotment_category'] = array('data' => 'Allotment Reason');
+    $header['flat_type'] = array('data' => 'Flat Type');
+    $header['date_of_verified'] = array('data' => 'Approval/Rejection Date');
+    $header['priority_order'] = array('data' => 'Priority Order');
+    $header['manual_allot'] = array('data' => 'Manual Allotment');
+   
+    $rows =array();
+    $output = '';
+    
+    while($data = $result->fetchObject()) {
+      $fields = array();
+      
+      $fields[] = $data->applicant_name;
+      $fields[] = $data->application_no;
+      $fields[] = $data->date_of_application;
+      $fields[] = $data->computer_serial_no;
+      $fields[] = $data->allotment_category;  
+      $fields[] = $data->flat_type;
+      $fields[] = $data->date_of_verified;
+      $fields[] = $data->priority_order;
+      // add manual allotment link
+      if($data->status == 'housingapprover_approved_1'){
+        $fields[] = l(
+          '<span class="btn bg-success btn-sm fa fa-plus text-white rounded" style="font-size:12px" > Manual Allotment</span>' ,
+          'special-recommendation-occupant/'.encrypt_url($data->online_application_id), 
+          array('html'=>TRUE)
+        );
+      }else{
+        $fields[] = 'Not Applicable';
+      }
+      
+
+      $query1 = db_select('housing_special_recommended', 'hsr');
+      $query1->addField('hsr', 'special_recommend_id');
+      $query1->condition('hsr.housing_online_application_id',$data->online_application_id,'=');
+      
+      $result1 = $query1->execute();
+      $data1 = $result1->fetchObject();
+      
+      $rows[] = $fields;
+    }
+
+    
+
+    $variables = array(
+      'attributes' => array('class'=>array('table table-list table-striped')),
+      'header' => $header,
+      'rows' => $rows,
+      'sticky' => true,
+      'empty' => t("No data found!") // The message to be displayed if table is empty
+      );
+      //end
+    //sd turned off 21-06-2024
+    if(count($rows) > 0) {
+      // Render using Drupal's render API.
+      $build['datatable'] = array(
+        '#theme' => 'datatable',
+        '#header' => $header,
+        '#rows' => $rows,
+        '#attributes' => array(),
+      );
+      
+      // Or, render using a theme function.
+      $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped')),
+        'header' => $header,
+        'rows' => $rows,
+      );
+      
+      $output = theme('datatable', $variables);
+    }
+    else {
+      $output = '<div>
+              <table class="datatable_no_data_found table table-list">
+                <tr class="tr_no_data_found">
+                  <th class="th_no_data_found"></th>
+                </tr>
+                <tr class="tr_no_data_found">
+                  <td class="td_no_data_found">No data found!</td>
+                </tr>
+              </table>
+            </div>';
+    }
+  
+  return $output;
+  }
+}
+
+
+function get_special_recomendation_list(){
+  $query = db_select('housing_special_recommended', 'hsr');
+    //$query->fields('hoa', array());
+    $query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hsr.housing_online_application_id');
+    $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+    $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+    
+    $query->fields('hsr',array('special_recommend_id'));
+    $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+
+
+    $query->addField('ha', 'applicant_name');
+    $query->addField('hnaa', 'allotment_category');
+    $query->addField('hft', 'flat_type');
+    
+    $query->condition('hoa.status','housingapprover_approved_1','=');
+    $query->condition('haod.is_active','1','=');
+
+    $result = $query->execute();
+    return $data = $result->fetchAll();
+    // echo "<pre>";print_r($data);die;
+}
+
+function special_recommendation_form($form, &$form_state){
+  
+  $form = array();
+
+  $form['online_application_ids'] = array(
+      '#type' => 'textfield',
+      '#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+      '#suffix' => '</div></div>',
+      '#attributes' => array('class' => array('form-control'),'id' => array('online_application_ids')),
+      //'#required' => TRUE,
+  );
+
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#prefix' => '<div class="col-md-6"><div class="form-floating"><br><br>',
+    '#suffix' => '</div></div>',
+    '#attributes' => array('class'=>array('btn bg-primary btn-sm px-5 rounded-pill text-white fw-bolder')),
+    '#submit' => array('special_recommendation_form_submit')
+  );
+
+
+
+return $form;
+}
+
+//modified the function on 19-09-2025
+function special_recommendation_remove($online_application_id = '', $action = ''){
+  
+  $online_application_id = decrypt_url($online_application_id);
+  $spl_recommended_data = db_query("select * from housing_special_recommended
+  WHERE housing_online_application_id = " . $online_application_id);
+  $spl_recommended_data = $spl_recommended_data->fetchObject();
+  //print_r($spl_recommended_data);die;
+
+
+
+  //insert the spl recommended application in log table
+ if($action == 'manual'){
+  $housing_special_recommended_log_arr = array(
+    'special_recommend_id'  => $spl_recommended_data->special_recommend_id,
+    'housing_online_application_id' => $spl_recommended_data->housing_online_application_id,
+    'priority_order' => $spl_recommended_data->priority_order,
+    'flag' => 'manual-allotment-deleted',
+    'old_category'=>$spl_recommended_data->old_category,
+    'new_category'=>$spl_recommended_data->new_category,
+    'created_at_housing_special_recommended'=>$spl_recommended_data->created_at,
+    'updated_at_housing_special_recommended'=>$spl_recommended_data->updated_at,
+    'created_at' => date('Y-m-d H:i:s')
+  );
+  }else{
+    $housing_special_recommended_log_arr = array(
+    'special_recommend_id'  => $spl_recommended_data->special_recommend_id,
+    'housing_online_application_id' => $spl_recommended_data->housing_online_application_id,
+    'priority_order' => $spl_recommended_data->priority_order,
+    'flag' => 'deleted',
+    'old_category'=>$spl_recommended_data->old_category,
+    'new_category'=>$spl_recommended_data->new_category,
+    'created_at_housing_special_recommended'=>$spl_recommended_data->created_at,
+    'updated_at_housing_special_recommended'=>$spl_recommended_data->updated_at,
+    'created_at' => date('Y-m-d H:i:s')
+    );
+  }
+  
+  db_insert('housing_special_recommended_log')
+    ->fields($housing_special_recommended_log_arr)
+    ->execute();
+
+  if($action != 'manual'){  
+    //update the old allotment category in housing_new_allotment_application table
+    $housing_new_allotment_application_upd_arr['allotment_category']  = $spl_recommended_data->old_category;
+    //print_r($housing_new_allotment_application_upd_arr);die;
+
+    db_update('housing_new_allotment_application')
+    ->fields($housing_new_allotment_application_upd_arr)
+    ->condition('online_application_id', $online_application_id)
+    ->execute();
+  }
+
+    
+  //delete the spl recommended application from spl recommended table  
+  db_delete('housing_special_recommended')
+  ->condition('special_recommend_id', $spl_recommended_data->special_recommend_id)
+  ->execute();
+
+
+  $applicant_priority_order = $spl_recommended_data->priority_order;
+  
+
+  $query = db_select('housing_special_recommended','hsr');
+  $query->addExpression('MAX(priority_order)');
+  $max= $query->execute()->fetchField();
+  $max_order = ($max == '') ? '0' : $max;
+
+
+  //update priority orders for rest of the datas present in spl recommended table
+  for($i=$applicant_priority_order+1; $i<=$max_order; $i++){
+    $spl_recommended_data = db_query("UPDATE housing_special_recommended SET priority_order = $i-1
+    WHERE priority_order = $i");
+  }
+
+  if($action == 'manual'){
+    drupal_set_message(t('Flat has been successfully tagged for special recommendation.'));
+    drupal_goto('special-recommended-list');
+  }else{
+    drupal_set_message(t('Special Recommendation is Removed for the Application'));
+    drupal_goto('housing-approver-list');
+  }
+  
+}
+
+// added 13-10-2025
+function spl_recommendation_view_details($online_application_id = '') {
+  global $base_root, $base_path;
+  $dec_online_application_id = decrypt_url($online_application_id);
+
+  $output = '';
+  
+  if (db_table_exists('housing_online_application')) {
+   
+    $query = db_select('housing_online_application', 'hoa');
+    
+    $query->innerJoin('housing_applicant_official_detail', 'haod', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+    $query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
+    $query->innerJoin('users', 'u', 'u.uid = haod.uid');
+    $query->innerJoin('housing_ddo', 'hd', 'hd.ddo_id = haod.ddo_id');
+    $query->leftJoin('housing_district', 'hdis', 'hdis.district_code = hd.district_code');
+    $query->leftJoin('housing_district', 'hdis_present', 'hdis_present.district_code = ha.present_district');
+		$query->leftJoin('housing_district', 'hdis_permanent', 'hdis_permanent.district_code = ha.permanent_district');
+		$query->leftJoin('housing_district', 'hdis_office', 'hdis_office.district_code = haod.office_district');
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hnaa.flat_type_id');
+
+    $query->fields('hoa',array('application_no','date_of_application','computer_serial_no','date_of_verified','online_application_id'));
+    $query->fields('ha', array('applicant_name','guardian_name','date_of_birth','mobile_no','gender','permanent_street','permanent_city_town_village','permanent_post_office','permanent_pincode','permanent_district','permanent_present_same','present_street','present_city_town_village','present_post_office','present_pincode','present_district'));
+    $query->fields('haod', array('ddo_id', 'applicant_designation', 'applicant_headquarter', 'applicant_posting_place', 'pay_in_the_pay_band', 'date_of_joining','date_of_retirement', 'office_name', 'office_street', 'office_city_town_village', 'office_post_office', 'office_pin_code', 'hrms_id', 'office_district', 'office_phone_no'));
+    $query->addField('hnaa', 'allotment_category');
+    $query->addField('hft', 'flat_type');
+    $query->fields('hd', array('ddo_designation', 'ddo_address'));
+    $query->addField('hdis', 'district_name');
+    $query->addField('u', 'mail');
+    
+    $query->condition('hoa.status','housingapprover_approved_1','=');
+    $query->condition('haod.is_active','1','=');
+    $query->condition('hoa.online_application_id', $dec_online_application_id);
+
+    $result =$query->execute();
+		$data = $result->fetchObject();
+    // print_r($data);die;
+
+    $present_address_parts = array_filter([
+			$data->present_street ?? '',
+			$data->present_city_town_village ?? '',
+			$data->present_post_office ? 'P.O- ' . $data->present_post_office : '',
+			$data->present_district_name ?? '',
+			$data->present_pincode ? '-' . $data->present_pincode : '',
+		]);
+
+		$present_address = !empty($present_address_parts) ? implode(', ', $present_address_parts) : 'Data Not Available';
+
+		$permanent_address_parts = array_filter([
+			$data->permanent_street ?? '',
+			$data->permanent_city_town_village ?? '',
+			$data->permanent_post_office ? 'P.O- ' . $data->permanent_post_office : '',
+			$data->permanent_district_name ?? '',
+			$data->permanent_pincode ? '-' . $data->permanent_pincode : '',
+		]);
+		
+		$permanent_address = !empty($permanent_address_parts) ? implode(', ', $permanent_address_parts) : 'Data Not Available';
+		
+		$office_address_parts = array_filter([
+			$data->office_street ?? '',
+			$data->office_city_town_village ?? '',
+			$data->office_post_office ? 'P.O- ' . $data->office_post_office : '',
+			$data->office_district_name ?? '',
+			$data->office_pin_code ? '-' . $data->office_pin_code : '',
+		]);
+		
+		$office_address = !empty($office_address_parts) ? implode(', ', $office_address_parts) : 'Data Not Available';
+
+  }
+
+  $output = '<div class="table-bottom">
+              <table class="table table-list">
+                <tr>
+                  <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000" width="50%">Application Number:</th>
+                  <td width="50%">'.(isset($data->application_no) ? $data->application_no : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Date of Application:</th>
+                  <td>'.(isset($data->date_of_application) ? date('d/m/Y', strtotime($data->date_of_application)) : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000" width="50%">Allotment Reason:</th>
+                  <td width="50%">'.(isset($data->allotment_category) ? $data->allotment_category : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000" width="50%">Applied for flat type:</th>
+                  <td width="50%">'.(isset($data->flat_type) ? $data->flat_type : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Personal Information (According to Service Book)</th>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Applicant\'s Name:</th>
+                  <td>'.(isset($data->applicant_name) ? $data->applicant_name : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Father\'s/ Husband\'s Name:</th>
+                  <td>'.(isset($data->guardian_name) ? $data->guardian_name : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Present Address</th>
+                  <td>'.$present_address.'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Parmanent Address</th>
+                  <td>'.$permanent_address.'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Gender:</th>
+                  <td>'.(isset($data->gender) ? $data->gender : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Date of Birth(According to Service Book):</th>
+                  <td>'.(isset($data->date_of_birth) ? date('d/m/Y', strtotime($data->date_of_birth)) : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Mobile No:</th>
+                  <td>'.(isset($data->mobile_no) ? $data->mobile_no : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Email ID:</th>
+                  <td>'.(isset($data->mail) ? $data->mail : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Official Information</th>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Employee HRMS ID:</th>
+                  <td>'.(isset($data->hrms_id) ? $data->hrms_id : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Designation:</th>
+                  <td>'.(isset($data->applicant_designation) ? $data->applicant_designation : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Office Headquarter:</th>
+                  <td>'.(isset($data->applicant_headquarter) ? $data->applicant_headquarter : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Place of Posting:</th>
+                  <td>'.(isset($data->applicant_posting_place) ? $data->applicant_posting_place : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Basic Pay:</th>
+                  <td>'.(isset($data->pay_in_the_pay_band) ? $data->pay_in_the_pay_band : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Date of Joining:</th>
+                  <td>'.(isset($data->date_of_joining) ? date('d/m/Y', strtotime($data->date_of_joining)) : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Date of Retirement(According to Service Book):</th>
+                  <td>'.(isset($data->date_of_retirement) ? date('d/m/Y', strtotime($data->date_of_retirement)) : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Office Name and Address</th>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Name of the Office:</th>
+                  <td>'.(isset($data->office_name) ? $data->office_name : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Office Address:</th>
+                  <td>'.$office_address.'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">Office Phone No.:</th>
+                  <td>'.(isset($data->office_phone_no) ? $data->office_phone_no : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant DDO Information</th>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">DDO District.:</th>
+                  <td>'.(isset($data->district_name) ? $data->district_name : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">DDO Designation:</th>
+                  <td>'.(isset($data->ddo_designation) ? $data->ddo_designation : 'Data Not Available').'</td>
+                </tr>
+                <tr>
+                  <th style="background-color:#00000000">DDO Address :</th>
+                  <td>'.(isset($data->ddo_address) ? $data->ddo_address : 'Data Not Available').'</td>
+                </tr>
+              </table>
+            </div>';
+
+  return $output;
+}
+
+// added dt.13-10-2025
+function convert_from_recommended_to_general_category($online_application_id = '') {
+  global $base_root, $base_path;
+  $dec_online_application_id = decrypt_url($online_application_id);
+
+  if (db_table_exists('housing_new_allotment_application')) {
+    $update_allotment_category = array(
+                                      'allotment_category' => 'General',
+                                    );
+
+    db_update('housing_new_allotment_application')
+          ->fields($update_allotment_category)
+          ->condition('online_application_id', $dec_online_application_id, '=')
+          ->execute(); 
+
+    $status_conversion_log = array(
+                                  'special_recommend_id' => 0,
+                                  'housing_online_application_id' => $dec_online_application_id,
+                                  'priority_order' => 0,
+                                  'flag' => 'convert_to_general',
+                                  'old_category' => 'Recommended',
+                                  'new_category' => 'General',
+                                  'created_at' => date('Y-m-d H:i:s')
+    );
+    db_insert('housing_special_recommended_log')->fields($status_conversion_log)->execute();
+    
+    drupal_set_message('Applicant converted to General category with same waiting list'); 
+    drupal_goto('housing-approver-list'); 
+  } else{
+    $error_message = 'Something went wrong.';
+    drupal_set_message(t($error_message), 'error');
+    drupal_goto('housing-approver-list');
+  }
+}
+
+
+
+

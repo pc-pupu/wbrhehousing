@@ -1,0 +1,208 @@
+<?php
+function cms_content_menu() {
+    $items = array();
+
+    $items['cms-content-add'] = array(
+      'title' => 'Add CMS Content',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cms_content_add_form'),
+      'file' => 'cms_content_add_form.inc',
+      'access arguments' => array('administer CMS Content Management')
+    );
+
+    $items['cms-content-list'] = array(
+      'title' => 'All CMS Contents',
+      'page callback' => 'cms_content_list_view',
+      'access arguments' => array('administer CMS Content Management')
+    );
+
+    $items['cms-content-edit'] = array(
+      'title' => 'Edit CMS Content',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('cms_content_edit_form',1),
+      'file' => 'cms_content_edit_form.inc',
+      'access arguments' => array('administer CMS Content Management')
+    );
+
+    $items['cms-content-delete'] = array(
+      'page callback' => 'cms_content_delete',
+      'page arguments' => array(),
+      'access arguments' => array('administer CMS Content Management')
+    );
+
+    $items['faq'] = array(
+      'title' => 'Frequenty Asked Questions',
+      'page callback' => 'faq_view_page',
+      'file' => 'faq_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['about-us'] = array(
+      'title' => 'About Us',
+      'page callback' => 'about_us_view_page',
+      'file' => 'about_us_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['contact-us'] = array(
+      'title' => 'Contact Us',
+      'page callback' => 'contact_us_view_page',
+      'file' => 'contact_us_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['notice'] = array(
+      'title' => 'Notice',
+      'page callback' => 'notice_view_page',
+      'file' => 'notice_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['user-manual'] = array(
+      'title' => 'User Manual',
+      'page callback' => 'user_manual',
+      'file' => 'user_manual_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    return $items;
+}
+
+function cms_content_permission() {
+  return array(
+    'administer CMS Content Management' => array(
+      'title' => t('administer CMS Content Management'),
+      'description' => t('perform administer for CMS Content Management.')
+    )
+  );	
+}
+
+function cms_content_list_view() {
+  global $base_root, $base_path;
+  $output = '';
+
+  if (db_table_exists('housing_cms')) { 
+    $query = db_select('housing_cms', 'hc');
+    $query->fields('hc', array('housing_cms_id', 'content_type', 'content_title', 'created_date', 'is_active', 'order_no', 'file_path'));
+    $query->orderBy('housing_cms_id', 'DESC');
+  
+    $result = db_query($query);
+
+    $header['serial_no'] = array('data' => 'Serial No.', 'width' => '5%');
+    $header['content_type'] = array('data' => 'Content Type', 'width' => '8%');
+    $header['content_title'] = array('data' => 'Content Title', 'width' => '10%');
+    $header['created_date'] = array('data' => 'Created Date', 'width' => '10%');
+    $header['order_no'] = array('data' => 'Order No.', 'width' => '5%');
+    $header['is_active'] = array('data' => 'Activation Status', 'width' => '8%');
+    $header['download_content'] = array('data' => 'Download Content', 'width' => '10%');
+		$header['action'] = array('data' => 'Action', 'width' => '10%');
+
+		$rows = array();
+		$output = '';
+    $serialNumber = 1;
+		
+		while($data = $result->fetchObject()) {
+			$fields = array();
+      
+      $fields[] = $serialNumber;
+			$fields[] = $data->content_type;
+			$fields[] = $data->content_title;
+      $fields[] = date('d/m/Y', strtotime($data->created_date));
+      $fields[] = $data->order_no;
+      $fields[] = ($data->is_active == 1) ? 'Active' : 'Inactive';
+
+      if (!empty($data->file_path)) {
+        $file_url = file_create_url($data->file_path);
+        $fields[] = l(
+            '<span class="btn bg-light btn-sm fa fa-file-pdf-o text-black rounded" style="font-size:20px; display:flex; justify-content:center; align-items:center; width: 30px; height: 30px; margin: 0 auto;"></span>',
+            $file_url,
+            array('html' => TRUE, 'attributes' => array('target' => '_blank'))
+        );
+      } else {
+            $fields[] = '<div style="text-align: center;"><span style="font-size: 0.8em; color: #666;">File not available to download</span></div>';
+      }
+
+			$onclick="return confirm('Are you sure you want to Delete?')";
+			
+			$edit_link = l('<i class="fa fa-edit"></i> Edit', 'cms-content-edit/' . encrypt_url($data->housing_cms_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+
+      $delete_link = l('<i class="fa fa-trash"></i> Delete', 'cms-content-delete/' . encrypt_url($data->housing_cms_id), array('html' => true, 'attributes' => array('onclick'=> $onclick, 'class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+
+      $fields[] = $edit_link . ' &nbsp;&nbsp; ' . $delete_link;
+      $serialNumber++;
+      
+			$rows[] = $fields;
+		}
+
+		$variables = array(
+			'attributes' => array('class'=>array('table table-list table-striped')),
+			'header' => $header,
+			'rows' => $rows,
+			'sticky' => true,
+			'empty' => t("No data found!") 
+		  );
+
+		if(count($rows) > 0) {
+			$build['datatable'] = array(
+			  '#theme' => 'datatable',
+			  '#header' => $header,
+			  '#rows' => $rows,
+			  '#attributes' => array(),
+			);
+			
+			$variables = array(
+			  'attributes' => array('class'=>array('table table-list table-striped')),
+			  'header' => $header,
+			  'rows' => $rows,
+			);
+			
+			$output = theme('datatable', $variables);
+		}
+		else {
+			$output = '<div>
+							<table class="datatable_no_data_found table table-list">
+								<tr class="tr_no_data_found">
+									<th class="th_no_data_found"></th>
+								</tr>
+								<tr class="tr_no_data_found">
+									<td class="td_no_data_found">No data found!</td>
+								</tr>
+							</table>
+						</div>';
+		}
+	
+	return $output;
+  }
+}
+
+function cms_content_delete($housing_cms_id_enc = '') {
+   $housing_cms_id = decrypt_url($housing_cms_id_enc);
+   db_delete('housing_cms')
+    ->condition('housing_cms_id', $housing_cms_id)
+    ->execute();
+
+  drupal_set_message(t('Content deleted successfully.'));
+  drupal_goto('cms-content-list'); 
+}
+
+function cms_content_validate($form, &$form_state) {
+    if (!empty($_FILES['files']['name']['content_file_upload'])) {
+        $file = $_FILES['files'];
+        $file_name = $file['name']['content_file_upload'];
+        $file_tmp = $file['tmp_name']['content_file_upload'];
+        $file_type = $file['type']['content_file_upload'];
+        $file_size = $file['size']['content_file_upload'];
+
+        $allowed_extension = 'pdf';
+        $max_size = 1 * 1024 * 1024;
+
+        $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+        if (strtolower($ext) != $allowed_extension) {
+            form_set_error('content_file_upload', t('Only PDF files are allowed.'));
+        }
+
+        if ($file_size > $max_size) {
+            form_set_error('content_file_upload', t('File size exceeds 1 MB limit.'));
+        }
+    }
+}
