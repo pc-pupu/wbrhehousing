@@ -241,7 +241,7 @@
             }
 
 			if($url1 == 'new-apply'){
-				$output['new-apply'] = application_list_fetch('new-apply',$status)->rowCount();
+			   $output['new-apply'] = application_list_fetch('new-apply',$status)->rowCount();
 			   $output['new-apply-verified'] = application_list_fetch_for_verified_reject('new-apply',$verified_status_app)->rowCount();//print_r($output['new-apply-verified']);//die;
 			   $output['new-apply-rejected'] = application_list_fetch_for_verified_reject('new-apply',$rejected_status_app)->rowCount();
 		   }else if($url1 == 'vs'){
@@ -987,7 +987,7 @@ function decrypt_url($string) {
 }
 
 function application_list_fetch($entity = '',$status = ''){
-	//echo $entity;echo $status;die;
+	// echo $entity;echo $status;die;
 	global $user, $user_role;
 		$query = db_select('housing_applicant_official_detail', 'haod');
 		//$query->innerJoin('housing_applicant', 'ha','ha.uid = haod.uid'); turned off by debaleena 05-12-2024
@@ -1093,7 +1093,7 @@ function application_list_fetch($entity = '',$status = ''){
 		$query->condition('haod.is_active',1);
 		//end
 		//12-12-2024 start
-		// print_r($user_role);die;
+		// print_r($user->name);die;
 		if($user_role == '11'){
 			$query->condition('hd.ddo_code',$user->name);
 		}
@@ -1142,7 +1142,7 @@ function application_list_fetch($entity = '',$status = ''){
 		
 		// $d = $query->execute()->fetchObject();
 		// print_r($d);die;
-		//cho($query);die;
+		// echo($query);die;
 		//$query = $query->extend('PagerDefault')->limit(10);
 		//echo $query;die;
 		return $query->execute();
@@ -1619,8 +1619,7 @@ function fetch_application_status_description($status_shortcode=''){
 	//echo $status_shortcode;die;
 	$query = db_select('housing_allotment_status_master', 'hasm');
 	$query->condition('hasm.short_code', $status_shortcode, '=');
-	$query->addField('hasm', 'status_description');
-	$query->addField('hasm', 'short_code');  //debaleena 09-08-2024
+	$query->Fields('hasm', array('short_code','status_description','applicant_show_status'));  //added by dg 26-02-2026
 	$result = $query->execute();  
 	$result = $result->fetchObject();
 	//echo "<pre>";print_r($result);die;	

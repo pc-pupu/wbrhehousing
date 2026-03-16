@@ -10,7 +10,7 @@
 		$flat_type = decrypt_url($flat_type);  //added by dg 06-11-2025
 		// echo $online_application_id,$status_new,$status,$entity;die;
 		//print_r($user);die;
-
+		// echo $flat_type;die;
 		if($entity == 'new-apply'){
 			$computer_serial_no = decrypt_url($comp_serial_no);
 		}else if($entity == 'vs' || $entity == 'cs'){
@@ -31,12 +31,13 @@
 		$min_serial_no = NULL;
 		if($entity == 'new-apply'){
 			while ($result_fetch = $data_fetch->fetchObject()) {
+				// echo "<pre>";print_r($result_fetch);die;
 				if ($min_serial_no === NULL || $result_fetch->computer_serial_no < $min_serial_no) {
 					$min_serial_no = $result_fetch->computer_serial_no;
 				}
 			}
 
-			$error_message = 'Approval must begin with the application that has the lowest Application number with the same Flat Type.';
+			$error_message = 'Approval must begin with the application that has the lowest computer serial number with the same Flat Type.';
 		}else if($entity == 'vs' || $entity == 'cs'){   //not used computer serial no for vs cs, used online_application_id
 			while ($result_fetch = $data_fetch->fetchObject()) {
 				if ($min_serial_no === NULL || $result_fetch->online_application_id < $min_serial_no) {
@@ -44,7 +45,7 @@
 				}
 			}
 
-			$error_message = 'Approval must begin with the application that has the lowest Application number with the same Flat Type..';
+			$error_message = 'Approval must begin with the application that has the lowest Application number with the same Flat Type.';
 		}
 		
 		//if($online_application_id != 0) {

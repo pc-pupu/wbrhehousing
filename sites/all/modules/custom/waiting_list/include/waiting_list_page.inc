@@ -71,7 +71,7 @@
 				 /*$wait_no = get_individual_waiting_no($data->application_no);
 		 		 $fields[] = array('data' => $wait_no != 0 ? $wait_no : '', 'class' => array('text-font-r'));*/
 				 $flat_type_wait_no = flat_type_wise_waiting_no($data->application_no, $data->flat_type_id);
-				// echo 'ee'.$flat_type_wait_no;die;
+				 // echo $flat_type_wait_no;die;
 
 		 		// $fields[] = array('data' => $flat_type_wait_no != 0 ? $flat_type_wait_no : 'Pending', 'class' => array('text-font-r'));
 				$fields[] = array('data' => $flat_type_wait_no, 'class' => array('text-font-r'));   //by debaleena 11.06.24

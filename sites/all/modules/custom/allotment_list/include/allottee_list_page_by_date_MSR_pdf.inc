@@ -100,14 +100,19 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td align="center" width="35%">
+						<td style="font-size:15px;" align="center" width="35%">
 							<b>Competent Authority &<br>
-							Commissioner<br>
+							Senior Special Secretary<br>
 							Housing Department</b>
 						</td>
 						<td width="25%"></td>
-						<td align="center" width="40%">
-							<b>Secretary<br>
+						<td style="font-size:15px;" align="center" width="40%">
+							<b>Principal Secretary<br>
+							Housing Department</b>
+						</td>
+						<td width="25%"></td>
+						<td style="font-size:15px;" align="center" width="40%">
+							<b>Hon\'ble Minister-in-Charge<br>
 							Housing Department</b>
 						</td>
 					</tr>

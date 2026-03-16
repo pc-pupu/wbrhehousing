@@ -4,46 +4,46 @@ global $base_root, $base_path, $user_role;
 $isVal = $output[0];
 //echo "<pre>";print_r($page_status);die;
 if($isVal){
-	$application_arr = $output[2];
-	$entityList = $application_arr[0];
+  $application_arr = $output[2];
+  $entityList = $application_arr[0];
 
-	$fields = $entityList['fields'];
-	$expressions = $entityList['expressions'];
-	
-	
-	$entityType = $entityList['type'];
-	$application_data = $application_arr[1]; 
-	$common_data = $output[1];
-	$applicant_data = $output[3];
+  $fields = $entityList['fields'];
+  $expressions = $entityList['expressions'];
+  
+  
+  $entityType = $entityList['type'];
+  $application_data = $application_arr[1]; 
+  $common_data = $output[1];
+  $applicant_data = $output[3];
 
   
 
   if(isset($output[4]))
   // $status_description=$output[4];  //off by dg 26-05-2025
-  $status_description=$output[4]->status_description; //by dg	 
+  $status_description=$output[4]->status_description; //by dg  
   $status_shortcode=$output[4]->short_code; // by dg
-	
-	#krumo($applicant_data);
-	/*if($common_data->status == 'applied'){
- 		$options['attributes']['class'] = array('button','link-button','round','child-tab','child-color-sea');
- 		$options['attributes']['style'] = 'float:right;';
-		echo l('Reject' ,  'update_status/'.encrypt_url($common_data->online_application_id).'/'.encrypt_url('reject'),							$options).l('Verify' , 'update_status/'.encrypt_url($common_data->online_application_id).'/'.encrypt_url('verified'),							$options);
-	}*/
-	//echo $common_data->online_application_id;
+  
+  #krumo($applicant_data);
+  /*if($common_data->status == 'applied'){
+    $options['attributes']['class'] = array('button','link-button','round','child-tab','child-color-sea');
+    $options['attributes']['style'] = 'float:right;';
+    echo l('Reject' ,  'update_status/'.encrypt_url($common_data->online_application_id).'/'.encrypt_url('reject'),             $options).l('Verify' , 'update_status/'.encrypt_url($common_data->online_application_id).'/'.encrypt_url('verified'),             $options);
+  }*/
+  //echo $common_data->online_application_id;
   //echo "<pre>";print_r($output);die;
 ?>
 
 
-	<?php
-		$filename = str_replace( ' ', '', $entityType );
-		$custom_filename = $common_data->application_no;
-		$download_path = "sites/default/files/";
-	?>
+  <?php
+    $filename = str_replace( ' ', '', $entityType );
+    $custom_filename = $common_data->application_no;
+    $download_path = "sites/default/files/";
+  ?>
     <div class="table-bottom">
       <table class="table table-list"><!--sd 21-06-2024--->
-		  <tr>
+      <tr>
      <?php
-  		
+      
      if($application_arr[1]->allotment_category !='General'){
         if($common_data->uri_extra_doc == '') {
           $url_code = '<span color="red">Supporting Document Not Uploaded<br/></span>';
@@ -54,16 +54,16 @@ if($isVal){
       }else{
         $url_code = '';
       }
-	   ?>
-				<td colspan="2">
-        <?php					
-    	
+     ?>
+        <td colspan="2">
+        <?php         
+      
           echo $url_code;
-    	   ?>
+         ?>
         </td>
         </tr>
       <tr>
-    	
+      
     <?php
 
     if($page_status=='action-list'){
@@ -72,36 +72,36 @@ if($isVal){
       $status_for_ddo_osd = $common_data->short_code;
     }
    
-		if(trim($entityType) == 'Vertical Shifting') {
-			if($common_data->uri_vs != '') {
-				$path = substr($common_data->uri_vs, 9);
-				$custom_file_name = $custom_filename.'_Current_Licence';
-	?>
-    			<td>
-    <?php					
-		
+    if(trim($entityType) == 'Vertical Shifting') {
+      if($common_data->uri_vs != '') {
+        $path = substr($common_data->uri_vs, 9);
+        $custom_file_name = $custom_filename.'_Current_Licence';
+  ?>
+          <td>
+    <?php         
+    
     echo l(' Download Current Licence',$download_path.$path,array('html'=>TRUE,'attributes' => array('download' => $custom_file_name, 'class' => 'btn bg-dark  px-4 fa fa-download rounded-pill text-white fw-bolder')));//sd 21-06-2024
-	?>
+  ?>
                 </td>
     <?php
-			}			
-		}else if(trim($entityType) == 'Category Shifting') {
-			if($common_data->uri_cs != '') {
-				$path = substr($common_data->uri_cs, 9);
-				$custom_file_name = $custom_filename.'_Current_Licence';
-	?>
-    			<td>
-    <?php					
+      }     
+    }else if(trim($entityType) == 'Category Shifting') {
+      if($common_data->uri_cs != '') {
+        $path = substr($common_data->uri_cs, 9);
+        $custom_file_name = $custom_filename.'_Current_Licence';
+  ?>
+          <td>
+    <?php         
 
       echo l(' Download Current Licence',$download_path.$path,array('html'=>TRUE,'attributes' => array('download' => $custom_file_name, 'class' => 'btn bg-dark  px-4 fa fa-download rounded-pill text-white fw-bolder')));//sd 21-06-2024
-	?>
+  ?>
                 </td>
     <?php
-			}			
-		}
-		
-	?>
-    	
+      }     
+    }
+    
+  ?>
+      
 
 <div class="table-bottom">
   <table class="table table-list"><!-- sd 21-06-2024-->
@@ -149,36 +149,36 @@ if($isVal){
     </tr>
 
 <?php
-	 $headArr = array();
-	 $valArr = array();
-	 $l = 0;
-	  if(count($expressions) != 0){
-	  foreach($expressions as $entityAlias => $columnHeadFieldSet ){
-			foreach($columnHeadFieldSet as $columnHead => $expression){
-				$headArr[$l] = $columnHead;
-				//$valArr[$l] = $application_data->$expression[1];
+   $headArr = array();
+   $valArr = array();
+   $l = 0;
+    if(count($expressions) != 0){
+    foreach($expressions as $entityAlias => $columnHeadFieldSet ){
+      foreach($columnHeadFieldSet as $columnHead => $expression){
+        $headArr[$l] = $columnHead;
+        //$valArr[$l] = $application_data->$expression[1];
         $valArr[$l] = $application_data;
-				$l++;
-	   }}} 
-	    if(count($fields) != 0){
-	  foreach($fields as $entityAlias => $columnHeadFieldSet ){
-			foreach($columnHeadFieldSet as $columnHead => $field){
-				$headArr[$l] = $columnHead;
-				//$valArr[$l] = $application_data->$field[1];
+        $l++;
+     }}} 
+      if(count($fields) != 0){
+    foreach($fields as $entityAlias => $columnHeadFieldSet ){
+      foreach($columnHeadFieldSet as $columnHead => $field){
+        $headArr[$l] = $columnHead;
+        //$valArr[$l] = $application_data->$field[1];
         $valArr[$l] = $application_data;
-				$l++;
-	 }}} 
-	 $l = 0;
-	 
-	if(trim($entityType) == 'New Allotment') {
-		//$heading = 'Information for Allotment';
-	}
-	else if(trim($entityType) == 'Vertical Shifting' || trim($entityType) == 'Category Shifting') {	
-		$heading = 'Existing Flat Details With Possession Date';
-	}
-	else if(trim($entityType) == 'New Licence' || trim($entityType) == 'VS Licence' || trim($entityType) == 'CS Licence' || trim($entityType) == 'Renew Licence') {
-		$heading = 'Allotment Details';	
-	}
+        $l++;
+   }}} 
+   $l = 0;
+   
+  if(trim($entityType) == 'New Allotment') {
+    //$heading = 'Information for Allotment';
+  }
+  else if(trim($entityType) == 'Vertical Shifting' || trim($entityType) == 'Category Shifting') { 
+    $heading = 'Existing Flat Details With Possession Date';
+  }
+  else if(trim($entityType) == 'New Licence' || trim($entityType) == 'VS Licence' || trim($entityType) == 'CS Licence' || trim($entityType) == 'Renew Licence') {
+    $heading = 'Allotment Details'; 
+  }
 ?>
 
 <tr>
@@ -194,21 +194,21 @@ if($isVal){
     </tr>
     
     <?php
-		$result_permanent = particular_district_list($applicant_data->permanent_district);
-		$data_permanent = $result_permanent->fetchObject();
+    $result_permanent = particular_district_list($applicant_data->permanent_district);
+    $data_permanent = $result_permanent->fetchObject();
     //echo "<pre>";print_r($applicant_data);die;
-		
-		$permanent_address = $applicant_data->permanent_street.', P.O - '.$applicant_data->permanent_post_office.', '.$applicant_data->permanent_city_town_village.', '.$applicant_data->permanent_district.' - '.$applicant_data->permanent_pincode;
-		
-		if($applicant_data->permanent_present_same == 1) {
-			$present_address = $permanent_address;
-		} else {
-			$result_present = particular_district_list($applicant_data->present_district);
-			$data_present = $result_present->fetchObject();
-			
-			$present_address = $applicant_data->present_street.', P.O - '.$applicant_data->present_post_office.', '.$applicant_data->present_city_town_village.', '.$applicant_data->permanent_district.' - '.$applicant_data->present_pincode;	
-		}
-	?>
+    
+    $permanent_address = $applicant_data->permanent_street.', P.O - '.$applicant_data->permanent_post_office.', '.$applicant_data->permanent_city_town_village.', '.$applicant_data->permanent_district.' - '.$applicant_data->permanent_pincode;
+    
+    if($applicant_data->permanent_present_same == 1) {
+      $present_address = $permanent_address;
+    } else {
+      $result_present = particular_district_list($applicant_data->present_district);
+      $data_present = $result_present->fetchObject();
+      
+      $present_address = $applicant_data->present_street.', P.O - '.$applicant_data->present_post_office.', '.$applicant_data->present_city_town_village.', '.$applicant_data->permanent_district.' - '.$applicant_data->present_pincode; 
+    }
+  ?>
     
     <tr>
       <th style="background-color:#00000000">Permanent Address</th>
@@ -237,7 +237,7 @@ if($isVal){
 <tr>
   <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first">Applicant Official Information</th>
   </tr>
-  	<tr>
+    <tr>
       <th style="background-color:#00000000">Employee HRMS ID</th>
       <td ><?php echo $common_data->hrms_id;?></td>
     </tr>
@@ -299,11 +299,11 @@ if($isVal){
     </tr>
     
     <?php
-		$result_office = particular_district_list($common_data->office_district);
-		$data_office = $result_office->fetchObject();
-		//echo "<pre>";print_r($common_data);die;
-		$office_address = $common_data->office_street.', P.O - '.$common_data->office_post_office.', '.$common_data->office_city_town_village.', '.$common_data->office_district.' - '.$common_data->office_pin_code;
-	?>
+    $result_office = particular_district_list($common_data->office_district);
+    $data_office = $result_office->fetchObject();
+    //echo "<pre>";print_r($common_data);die;
+    $office_address = $common_data->office_street.', P.O - '.$common_data->office_post_office.', '.$common_data->office_city_town_village.', '.$common_data->office_district.' - '.$common_data->office_pin_code;
+  ?>
     
     <tr>
       <th style="background-color:#00000000">Office Address</th>
@@ -314,8 +314,8 @@ if($isVal){
       <td><?php echo $common_data->office_phone_no;?></td>
     </tr>
     <tr>
-  		<th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first">Applicant DDO Information</th>
-  	</tr>
+      <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first">Applicant DDO Information</th>
+    </tr>
     <tr>
       <th style="background-color:#00000000">DDO District</th>
       <td><?php echo $common_data->district_name;?></td>
@@ -330,7 +330,7 @@ if($isVal){
     </tr>
     
     <!-- <tr>
-  		<th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php //echo $heading;?></th>
+      <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php //echo $heading;?></th>
     </tr> -->
 
      <?php 
@@ -356,7 +356,7 @@ if($isVal){
       {
         ?>
       <tr>
-  		  <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php echo $heading;?></th>
+        <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php echo $heading;?></th>
       </tr>
         <tr>
           <th style="background-color:#00000000"><?php echo $headArr[0];?></th>
@@ -389,7 +389,7 @@ if($isVal){
 
         while($l < count($headArr)){?>
           <tr>
-  		      <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php echo $heading;?></th>
+            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px;font-weight: normal;font-family: 'Dosis',Arial,Verdana,serif;" class="first"><?php echo $heading;?></th>
           </tr> 
         <tr>
           <th style="background-color:#00000000"><?php echo $headArr[$l];?></th>
@@ -453,11 +453,11 @@ if($isVal){
       $reject_uri = end($uriArray);
       $rejected_status = decrypt_url($reject_uri);
       $rejected_status=trim(preg_replace("/[^ \w]+/", "", $rejected_status));
-      $page_status = $uriArray[3];  //$uriArray[4] to $uriArray[3] changed by dg 03-11-2025
-      
-     if($rejected_status == 'housing_sup_reject_1' || $rejected_status == 'housing_official_reject' || $rejected_status == 'housing_sup_reject_2' || $rejected_status == 'housingapprover_reject1' || $rejected_status == 'housingapprover_reject2') {
+      $page_status = $uriArray[4];  //$uriArray[4] for demo and $uriArray[3] for live changed by dg 03-11-2025
+      // echo $rejected_status;die;
+     if($rejected_status == 'housing_sup_reject_1' || $rejected_status == 'housing_official_reject' || $rejected_status == 'housing_sup_reject_2' || $rejected_status == 'housing_approver_reject_1' || $rejected_status == 'housing_approver_reject_2') {
       if($page_status == 'action-list'){
-      	//echo "hiiiiii".$page_status;die;
+        //echo "hiiiiii".$page_status;die;
         $string = $common_data->application_no;
         $parts = explode('-', $string);
         $entity = $parts[0];

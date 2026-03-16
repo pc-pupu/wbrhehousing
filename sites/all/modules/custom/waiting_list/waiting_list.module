@@ -319,8 +319,8 @@
 				                ON hnaa.flat_type_id = hft.flat_type_id ";
 				    //$orderby_con = 'order by cast(hoa.computer_serial_no AS integer) ASC';
 	                $orderby_con = "ORDER BY 
-									regexp_replace(hoa.computer_serial_no, '\\D', '', 'g')::int ASC,
-									regexp_replace(hoa.computer_serial_no, '\\d', '', 'g') ASC";   //added by dg 04-12-2025
+						regexp_replace(hoa.computer_serial_no, '\\D', '', 'g')::int ASC,
+						regexp_replace(hoa.computer_serial_no, '\\d', '', 'g') ASC";   //added by dg 04-12-2025
 				} elseif ($app_type == 'VS') {
 				    $sql .= "LEFT JOIN {housing_vs_application} hva 
 				                ON hva.online_application_id = hoa.online_application_id ";
@@ -417,7 +417,7 @@
 							where status = :status and hft.flat_type_id = :flat_type_id 
 							ORDER BY 
 			                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
-			                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC",  
+			                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC", 
 							//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));
 							//debaleena start//
 							//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
@@ -551,7 +551,7 @@
 
 
 		//$query->leftJoin('housing_vs_application', 'hva','hva.online_application_id = hoa.online_application_id');
-		$query->addField('hasm', 'status_description');
+		$query->Fields('hasm', array('status_description','applicant_show_status')); //updated by dg 06-03-2026
 		$query->addField('hoa', 'status');
 		$query->condition('hoa.application_no', $application_no);
 	 
@@ -573,7 +573,7 @@
 			} 
 			
 		}else{
-			$flat_type_waiting_no = $result->status_description;
+			$flat_type_waiting_no = $result->applicant_show_status;  ////updated by dg 06-03-2026
 		}
 		
 		return $flat_type_waiting_no;

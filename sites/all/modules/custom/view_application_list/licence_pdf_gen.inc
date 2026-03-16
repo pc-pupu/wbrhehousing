@@ -27,7 +27,7 @@ function licence_pdf_gen($app_id = '') {
     where hoa.online_application_id = :app_id";
 
     $fetch_applicant_details = db_query($sql, array(':app_id'=>$app_id))->fetchObject();
-    //  print_r($fetch_applicant_details);die;
+     // print_r($fetch_applicant_details);die;
 
     if($fetch_applicant_details->type_of_application == 'New'){
        $allotment_type = 'Fresh'; 
@@ -35,6 +35,7 @@ function licence_pdf_gen($app_id = '') {
         $allotment_type = $fetch_applicant_details->type_of_application;
     }
     
+
     /*~~~~~~~~~~~~~~~~~~~~~ QR Code Generation Code Starts Here ~~~~~~~~~~~~~~~~~~~*/
 
     $PNG_TEMP_DIR = drupal_get_path('module','view_application_list').'/phpqrcode/upload/license_qr_code/';
@@ -57,7 +58,7 @@ function licence_pdf_gen($app_id = '') {
 
     $license_info = "License No.:".$fetch_applicant_details->license_no.', Issue Date: '.$license_issue_date;
 
-    $applicant_info = "Name:".$fetch_applicant_details->applicant_name.", Designation:".$fetch_applicant_details->applicant_designation.", Office:".$fetch_applicant_details->office_name.', DDO Code:'.$fetch_applicant_details->ddo_code;
+    $applicant_info = "Application No.: ".$fetch_applicant_details->application_no.", Name:".$fetch_applicant_details->applicant_name.", Designation:".$fetch_applicant_details->applicant_designation.", Office:".$fetch_applicant_details->office_name.', DDO Code:'.$fetch_applicant_details->ddo_code;
     
 
     $qr_content = $applicant_info.$license_info."Flat Info- ".$flat_info;

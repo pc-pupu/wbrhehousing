@@ -1,6 +1,7 @@
 <?php
 
 	function allottee_list_page_pdf($allotment_process_date = '', $allotment_process_no = '', $allotment_process_type = '', $file_name = '') {
+
 		$allotment_process_date = decrypt_url($allotment_process_date);
 		$allotment_process_no = decrypt_url($allotment_process_no);
 		$allotment_process_type = decrypt_url($allotment_process_type);
@@ -13,25 +14,10 @@
 			$data1 = $result1->fetchObject();
 			
 		}
-		// added by Moumita on 30-11-2025
-		$est_arr = array();
-		if($allotment_process_type != 'NAL' && $allotment_process_type != 'MSR') {
+		
+		if($allotment_process_type != 'NAL') {
 			$result_rhe = fetch_shifting_allotment_rhe_detail($allotment_process_date, $allotment_process_no, $allotment_process_type);
-			$all_data = $result_rhe->fetchAll();
-			
-			$unique = [];
-			$temp = [];
-			if(!empty($all_data)){
-				foreach ($all_data as $obj) {
-					if (!in_array($obj->estate_id, $temp)) {
-						$temp[] = $obj->estate_id;
-						$unique[] = $obj;
-					}
-				}
-			}
-
 		}
-		// echo '<pre>';print_r($unique);die;
 		
 		$page_output = '';
 		
@@ -179,7 +165,7 @@
 							<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
 						</tr></tbody>';
 						$i++;
-					}   // block name added by dg th and td on 14-11-2025
+					}  // block name added by dg th and td on 14-11-2025
 			
 				} else {
 						if($data_roaster->roaster_vacancy_position == 1 || $data_roaster->roaster_vacancy_position == 21) {
@@ -207,41 +193,36 @@
 						$i++;	
 				}
 			}
-			$page_output .='</table>
-			<br><br><br><br><br><br>
-			<table width="100%" align="center">
-				<tr>
-					<td style="font-size:15px;" align="center" width="35%">
-						<b>Competent Authority &<br>
-						Senior Special Secretary<br>
-						Housing Department</b>
-					</td>
-					<td width="25%"></td>
-					<td style="font-size:15px;" align="center" width="40%">
-						<b>Principal Secretary<br>
-						Housing Department</b>
-					</td>
-					<td width="25%"></td>
-					<td style="font-size:15px;" align="center" width="40%">
-						<b>Hon\'ble Minister-in-Charge<br>
-						Housing Department</b>
-					</td>
-				</tr>
-			</table>
-		</div>';
+				$page_output .='</table>
+				<br><br><br><br><br><br>
+				<table width="100%" align="center">
+					<tr>
+						<td align="center" width="35%">
+							<b>Competent Authority &<br>
+							Commissioner<br>
+							Housing Department</b>
+						</td>
+						<td width="25%"></td>
+						<td align="center" width="40%">
+							<b>Secretary<br>
+							Housing Department</b>
+						</td>
+					</tr>
+				</table>
+				</div>';
 			} else if($allotment_process_type == 'VSAL') {
-				$page_output .= '
-		<div align="center">
-			<font style="font-size: 14px;"><b>Date of Allotment - '.implode('/', array_reverse(explode('-', $allotment_process_date))).'</b></font>
-		</div>
-		<br>
-		<div align="right">
-			<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
-		</div><br>';
+						$page_output .= '
+				<div align="center">
+					<font style="font-size: 14px;"><b>Date of Allotment - '.implode('/', array_reverse(explode('-', $allotment_process_date))).'</b></font>
+				</div>
+				<br>
+				<div align="right">
+					<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
+				</div><br>';
 		
-				// while($data_rhe = $result_rhe->fetchObject()) {
-				foreach($unique as $data_rhe){
+				while($data_rhe = $result_rhe->fetchObject()) {
 					$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type, $data_rhe->estate_id);
+
 					$page_output .= '<br><div align="center"><font style="font-size: 16px;">Proposal for allotment of \''.trim($data1->flat_type).'\' Type flats at '.$data_rhe->estate_name.'
 					<br><br>
 					<b>(Floor Shifting '.trim($data_rhe->from_flat_type).' type to '.trim($data_rhe->to_flat_type).' type)</b>
@@ -254,16 +235,19 @@
 								<th align="left" width="4%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Sl. No.</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Name</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>1. Date of Possession<br>2. Date of Application<br>3. Date of Retirement</b></font></th>
+								<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Allotted Flat No.</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Type of Flat</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Floor</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>From Block</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Block</b></font></th>
 								<th align="center" width="16%" style="border: 1px solid black; border-collapse: collapse;" colspan="2"><font size="5"><b>By way of shifting</b></font></th>
 								<th align="right" width="14%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Remarks</b></font></th>
 								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
 								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application Status</b></font></th>
 							</tr>
 							<tr bgcolor="#999999">
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From(Block/Flat No)</b></font></th>
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To(Block/Flat No)</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To</b></font></th>	
 							</tr>
 						</thead>
 					';
@@ -284,13 +268,17 @@
 								<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_type.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_vs.'/'.$data->occupied_flat_vs.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'/'.$data->flat_no.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_vs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->occupied_flat_vs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'Floor Shifting'.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
+							</tr>
 						</tbody>';
 						$i++;
 						}  //after floor block name added by dg 14-11-2025
@@ -303,19 +291,14 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td style="font-size:15px;" align="center" width="35%">
+						<td align="center" width="35%">
 							<b>Competent Authority &<br>
-							Senior Special Secretary<br>
+							Commissioner<br>
 							Housing Department</b>
 						</td>
 						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Principal Secretary<br>
-							Housing Department</b>
-						</td>
-						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Hon\'ble Minister-in-Charge<br>
+						<td align="center" width="40%">
+							<b>Secretary<br>
 							Housing Department</b>
 						</td>
 					</tr>
@@ -332,10 +315,7 @@
 					<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
 				</div><br>';
 				
-				// echo '<pre>'; print_r($unique); die;
-				// while($data_rhe = $unique->fetchObject()) {
-				foreach($unique as $data_rhe){
-				
+				while($data_rhe = $result_rhe->fetchObject()) {
 					$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type, $data_rhe->estate_id);
 					$page_output .= '<br><div align="center"><font style="font-size: 16px;">Proposal for allotment of \''.trim($data1->flat_type).'\' Type flats at '.$data_rhe->estate_name.'
 					<br><br>
@@ -349,16 +329,19 @@
 								<th align="left" width="4%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Sl. No.</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Name</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>1. Date of Possession<br>2. Date of Application<br>3. Date of Retirement</b></font></th>
+								<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Allotted Flat No.</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Type of Flat</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Floor</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>From Block</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Block</b></font></th>
 								<th align="center" width="16%" style="border: 1px solid black; border-collapse: collapse;" colspan="2"><font size="5"><b>By way of shifting</b></font></th>
 								<th align="right" width="14%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Remarks</b></font></th>
 								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
 								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application Status</b></font></th>
 							</tr>
 							<tr bgcolor="#999999">
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From(Block/Flat No)</b></font></th>
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To(Block/Flat No)</b></font></th>	
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To</b></font></th>	
 							</tr>
 						</thead>
 					';
@@ -379,10 +362,13 @@
 								<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_type.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_cs.'/'.$data->occupied_flat_cs.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'/'.$data->flat_no.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_cs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->occupied_flat_cs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'Category Shifting'.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
@@ -399,19 +385,14 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td style="font-size:15px;" align="center" width="35%">
+						<td align="center" width="35%">
 							<b>Competent Authority &<br>
-							Senior Special Secretary<br>
+							Commissioner<br>
 							Housing Department</b>
 						</td>
 						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Principal Secretary<br>
-							Housing Department</b>
-						</td>
-						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Hon\'ble Minister-in-Charge<br>
+						<td align="center" width="40%">
+							<b>Secretary<br>
 							Housing Department</b>
 						</td>
 					</tr>
@@ -489,19 +470,14 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td style="font-size:15px;" align="center" width="35%">
+						<td align="center" width="35%">
 							<b>Competent Authority &<br>
-							Senior Special Secretary<br>
+							Commissioner<br>
 							Housing Department</b>
 						</td>
 						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Principal Secretary<br>
-							Housing Department</b>
-						</td>
-						<td width="25%"></td>
-						<td style="font-size:15px;" align="center" width="40%">
-							<b>Hon\'ble Minister-in-Charge<br>
+						<td align="center" width="40%">
+							<b>Secretary<br>
 							Housing Department</b>
 						</td>
 					</tr>

@@ -4,7 +4,6 @@
 		global $base_root, $base_path, $user;
 		
 		$output = '';
-		$result = fetch_cs_allotment_details();
 
 		// ~~~~~~~ Query added by subham dt.26-11-2025 for fetching and pass online application id as a parameter to below funcn. ~~~~~~~~//
 		$query = db_select('housing_applicant_official_detail', 'haod');
@@ -14,10 +13,12 @@
 
 		$query->addField('hoa', 'online_application_id');
 		$rslt = $query->execute()->fetchAssoc();
+		
+		$result = fetch_cs_allotment_details();
 
 		/////added by dg 23-12-2024////
 
-		$fetchDoc = get_applicant_upload_docs($rslt['online_application_id']);  // parameter added by subham dt.26-11-2025
+		$fetchDoc = get_applicant_upload_docs($rslt['online_application_id']);
 		// print_r($fetchDoc->fetchAll());echo $fetchDoc->rowCount(); die;
 		
 		if($fetchDoc->rowCount() >0){
@@ -63,7 +64,7 @@
 		
 		while($data = $result->fetchObject()) {
 			//$data_val = isset($data_arr[$data->online_application_id]) ? $data_arr[$data->online_application_id] : NULL;
-			// echo "<pre>";print_r($data);die;
+			
 			$fields = array();
 			$fields[] = $data->allotment_no;
 			$fields[] = implode('/', array_reverse(explode('-', $data->allotment_date)));

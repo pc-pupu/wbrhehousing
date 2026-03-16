@@ -62,15 +62,14 @@
 		$output = '';
 		
 		$rows =array();
-		//$rows = flat_type_wise_waiting_detail($flat_type); //19-09-2025
-		$rows = flat_type_wise_waiting_detail_for_competent_authority($flat_type); //19-09-2025
+		$rows = flat_type_wise_waiting_detail_for_competent_authority($flat_type);//19-09-2025 flat_type_wise_waiting_detail($flat_type);
 		
 		
 		$header = array();
 		$header[] = array('data' => 'Flat Type Wise Waiting No');
 		$header[] = array('data' => 'Applicant Name');
 		$header[] = array('data' => 'Application No.');
-		$header[] = array('data' => 'Allotment Category');
+		$header[] = array('data' => 'Allotment Reason');
 		$header[] = array('data' => 'Flat Type');
 		if($flat_type == 5) {
 			$header[] = array('data' => 'Grade Pay');

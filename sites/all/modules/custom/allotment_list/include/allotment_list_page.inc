@@ -546,6 +546,7 @@
 		if($allotment_process_type != 'MSR'){    //added by dg on 14-11-2025 because for manual allotment there will be no remarks (no roaster maintain)
 			$header[] = array('data' => 'Remarks');
 		}
+		
 		$header[] = array('data' => 'Allotment Approval Status');// sd 11-09-2024
 		$header[] = array('data' => 'Application Status');// dg 06-12-2024
 		
@@ -670,7 +671,7 @@
 			
 			$i = 1;
 			while($data = $result->fetchObject()) {
-				//print_r($data);die;
+				
 				$fields = array();
 				$allotment_status=fetchAllotmentStatus($data->online_application_id);// 11-09-2024 sd
 				
@@ -705,16 +706,19 @@
 				$fields[] = $floor;
 				$fields[] = 'Floor Shifting';
 				$fields[] = $allotment_status; //sd 11-09-2024
-				$fields[] = $application_status; //dg 06-12-2024
+				// $fields[] = $application_status; //dg 06-12-2024
+				$fields[] = $data->status_description; // by Moumita 29-01-2026
 				
 				$i++;
 				$rows[] = $fields;
 			}
 		} else if($allotment_process_type == 'CSAL') {
+
 			$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type);
 			
 			$i = 1;
 			while($data = $result->fetchObject()) {
+				// print_r($data);die;
 				$fields = array();
 				$allotment_status=fetchAllotmentStatus($data->online_application_id);// 11-09-2024 sd
 				
@@ -749,7 +753,8 @@
 				$fields[] = $floor;
 				$fields[] = 'Category Shifting';
 				$fields[] = $allotment_status; //sd 11-09-2024
-				$fields[] = $application_status; //dg 06-12-2024
+				// $fields[] = $application_status; //dg 06-12-2024
+				$fields[] = $data->status_description; // by Moumita 29-01-2026
 				
 				$i++;
 				$rows[] = $fields;
@@ -838,7 +843,7 @@
 			)
 		).theme('pager');*/
 		
-		if($allotment_process_type == 'NAL') {	
+		if($allotment_process_type == 'NAL') {		
 			if($result->rowCount() > 0) {
 				// Render using Drupal's render API.
 				$build['datatable'] = array(
@@ -875,7 +880,13 @@
 			$html = '';
 			$html = '<br><div style="padding-right:20px;">'.l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'allotment_list').'/images/pdf_icon.png" title="Download Allottee List" alt="PDF Icon">Download Allottees List', 'allottee_list_pdf/'.encrypt_url($allotment_process_date).'/'.encrypt_url($allotment_process_no).'/'.encrypt_url($allotment_process_type).'/'.$allotment_process_type.'_allottees_list_'.time(), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'</div><br>';
 			
-			$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat Type - '.$data1->flat_type.' (New Allotment)</u></b></font><br>';		
+
+			if($allotment_process_type == 'MSR'){
+				$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat (Manual Allotment)</u></b></font><br>';	
+			}else if($allotment_process_type == 'NAL'){
+				$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat Type - '.$data1->flat_type.' (New Allotment)</u></b></font><br>';	
+			}
+				
 	
 			if($result->rowCount() > 0) {
 				return $html.$output;
@@ -883,7 +894,7 @@
 			else {
 				return $output;
 			}
-		}  else if($allotment_process_type == 'VSAL') {
+		} else if($allotment_process_type == 'VSAL') {
 			if($result->rowCount() > 0) {
 				// Render using Drupal's render API.
 				$build['datatable'] = array(
@@ -974,7 +985,7 @@
 			else {
 				return $output;
 			}	
-		} else if($allotment_process_type == 'MSR') {	 //MSR added by dg 24-11-2025	
+		} else if($allotment_process_type == 'MSR') {		//MSR added by dg 24-11-2025	
 			if($result->rowCount() > 0) {
 				// Render using Drupal's render API.
 				$build['datatable'] = array(

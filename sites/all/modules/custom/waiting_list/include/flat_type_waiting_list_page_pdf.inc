@@ -7,7 +7,8 @@
 		
 		if(is_numeric($flat_type)) {
 			if($flat_type == 5) {
-				/* $result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
+				
+				/*$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
 									allotment_category, computer_serial_no, grade_pay 
 									from {housing_applicant} ha
 									inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
@@ -23,7 +24,7 @@
 									//debaleena start//
 									//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));	
 									array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));  //debaleena 04-09-2024
-									//end//	*/
+									//end//	*/ // turned off 19-09-2025
 
 				//added 19-09-2025					
 				$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
@@ -45,23 +46,6 @@
 							array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type));  //debaleena 04-09-2024
 							//end//
 			} else {
-				/*$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
-									allotment_category, computer_serial_no, grade_pay 
-									from {housing_applicant} ha
-									inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
-									inner join {housing_online_application} hoa 
-									on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
-									inner join {housing_new_allotment_application} hnaa 
-									on hnaa.online_application_id = hoa.online_application_id
-									inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
-									where status = :status and hft.flat_type_id = :flat_type_id 
-									and substring(application_no,1,2) = :app_no
-									order by online_application_id asc", 
-									//array(':status' => 'verified', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));
-									//debaleena start//
-									//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));	
-									array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));   //debaleena 04-09-2024
-									//end// */
 
 				//added 19-09-2025
 				$sql = "SELECT applicant_name, hoa.online_application_id, status, application_no, 	
@@ -93,6 +77,23 @@
 
 				// Execute query
 				$result = db_query($sql, $codn_arr); //print_r($result->fetchObject);die;
+				/*$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
+									allotment_category, computer_serial_no, grade_pay 
+									from {housing_applicant} ha
+									inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
+									inner join {housing_online_application} hoa 
+									on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+									inner join {housing_new_allotment_application} hnaa 
+									on hnaa.online_application_id = hoa.online_application_id
+									inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+									where status = :status and hft.flat_type_id = :flat_type_id 
+									and substring(application_no,1,2) = :app_no
+									order by online_application_id asc", 
+									//array(':status' => 'verified', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));
+									//debaleena start//
+									//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));	
+									array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));   //debaleena 04-09-2024
+									//end//*/ // turned of 19-09-2025
 			}
 		//$data1 = $result->fetchObject();					
 		
@@ -122,8 +123,9 @@
 				<tr bgcolor="#999999">
 					<th align="left" width="15%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Flat Type Wise Waiting No</b></font></th>
 					<th align="center" width="30%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Applicant Name</b></font></th>
-					<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application No.</b></font></th>
-					<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Category</b></font></th>
+					<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application No.</b></font></th>'.
+					//<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Category</b></font></th>
+					'.
 					<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Flat Type</b></font></th>
 					';
 					if($flat_type == 5) {
@@ -148,8 +150,8 @@
 					<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
 					<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'</font></td>
 					<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->application_no.'</font></td>
-					'.'<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->allotment_category.'</font></td>
-
+					'.//<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->allotment_category.'</font></td>
+					'.
 					<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_type.'</font></td>
 				';
 					if($flat_type == 5) {

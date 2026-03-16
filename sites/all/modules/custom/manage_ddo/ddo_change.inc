@@ -15,7 +15,7 @@ function ddo_change($form, &$form_state, $online_application_id = '') {
     //echo $query;die;
 
     $deptresult = $query->execute()->fetchObject();
-    //echo '<pre>';print_r($deptresult);die;
+    echo '<pre>';print_r($deptresult);die;
 
     if(!empty($deptresult)){
         $ddo_designation =  $deptresult->ddo_designation;
@@ -32,17 +32,16 @@ function ddo_change($form, &$form_state, $online_application_id = '') {
     }
 
     // current ddo data from HRMS
-    $hrmsdata = (object)getHRMSUserData($user->name);
+  $hrmsdata = (object)getHRMSUserData($user->name); 
     if(!empty($hrmsdata)){
         $current_ddo_code = $hrmsdata->ddoId;
         $current_ddo_designation_arr = get_ddo_designation_by_ddoid($current_ddo_code); // calling from manage_ddo.module
 
-        if(!empty($current_ddo_designation_arr)){  
+        if(!empty($current_ddo_designation_arr)){
             $current_ddo_code = $current_ddo_designation_arr['ddo_code'];
             $current_ddo_id = $current_ddo_designation_arr['ddo_id'];   //added by dg 26-11-2025
             $current_ddo_designation = $current_ddo_designation_arr['ddo_designation'];
         }else{
-            
             $current_ddo_code = '<span style="color:red;">DDO code not found in the Housing Department records. Please contact the department for updation.</span>';
             $current_ddo_designation = '';
         }
@@ -108,7 +107,7 @@ function ddo_change_submit($from, &$form_state) {
     global $user;
     $values = $form_state['values'];
 
-    $hiddenArr = unserialize($values['hidden_data']); 
+    $hiddenArr = unserialize($values['hidden_data']); echo '<pre>';print_r($hiddenArr);die;
     $online_application_id = $hiddenArr['online_application_id'];
 
     if($values['agree_chk']!=1){
@@ -122,11 +121,57 @@ function ddo_change_submit($from, &$form_state) {
             drupal_goto('ddo-change/'.$hiddenArr['online_application_id']);
             return;
         }else{
-            
+
+            $current_ddo_designation_arr = get_ddo_designation_by_ddoid($hiddenArr['current_ddo_code']); // calling from manage_ddo.module   
+            if(empty($current_ddo_designation_arr)){
+                drupal_set_message(t('Current DDO code not found in the Housing Department records. Please contact the department for updation.'),'error');
+                drupal_goto('dashboard');
+                return;
+            }            
             
 
             if($hiddenArr['current_ddo_code'] == $hiddenArr['old_ddo_code']){
-                drupal_set_message(t('DDO details updated successfully.'));
+                
+                echo $hiddenArr['current_ddo_code'].'----'.$hiddenArr['old_ddo_code']; die;
+                // added on 17-01-2026 by Moumita //
+                // update housing_declration table
+
+                $ddodeclration_data = array(
+                    'ddo_change_date' => date('Y-m-d H:i:s'),
+                    'ddo_id_from' => $hiddenArr['old_ddo_id'],
+                    'ddo_id_to' => $hiddenArr['current_ddo_id'],
+                );
+
+                echo '<pre>';print_r($ddodeclration_data);die;
+
+                db_update('housing_declration')
+                ->fields($ddodeclration_data)
+                ->condition('online_application_id', $online_application_id)
+                ->condition('uid', $user->uid)
+                ->execute();
+
+                // added on 17-10-2025 by Moumita //
+                db_update('housing_flat_occupant')
+                 ->fields(array('accept_reject_status' => 'Accept'))  
+                 ->condition('online_application_id', $online_application_id, '=')
+                 ->execute();
+
+                db_update('housing_online_application')
+                 ->fields(array('status' => 'applicant_acceptance'))  
+                 ->condition('online_application_id', $online_application_id, '=')
+                 ->execute();
+                $status_id = get_status_id('applicant_acceptance');
+                $ins_arr = array(
+                    'online_application_id'=> $online_application_id,
+                    'status_id' => $status_id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'uid' => $user->uid,
+                    'short_code' => 'applicant_acceptance'   
+                );
+
+                db_insert('housing_process_flow')->fields($ins_arr)->execute();
+
+                drupal_set_message(t('DDO details updated successfully and You have accepted the terms and conditions stated in the Declaration before Competent Authority'));
                 drupal_goto('dashboard');
                 return;
 
@@ -180,6 +225,8 @@ function ddo_change_submit($from, &$form_state) {
                 drupal_set_message(t('DDO details updated successfully and You have accepted the terms and conditions stated in the Declaration before Competent Authority.'));
                 drupal_goto('dashboard');
             }
+
+
             
         }
     }

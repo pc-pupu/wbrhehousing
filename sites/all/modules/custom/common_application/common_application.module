@@ -68,6 +68,16 @@
 			// 'page arguments' => array(1),
 			'access arguments' => array('access content'),
 		);
+
+		// added on 14-01-2026 By Moumita
+		$items['download-noc/%'] = array(
+			'title' => 'No Objection Certificate',	
+			'page callback' => 'download_noc',
+			'file'=>'download_noc.inc',
+			'page arguments' => array(1),
+			'access arguments' => array('access content'),
+		);
+
 		return $items;
   	}
     
@@ -149,7 +159,7 @@
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
 
-			// '#element_validate' => array('element_validate_alphabatic_fullstop'), 
+			'#element_validate' => array('element_validate_alphabatic_fullstop'), 
 			'#required' => TRUE,
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 		);
@@ -169,7 +179,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			// '#element_validate' => array('element_validate_streetaddress'), 
+			'#element_validate' => array('element_validate_streetaddress'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 			
 		);
@@ -179,7 +189,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
-			// '#element_validate' => array('element_validate_alphabatic_text'), 
+			'#element_validate' => array('element_validate_alphabatic_text'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 			
 		);
@@ -189,7 +199,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			// '#element_validate' => array('element_validate_alphabatic_text'), 
+			'#element_validate' => array('element_validate_alphabatic_text'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 			
 		);
@@ -251,7 +261,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6" id="reload_present_street"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			// '#element_validate' => array('element_validate_streetaddress'), 
+			'#element_validate' => array('element_validate_streetaddress'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')), //'id' => 'present_street',
 			
 		);
@@ -261,7 +271,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="col-md-6" id="reload_present_city_town_village"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
-			// '#element_validate' => array('element_validate_alphabatic_text'), 
+			'#element_validate' => array('element_validate_alphabatic_text'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')), //'id' => 'present_city_town_village', 
 			
 		);
@@ -271,7 +281,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4" id="reload_present_post_office"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			// '#element_validate' => array('element_validate_alphabatic_text'), 
+			'#element_validate' => array('element_validate_alphabatic_text'), 
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')), //'id' => 'present_post_office', 
 			
 		);
@@ -405,7 +415,7 @@
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
-		// '#element_validate' => array('element_validate_textarea'),
+		'#element_validate' => array('element_validate_textarea'),
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()",'class'=>array('form-control')),
 		//'#attributes' => array('id' => 'edit-app-designation', 'oncopy' => "return false", 'onpaste' => "return false"),
 		
@@ -468,7 +478,7 @@
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div></div>',
-		// '#element_validate' => array('element_validate_alphabatic_text'),
+		'#element_validate' => array('element_validate_alphabatic_text'),
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')), 
 		
 	);
@@ -515,7 +525,7 @@
 		'#required' => TRUE,
 		'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
-		// '#element_validate' => array('element_validate_textarea'), 
+		'#element_validate' => array('element_validate_textarea'), 
 		// '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('numeric_positive form-control')), // off on 22-07-2025 By Moumita
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')),
 	);
@@ -537,7 +547,7 @@
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div></div>',
-		// '#element_validate' => array('element_validate_alphabatic_text'), 
+		'#element_validate' => array('element_validate_alphabatic_text'), 
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')),
 		
 	);
@@ -547,7 +557,7 @@
 		'#required' => TRUE,
 		'#prefix' => '<div class="row"><div class="col-md-3"><div class="form-floating">',
 		'#suffix' => '</div></div>',
-		// '#element_validate' => array('element_validate_alphabatic_text'), 
+		'#element_validate' => array('element_validate_alphabatic_text'), 
 		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')),
 		
 	);
@@ -576,7 +586,7 @@
 		'#type' => 'textfield',
 		'#maxlength' => 15,
 		'#required' => TRUE,
-		// '#element_validate' => array('element_validate_telephoneno'), 
+		'#element_validate' => array('element_validate_telephoneno'), 
 		'#prefix' => '<div class="col-md-3"><div class="form-floating">',
 		'#suffix' => '</div></div></div>',
 		'#attributes' => array('class' => array('numeric_positive form-select')),
@@ -727,34 +737,28 @@ function get_status_id($status = ''){
 
 function check_mail_send_status(){
 
+	
+
+	// echo '<pre>'; print_r($result_sendmail); print_r($data_sendmail); die;
 
 	// $to = 'sayantika.debnath@nic.in';
 	$to = 'info.mchatterjee@gmail.com';
 
-	$user_info = get_userinfo_by_onlineapp_id($app_id = 34);
-	$to = $user_info['mail']; 
-	$to = 'info.mchatterjee@gmail.com';
-	$subject = 'Application Rejected';
+	$subject = 'RHE Licence Generated Successfully';
+	$message = 'Dear Applicant, the Licence for your allotted RHE has been successfully generated. You may please log in to view or download the Licence.
+-Dept. of Housing, GoWB';
 	$name = 'RHE';
 
-	$message = 'Dear '.$user_info['applicant_name'].', your application for RHE has been rejected by competent authority. For more details, you may please log in to rhe.wb.gov.in
--Dept. of Housing, GoWB';
-
-	if($to !=''){ 
-		custom_mail_function($to, $subject, $message, $name);
-	}
-	$dest = $user_info['mobile_no'];
 	$dest = '8017090753';
-	$template_id = '1107175508616693124';
-	if($dest !=''){
-		custom_sms_function($dest, $message, $template_id);
-	}
+	$template_id = '1107175508672559576';
 
-	
+	$data = get_userinfo_by_onlineapp_id($application_id = 34);
 
-	// custom_mail_function($to, $subject, $message, $name, 'otp');
+	// echo '<pre>'; print_r($data); die;
 
-	// custom_sms_function($dest, $message, $template_id);
+	custom_mail_function($to, $subject, $message, $name);
+
+	custom_sms_function($dest, $message, $template_id);
 
 	echo 'all ok';
 	die;
@@ -762,8 +766,8 @@ function check_mail_send_status(){
 }
 
 function custom_mail_function($to ='', $subject='', $message='', $name ='', $otp = ''){
-	global $base_root, $base_path;
-	
+
+	$to = 'sayantika.debnath@nic.in';  //added on 19-09-2025
 	// Place these at the very top of your module file
 	require_once DRUPAL_ROOT . '/sites/all/libraries/PHPMailer-master/src/Exception.php';
 	require_once DRUPAL_ROOT . '/sites/all/libraries/PHPMailer-master/src/PHPMailer.php';
@@ -815,15 +819,15 @@ function custom_mail_function($to ='', $subject='', $message='', $name ='', $otp
 		$mail->Body    = $message;
 		$mail->AltBody = '';
 
-		// $mail->send();
+		$mail->send();
 
 
 		if(!$mail->send()) { // start
 		return false;
-			// echo 'Message could not be sent.';
-			// echo 'Mailer Error: ' . $mail->ErrorInfo;
+			echo 'Message could not be sent.';
+			echo 'Mailer Error: ' . $mail->ErrorInfo;
 		}else{
-			// echo 'Message has been sent';
+			echo 'Message has been sent';
 		return true;
 		} // end
 		
@@ -843,7 +847,7 @@ function custom_sms_function($dest='', $msg='', $template_id = ''){
     $send = 'RHE';
     $url = "https://smsgw.sms.gov.in/failsafe/HttpLink?";
     
-
+    $dest = '8538072858';  // added 19-09-2025
     $data = "username=$uid&pin=$pass&message=$msg&mnumber=$dest&signature=$send&dlt_entity_id=1101589480000043999&dlt_template_id=$template_id"; 
 
     
@@ -859,11 +863,11 @@ function custom_sms_function($dest='', $msg='', $template_id = ''){
     curl_setopt($ch, CURLOPT_CAINFO,'/etc/pki/tls/certs/ca-bundle.crt');
     if (curl_errno($ch)) echo 'Curl error: ' . curl_error($ch);
     else $curl_output =curl_exec($ch);
-    curl_close($ch);  // echo $curl_output; echo 'aa'; die;
+    curl_close($ch);  //echo $curl_output; echo 'aa'; die;
     if($curl_output){
-    // echo "sent";
+    echo "sent";
     }else{
-    // echo "not sent";
+    echo "not sent";
     }
 }
 
