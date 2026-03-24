@@ -133,15 +133,36 @@
 		$query->condition('haod.uid', $user->uid);
 		$query->addField('hpf', 'short_code');
 		$query->addField('hpf', 'created_at');
-		$query->addField('hasm', 'status_description');
-		//$query->orderBy('hasm.status_id', 'ASC');
-		//echo $query;die;
-		
-		// $query->condition('hoa.online_application_id', $online_application_id, '=');
+		$query->Fields('hasm', array('status_description','applicant_show_status'));  //updated by dg 26-02-2026
 		
 		return $result=$query->execute();
-		//$result=$query->execute();
-		//print_r($result->fetchAll());die;
+		// $result=$query->execute();
+		// print_r($result->fetchAll());die;
 	}
+
+	//added by dg 26-02-2026
+	function fetch_full_application_status_updated($application_no = ''){
+		global $user;
+        // new query on 05-06-2026
+
+        $sql = "SELECT COUNT(1), t.applicant_show_status,MIN(t.created_at) AS created_at
+                FROM (
+                    SELECT 
+                        hpf.short_code, hoa.online_application_id, hpf.created_at, hasm.*
+                    FROM housing_process_flow hpf 
+                    INNER JOIN housing_online_application hoa 
+                        ON hoa.online_application_id = hpf.online_application_id
+                    INNER JOIN housing_allotment_status_master hasm 
+                        ON hasm.status_id = hpf.status_id 
+                    WHERE hoa.application_no = '".$application_no."'
+                ) AS t
+                GROUP BY t.applicant_show_status
+                ORDER BY MIN(t.created_at) ASC;";
+        $query = db_query($sql);
+        return $query;
+
+		// print_r($query->fetchAll());die;
+	}
+	
 	
 	

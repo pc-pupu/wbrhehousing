@@ -87,6 +87,17 @@ function add_possession_det_form_submit($form, &$form_state){
   $occupant_license_id = $data->occupant_license_id;
   $flat_id = $data->flat_id;
 
+  /* by dg 22-07-2025 */
+  $update_on_online_app = array();
+  $update_on_online_app['status'] = 'flat_possession_taken';
+  $update_on_online_app['date_of_verified'] = date("Y-m-d H:i:s");
+
+  db_update('housing_online_application')
+  ->fields($update_on_online_app)
+  ->condition('online_application_id', $app_id)
+  ->execute();
+  /* end */
+
   $possession_date_arr['possession_date']  = $possession_date;
   $possession_date_arr['authorised_or_not']  = 'authorised';  //added by dg 08-01-2025
 

@@ -328,6 +328,8 @@
 			$reason = 'LGH';
 		}else if($reason == 'Physically Handicaped or Serious Illness'){
 			$reason = 'PHI';
+		}else if($reason == 'Judicial Officer On Transfer'){  //added by dg for A and B 18-09-2025
+			$reason = 'JOT';
 		}
 	}
 
@@ -361,11 +363,27 @@
 		
 		//insertion of computer serial no continuation of existing applicant's computer serial no
 		
-		$result = db_query("select max(to_number(computer_serial_no, text(9999999999))) as no from housing_online_application 
-							where substring(application_no, 1, 2) = :app_no and computer_serial_no is not null", 
-							array(':app_no' => 'NA'));
+		//28-08-2025  to start with computer serial no with 200001 for NA wef 1st Sept 2025
+		if(date('Y-m-d')>='2025-08-28'){
+			$check_na = db_query("select 1 from housing_online_application where (substring(application_no, 1, 2) = 'NA') and computer_serial_no is not null");
+			$data_na = $check_na->fetchObject();
+			if(empty($data_na)){
+				$comp_serial_no = '200001';
+			}else{
+				$result = db_query("select max(to_number(computer_serial_no, text(9999999999))) as no from housing_online_application 
+							where ((substring(application_no, 1, 2) = :app_no_na) OR (substring(application_no, 1, 2) = :app_no_pa)) and computer_serial_no is not null", 
+							array(':app_no_na' => 'NA',':app_no_pa' => 'PA')); // modified on 22-07-2025 By Moumita
+				$data = $result->fetchObject();
+				$comp_serial_no = $data->no + 1;
+			}
+		}
+
+		
+		/*$result = db_query("select max(to_number(computer_serial_no, text(9999999999))) as no from housing_online_application 
+							where ((substring(application_no, 1, 2) = :app_no_na) OR (substring(application_no, 1, 2) = :app_no_pa)) and computer_serial_no is not null", 
+							array(':app_no_na' => 'NA',':app_no_pa' => 'PA')); // modified on 22-07-2025 By Moumita
 		$data = $result->fetchObject();
-		$comp_serial_no = $data->no + 1;
+		$comp_serial_no = $data->no + 1;*/ //turned of 28-08-2025 to start with computer serial no with 200001 for NA wef 1st Sept 2025
 		
 		/*add online application*/
 		

@@ -1,0 +1,4 @@
+name = Manage DDO Module
+description = Module for DDO Management
+core = 7.x
+package = DDO Management 

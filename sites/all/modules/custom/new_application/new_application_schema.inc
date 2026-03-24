@@ -49,7 +49,7 @@ $entities[] = array(
 						  'fields'=>array(
 										 
 										 
-										  'hna'=>array('Allotment Reason' =>array('allotment_category','allotment_category')),
+										  'hna'=>array('Allotment Category' =>array('allotment_category','allotment_category')), // 'Allotment Reason' changed to 'Allotment Category' by Subham 24-07-2025
 										  'hft'=>array('Flat Type'=>array('flat_type','flat_type')),
 										  //'he1'=>array('1st Estate Choice'=>array('estate_name','estate1')),
 										  //'he2'=>array('2nd Estate Choice'=>array('estate_name','estate2')),

@@ -47,9 +47,35 @@ function hrms_login_form($form, &$form_state) {
 
 function hrms_login_form_submit($form, &$form_state) {
     if(isset($form_state['values']['hrms_id']) && !empty($form_state['values']['hrms_id'])) {
-        $hrms_id = base64_encode(trim($form_state['values']['hrms_id']));
+
+
+        $account = user_load_by_name($form_state['values']['hrms_id']);
+        if (empty($account)) {
+            $mail = isset($form_state['values']['hrms_id']) ? trim($form_state['values']['hrms_id']) : $form_state['values']['hrms_id'].'@gmail.com';
+            $appUserData = array(
+                    'name' => trim($form_state['values']['hrms_id']) ,
+                    'pass' => trim($form_state['values']['hrms_id']) , // note: do not md5 the password
+                    'mail' => $mail,
+                    'access' => REQUEST_TIME,
+                    'login' => REQUEST_TIME,
+                    'status' => 1,
+                    //'init' => trim($userData['email']),
+                    'roles' => array(
+                        DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                        4 => 'Applicant'
+                    )
+                );
+            $userDetails = user_save(Null, $appUserData);
+        }
+
+        $hrmscode=encrypt_url($form_state['values']['hrms_id']); 
+        $timestamp = time();
+        $message = $hrmscode . "|" . $timestamp;
+        $hmac = hash_hmac("sha256", $message, variable_get('hmac_secret_me',''));
+        $token = base64_encode($message . "|" . $hmac);
+        // $redirect_url=$base_root.$base_path.'user/sso/'.urlencode($token);
         
-        drupal_goto('/user/sso/' . $hrms_id);
+        drupal_goto('user/sso/'.urlencode($token));
 
     }
 }

@@ -88,16 +88,25 @@ function rhe_flat_allotment_list_rst_estate_list($flat_type_id = 0, $flat_status
 	$query->addField('hf','flat_id');
 	$query->addField('hf','flat_no');
 	$query->addField('hf','floor');
+
+	/* Added by Moumita on 03-11-2025 */
+	$query->join('housing_block','hb','hf.block_id = hb.block_id');
+	$query->addField('hb','block_name');
+	/** End */
+
 	$db_and = db_and();
 	$db_and->condition('hf.flat_type_id', $flat_type_id, '=');
 	$db_and->condition('hf.flat_status_id', $flat_status_id, '=');
 	$db_and->condition('hf.estate_id', $estate_id, '=');
 	$query->condition($db_and);
-	$query->orderBy('estate_id', 'ASC');
-	$query->orderBy('flat_id', 'ASC');
-	//echo $query;
-	//die($query);
-	return $query->execute();
+	$query->orderBy('hf.estate_id', 'ASC');
+	$query->orderBy('hf.flat_id', 'ASC');
+	// echo $query;
+	// die();
+	 return $query->execute();
+	//$result = $query->execute()->fetchAll();
+	//return $result;
+	//echo "<pre>";print_r($result);die;
 }
 function rhe_flat_allotment_list_rst_estate($flat_type_id = 0, $flat_status_id = 0, $estate_id = 0) {
 
@@ -108,23 +117,51 @@ function rhe_flat_allotment_list_rst_estate($flat_type_id = 0, $flat_status_id =
 	if($result->rowCount() > 0){
 		$i = 0;
 		while($data = $result->fetchObject()){
-			
-			if(trim($data->floor) == 'G') {
-				$floor = 'Ground Flr.';	
+			/* off by dg 25-07-2025 */
+			// if(trim($data->floor) == 'G') {
+			// 	$floor = 'Ground Flr.';	
+			// }
+			// else if(trim($data->floor) == 'F') {
+			// 	$floor = '<b>1st Flr.</b>';	
+			// } else if(trim($data->floor) == 'S') {
+			// 	$floor = '<b>2nd Flr.</b>';	
+			// } else if(trim($data->floor) == 'T') {
+			// 	$floor = 'Top Flr.';	
+			// }
+
+
+
+			if(trim($data->floor) == 'Ground') {
+				$floor = 'Ground Flr';	
 			}
-			else if(trim($data->floor) == 'F') {
-				$floor = '<b>1st Flr.</b>';	
-			} else if(trim($data->floor) == 'S') {
-				$floor = '<b>2nd Flr.</b>';	
-			} else if(trim($data->floor) == 'T') {
-				$floor = 'Top Flr.';	
+			else if(trim($data->floor) == 'First') {
+				$floor = '<b>1st Flr</b>';	
+			} else if(trim($data->floor) == 'Second') {
+				$floor = '<b>2nd Flr</b>';	
+			} else if(trim($data->floor) == 'Third') {
+				$floor = '<b>3rd Flr</b>';	
+			}else if(trim($data->floor) == 'Fourth') {
+				$floor = '<b>4th Flr</b>';	
+			}else if(trim($data->floor) == 'Fifth') {
+				$floor = '<b>5th Flr</b>';	
+			}else if(trim($data->floor) == 'Sixth') {
+				$floor = '<b>6th Flr</b>';	
+			}else if(trim($data->floor) == 'Seventh') {
+				$floor = '<b>7th Flr</b>';	
+			}else if(trim($data->floor) == 'Eighth') {
+				$floor = '<b>8th Flr</b>';	
+			}else if(trim($data->floor) == 'Ninth') {
+				$floor = '<b>9th Flr</b>';	   //added by dg 9th floor 05-08-2025
+			}else if(trim($data->floor) == 'Top') {
+				$floor = '<b>Top Flr</b>';	
 			}
+			/* dg end 25-07-2025 */
 			
 			if($i == 0){
-				$str.=$data->flat_no.'('.$floor.')';
+				$str.=$data->flat_no.'('.$floor.'-'.$data->block_name.' Block)';
 				$i++;
 			}else{
-				$str.=', '.$data->flat_no.'('.$floor.')';
+				$str.=', '.$data->flat_no.'('.$floor.'-'.$data->block_name.' Block)';
 			}
 		}
 	}

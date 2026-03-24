@@ -3,11 +3,31 @@
 	function add_category_shifting_application($form, &$form_state, $online_application_id) {
 		global $user;
 		
-		$query = db_select('housing_pay_band', 'hpb');
+		// $query = db_select('housing_pay_band', 'hpb'); off By Moumita on 10/09/2025
+
+		$query = db_select('housing_pay_band_categories', 'hpb');
 		$query->fields('hpb', array('flat_type_id'));
 		$query->condition('hpb.pay_band_id', $form_state['values']['pay_band'], '=');
 		$result = $query->execute();
 		$data = $result->fetchObject();
+
+		/** checking existing flat type id is exist or not */
+
+		$query_check = db_query("select distinct(flat_type_id) from housing_flat where estate_id = :estate_id ", array(':estate_id' => $form_state['values']['cs_occupation_estate']));
+		$result_check = $query_check->fetchAll();
+		$flat_type_id_array = array();
+		foreach ($result_check as $record) {
+			$flat_type_id_array[] = $record->flat_type_id;
+		}
+
+		if(!empty($flat_type_id_array)){
+			if(!in_array($data->flat_type_id, $flat_type_id_array)){
+				drupal_set_message(t('Existing estate does not have the flat type as per your pay scale. Please apply for new allotment.'), 'error');
+				drupal_goto('dashboard');
+			}
+		}
+
+		/** End of Checking */
 		
 		/*add data in housing_cs_application*/
 		$category_shifting_app_arr = array();
@@ -28,7 +48,7 @@
 			}
 		}
 
-
+		/* Turned off by Subham 24-07-2025
 		if($form_state['values']['cs_scanned_sign'] != 0) {
 			$scanned_sign = file_load($form_state['values']['cs_scanned_sign']);
 			if($scanned_sign->status==0) {
@@ -37,7 +57,7 @@
 				file_usage_add($scanned_sign, 'shifting_of_category', 'CS Scanned Sign', $user->uid);
 				$category_shifting_app_arr['scanned_sign']  =  $scanned_sign->fid;	
 			}
-		}
+		}*/
 		// print_r($category_shifting_app_arr);die;
 		if($online_application_id != 0) {
 			db_insert('housing_cs_application')
@@ -50,7 +70,9 @@
 	function update_category_shifting_application($form, &$form_state, $online_application_id) {
 		global $user;
 		
-		$query1 = db_select('housing_pay_band', 'hpb');
+		//$query1 = db_select('housing_pay_band', 'hpb'); // off By Moumita on 10/09/2025
+
+		$query1 = db_select('housing_pay_band_categories', 'hpb');
 		$query1->fields('hpb', array('flat_type_id'));
 		$query1->condition('hpb.pay_band_id', $form_state['values']['pay_band'], '=');
 		$result1 = $query1->execute();

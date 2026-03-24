@@ -1,6 +1,6 @@
 <?php 
 global $user, $user_role,$base_path,$base_root;
-
+// echo 'sdsdfsdf'."<pre>";print_r($output);die;
 ?>
 
 <div class="row">
@@ -8,18 +8,39 @@ global $user, $user_role,$base_path,$base_root;
       <div class="counter-box p-3 rounded mb-3 position-relative shadow-sm row">
          <div class="col-md-9">
          <h4 class="title-lg">Welcome to e-Allotment of Rental Housing Estate</h4><br>
-         <!--<h4 class="mt-4">Welcome  <?= $output['user_info']['applicantName'] ?></h4> -->
+         <h6>Name:  <?= $output['user_info']['applicantName'] ?></h6> 
          <h6>Designation: <?= !empty($output['user_info']['applicantDesignation']) ? $output['user_info']['applicantDesignation'] : 'Data not found'; ?></h6>  
          <h6>Office: <?= !empty($output['user_info']['officeName']) ? $output['user_info']['officeName'] : 'Data not found'; ?></h6>
          <h6>Mobile Number: <?= !empty($output['user_info']['mobileNo']) ? $output['user_info']['mobileNo'] : 'Mobile No. not found'; ?></h6>
          <h6>Email: <?= $output['user_info']['email'] ?></h6>
+         <?php if($user_role == 4){ ?>
+         <h6>DDO Code: <?= !empty($output['ddo_code']) ? $output['ddo_code'] : 'DDO not found'; ?></h6>
+         <?php } ?>
          <?php if(isset($output['user_status']) && $output['user_status'] == 'offer_letter_cancel'){ ?>
-                  <p style="color:red;">** Your offer letter has been marked as inactive by the system due to non-acceptance within the 15-day timeline. Please contact your Sub-Divisional Asst. Engineer within 5 days to request an offer letter extension. Otherwise, Your application will be cancelled 15 days after the offer letter becomes inactive. </p> <!-- Done by Subham 09-12-2024 -->
+                  <p style="color:red;">** Your offer letter has been marked as inactive by the system due to non-acceptance within the 15-day timeline. Please contact your Housing Department within 5 days to request an offer letter extension. Otherwise, Your application will be cancelled 15 days after the offer letter becomes inactive. </p> <!-- Done by Subham 09-12-2024 -->
          <?php };
-      
-            if(isset($output['user_status']) && $output['user_status'] == 'license_cancel'){ ?>
-            <p style="color:red;">** The license has been cancelled due to the failure to receive the possession letter within 15 days. Please contact your sub-divisonal Exec. Engineer within 5 days to request for license extension; otherwise, your application will be considered cancelled.</p>
-         <?php }; ?> <!-- Done by debaleena 27-11-2024 -->
+         //added by dg on 06-03-2026
+            if(isset($output['fetch_license_status']->short_code) && $output['fetch_license_status']->short_code == 'license_generate'){ 
+               $license_date = date('d-m-Y', strtotime($output['fetch_license_status']->created_at));
+               $cancel_date = date('d-m-Y', strtotime($license_date . ' +15 days'));
+
+            ?>
+           <p style="color:red;">
+            ** Your license has been generated. Please contact your Sub-Divisional Executive Engineer to either take possession date or apply for a license extension. Otherwise, the allotment will be cancelled on the 15th day(<?php echo $cancel_date; ?>) from the date of license generation. Your license generation date is: <?php echo date('d-m-Y', strtotime($output['fetch_license_status']->created_at)); ?>.
+            </p>
+
+
+            <!-- The license has been Inactive due to the failure to receive the possession letter within 15 days. Please contact your sub-divisonal Exec. Engineer within 5 days to request for license extension otherwise, your application will be considered cancelled.</p>   -->
+         <?php }; 
+
+            if(isset($output['all-application-data'][0]->short_code) && $output['all-application-data'][0]->short_code == 'housing_official_approved'){ //added by dg 09-03-2026?>
+
+               <p style="color:red;">
+                  ** Your allotment has been completed. Kindly click on the “New Allotment” option under the “Allotment Details” tab on the left panel, where you can Accept or Reject the offer. Failure to accept the offer within 15 days will lead to automatic inactivation of the allotment.
+               </p>
+          <?php  }
+
+         ?> <!-- Done by debaleena 27-11-2024 -->
          </div>
          <div class="col-md-3"><img src="<?php echo $base_root.$base_path?>sites/all/themes/housingtheme/images/dashboard-user.jpeg" style="border-radius: 50%;" /></div>
          <!-- <img src="<?php //echo $base_root.$base_path?>sites/all/themes/housingtheme/images/dashboard-user.jpeg" class="position-absolute# end-0# counter-box-icon top-0" /> -->
@@ -332,7 +353,7 @@ global $user, $user_role,$base_path,$base_root;
                      <thead>
                         <tr class="table-primary">
                            <th>Flat Type</th>
-                           <th>No. of Waitlisted Applications
+                           <th>No. of Waitlisted Applications(For New Allotment)<!--19-09-2025-->
                            <a href="<?php echo $base_root.$base_path.'flat_type_waiting_list/'?>" class="badge rounded-pill text-bg-success">View Details</a>
                            </th>
                         </tr>
@@ -340,27 +361,27 @@ global $user, $user_role,$base_path,$base_root;
                      <tbody>
                         <tr>
                            <td><b>A</b></td>
-                           <?php $data=flat_type_wise_waiting_detail(1);?>
+                           <?php $data=flat_type_wise_waiting_detail_for_competent_authority(1);?><!--19-09-2025-->
                            <td><?php echo count($data);?></td> 
                         </tr>
                         <tr>
                            <td><b>B</b></td>
-                           <?php $data=flat_type_wise_waiting_detail(2);?>
+                           <?php $data=flat_type_wise_waiting_detail_for_competent_authority(2);?><!--19-09-2025-->
                            <td><?php echo count($data);?></td>  
                         </tr>
                         <tr>
                            <td><b>C</b></td>
-                           <?php $data=flat_type_wise_waiting_detail(3);?>
+                           <?php $data=flat_type_wise_waiting_detail_for_competent_authority(3);?><!--19-09-2025-->
                            <td><?php echo count($data);?></td>   
                         </tr>
                         <tr>
                            <td><b>D</b></td>
-                           <?php $data=flat_type_wise_waiting_detail(4);?>
+                           <?php $data=flat_type_wise_waiting_detail_for_competent_authority(4);?><!--19-09-2025-->
                            <td><?php echo count($data);?></td>   
                         </tr>
                         <tr>
                            <td><b>A+</b></td>
-                           <?php $data=flat_type_wise_waiting_detail(5);?>
+                           <?php $data=flat_type_wise_waiting_detail_for_competent_authority(5);?><!--19-09-2025-->
                            <td><?php echo count($data);?></td>  
                         </tr>
                      </tbody>
@@ -471,8 +492,7 @@ if ($user_role == 4 || $user_role == 5){ // For Applicant/Occupant
                         <th>Application Number</th>
                         <th>Date of Application</th>
                         <th>Status of Application</th>
-                        <!-- <th>Flat Type</th> -->
-                        <!-- <th>View</th> -->
+                        <th>Action</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -481,70 +501,53 @@ if ($user_role == 4 || $user_role == 5){ // For Applicant/Occupant
                         <td><b><?= $application->applicant_name ?></b></td>
                         <td><?= $application->application_no ?></td>
                         <td><?= !empty($application->date_of_application) ? date('d-m-Y', strtotime($application->date_of_application)) : 'N/A' ?></td>
-                        <td><?= $application->status_description ?></td>
-                        <!-- <td>Physically Handicaped or Serious Illness</td> -->
-                        <!-- <td><a href="#"
-                              class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">View</a></td> -->
+                        <td><?= $application->applicant_show_status ?></td> 
+                        <td>
+                          <a href="<?php echo $base_root . $base_path . 'view-application/' . encrypt_url($application->online_application_id); ?>" 
+                             class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                            View
+                          </a>
+                          <?php
+                          
+                          if($application->status == 'allow_new_application'){
+                           ?>
+                           
+                           <a href="<?php echo $base_root . $base_path . 'new-apply'; ?>" 
+                             class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                            Apply As New
+                           </a>
+                           
+                           <?php
+                          }
+
+                          ?>
+                          
+                           <?php if (strpos($application->application_no, 'VS') !== false || strpos($application->application_no, 'CS') !== false):  // condition added by subham dt.03-12-2025?>
+                           <?php else: ?>
+                               <?php 
+                                       //start added by dg 07-12-2025 //
+                                       $result = db_query("SELECT status_id FROM {housing_allotment_status_master} WHERE short_code = :short_code", [':short_code' => $application->status,]);
+
+                                       $status_id = $result->fetchField();
+                                       // end and in below last status_id checking also added//
+
+                                    if ($application->allotment_category != 'General' && $application->extra_doc == '' && $status_id <= 8): ?>
+                                      <br>
+                                      <a href="<?php echo $base_root . $base_path . 'supporting-doc-upload/' . encrypt_url($application->online_application_id); ?>" 
+                                         class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                                          Upload Supporting Documents
+                                      </a>
+                               <?php endif; ?>
+                           <?php endif; ?>
+                        </td>
                      </tr>
                      <?php endforeach; ?>
-                     <!-- <tr>
-                        <td><b>Debaleena</b></td>
-                        <td>NA-15042024-3273</td>
-                        <td>15/04/2024</td>
-                        <td>D</td> -->
-                        <!-- <td>Physically Handicaped or Serious Illness</td> -->
-                        <!-- <td><a href="#"
-                              class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">View</a></td> -->
-                        
-                     <!-- </tr>
-                     <tr>
-                        <td><b>Debaleena</b></td>
-                        <td>NA-15042024-3273</td>
-                        <td>15/04/2024</td>
-                        <td>D</td> -->
-                        <!-- <td>Physically Handicaped or Serious Illness</td> -->
-                        <!-- <td><a href="#"
-                              class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">View</a></td> -->
-                        <!-- <td>
-                           <span class="badge text-bg-danger rounded">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-x-circle" viewBox="0 0 16 16">
-                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                 <path
-                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-                              </svg>
-                           </span>
-                           <span class="badge text-bg-success rounded">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-check2-circle" viewBox="0 0 16 16">
-                                 <path
-                                    d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0" />
-                                 <path
-                                    d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z" />
-                              </svg>
-                           </span>
-                        </td> -->
-                     <!-- </tr> -->
+                     
                      <?php }else{  // Done by Subham 03-01-2025?>
                         <tr>No Application Data Found</tr> 
                      <?php } ?>
                   </tbody>
                </table>
-            <?php if (!empty($output['all-application-data'])){ ?>
-            <nav aria-label="Page navigation example">
-               <ul class="pagination justify-content-end pagination-sm">
-                  <li class="page-item disabled">
-                     <a class="page-link">Previous</a>
-                  </li>
-                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item">
-                     <a class="page-link" href="#">Next</a>
-                  </li>
-               </ul>
-            </nav>
-            <?php }?>
          </div>
       </div>
       <div class="col-md-3">

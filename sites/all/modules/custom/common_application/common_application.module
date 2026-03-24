@@ -61,6 +61,23 @@
 			'page arguments' => array(1),
 			'access arguments' => array('access content'),
 		);
+
+		$items['testmail-link'] = array(
+			'title' => 'Test Mail',	
+			'page callback' => 'check_mail_send_status',
+			// 'page arguments' => array(1),
+			'access arguments' => array('access content'),
+		);
+
+		// added on 14-01-2026 By Moumita
+		$items['download-noc/%'] = array(
+			'title' => 'No Objection Certificate',	
+			'page callback' => 'download_noc',
+			'page arguments' => array(1),
+			'file'=>'download_noc.inc',
+			'access arguments' => array('access content'),
+		);
+
 		return $items;
   	}
     
@@ -130,7 +147,7 @@
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 
-			'#element_validate' => array('element_validate_alphabatic_fullstop'), 
+			//'#element_validate' => array('element_validate_alphabatic_fullstop'), off by dg for demo
 			'#required' => TRUE,
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')), 
 		);
@@ -446,7 +463,8 @@
 	
 	$form['official_info']['app_posting_place'] = array(
 		'#title' => t('Place of Posting'),
-		'#type' => 'textfield',
+		// '#type' => 'textfield',
+		'#type' => 'textarea',
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
@@ -508,18 +526,19 @@
 		'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
 		'#element_validate' => array('element_validate_textarea'), 
-		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('numeric_positive form-control')),
-		
+		// '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('numeric_positive form-control')), // off on 22-07-2025 By Moumita
+		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array('form-control')),
 	);
 	
 	$form['office_add']['office_street'] = array(
 		'#title' => t('Address'),
-		'#type' => 'textfield',
+		// '#type' => 'textfield',
+		'#type' => 'textarea',
 		'#required' => TRUE,
 		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
 		'#suffix' => '</div></div>',
 		//'#element_validate' => array('element_validate_streetaddress'), 
-		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()"),
+		'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()",'class' => array('form-control') ),
 		
 	);
 	$form['office_add']['office_city'] = array(
@@ -625,15 +644,15 @@
 		'#suffix' => '</div></div>',
 	);
 	
-	$form['ddo']['address'] = array(
-		'#title' => t('DDO Address'),
-		'#type' => 'textarea',
-		'#prefix' => '<div id="replace_ddo_address" class="col-md-6"><div class="form-floating">',
-		'#suffix' => '</div></div>',
-		'#attributes' => array('class' => array('form-control')) 
-		//'#required' => TRUE,
-		//'#validated' => TRUE,
-	);
+	// $form['ddo']['address'] = array(
+	// 	'#title' => t('DDO Address'),
+	// 	'#type' => 'textarea',
+	// 	'#prefix' => '<div id="replace_ddo_address" class="col-md-6"><div class="form-floating">',							// Turned off by Subham dt. 25-07-2025
+	// 	'#suffix' => '</div></div>',
+	// 	'#attributes' => array('class' => array('form-control')) 
+	// 	//'#required' => TRUE,
+	// 	//'#validated' => TRUE,
+	// );
 
 	$form['submit'] = array(
 		'#prefix' =>'<div class="col-12 border-top pt-3">',
@@ -714,4 +733,161 @@ function get_status_id($status = ''){
 	$data = $result->fetchAssoc();
 	
 	return $data['status_id'];
+}
+
+function check_mail_send_status(){
+
+	
+
+	// echo '<pre>'; print_r($result_sendmail); print_r($data_sendmail); die;
+
+	// $to = 'sayantika.debnath@nic.in';
+	$to = 'info.mchatterjee@gmail.com';
+
+	$subject = 'RHE Licence Generated Successfully';
+	$message = 'Dear Applicant, the Licence for your allotted RHE has been successfully generated. You may please log in to view or download the Licence.
+-Dept. of Housing, GoWB';
+	$name = 'RHE';
+
+	$dest = '8017090753';
+	$template_id = '1107175508672559576';
+
+	$data = get_userinfo_by_onlineapp_id($application_id = 34);
+
+	// echo '<pre>'; print_r($data); die;
+
+	custom_mail_function($to, $subject, $message, $name);
+
+	custom_sms_function($dest, $message, $template_id);
+
+	echo 'all ok';
+	die;
+
+}
+
+function custom_mail_function($to ='', $subject='', $message='', $name ='', $otp = ''){
+
+	$to = 'sayantika.debnath@nic.in';  //added on 19-09-2025
+	// Place these at the very top of your module file
+	require_once DRUPAL_ROOT . '/sites/all/libraries/PHPMailer-master/src/Exception.php';
+	require_once DRUPAL_ROOT . '/sites/all/libraries/PHPMailer-master/src/PHPMailer.php';
+	require_once DRUPAL_ROOT . '/sites/all/libraries/PHPMailer-master/src/SMTP.php';
+
+
+	// use PHPMailer\PHPMailer\PHPMailer;
+	// use PHPMailer\PHPMailer\Exception;
+
+	// $mail = new PHPMailer(true);
+	$mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+	try {
+		// Server settings
+
+
+		$mail->isSMTP();
+		if($otp == 'otp'){
+			//$mail->Host       = '164.100.2.239'; // https://otprelay.nic.in  //off for migration on 09-02-2026
+			$mail->Host       = '164.100.172.25'; // https://otprelay.nic.in
+		}else{
+			$mail->Host       = '164.100.13.55'; // https://smtpsgwhyd.nic.in
+		}
+		
+		$mail->Port       = 465;               // use 587 instead of 465
+		$mail->SMTPSecure = 'tls';             // encryption required
+		$mail->SMTPAuth   = true;              // must be true if using username/password
+
+		$mail->Username   = 'noreply-eallotment@bangla.gov.in';
+		$mail->Password   = 'G2#pS2@uW7';
+
+		$mail->SMTPDebug  = 0; 
+		$mail->Debugoutput = 'html';
+
+		$mail->SMTPOptions = [
+			'ssl' => [
+				'verify_peer'       => false,
+				'verify_peer_name'  => false,
+				'allow_self_signed' => true
+			]
+		];
+
+		// Sender & recipient
+		$mail->setFrom('noreply-eallotment@bangla.gov.in', 'Noreply e-Allotment');
+		$mail->addAddress($to);
+
+		// Content
+		$mail->isHTML(true);
+		$mail->Subject = $subject;
+		$mail->Body    = $message;
+		$mail->AltBody = '';
+
+		$mail->send();
+
+
+		if(!$mail->send()) { // start
+		return false;
+			echo 'Message could not be sent.';
+			echo 'Mailer Error: ' . $mail->ErrorInfo;
+		}else{
+			echo 'Message has been sent';
+		return true;
+		} // end
+		
+		drupal_set_message('Message has been sent successfully!');
+	} catch (Exception $e) {
+		drupal_set_message('Message could not be sent. Mailer Error: ' . $mail->ErrorInfo, 'error');
+	}
+	//die;
+
+}
+
+function custom_sms_function($dest='', $msg='', $template_id = ''){
+    
+    $uid	=	'wbhousing.sms'; 
+    $pass	=	'bJoddiHP';
+
+    $send = 'RHE';
+    $url = "https://smsgw.sms.gov.in/failsafe/HttpLink?";
+    
+    $dest = '8538072858';  // added 19-09-2025
+    $data = "username=$uid&pin=$pass&message=$msg&mnumber=$dest&signature=$send&dlt_entity_id=1101589480000043999&dlt_template_id=$template_id"; 
+
+    
+
+    $ch 	= 	curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,1);
+    curl_setopt($ch, CURLOPT_CAINFO,'/etc/pki/tls/certs/ca-bundle.crt');
+    if (curl_errno($ch)) echo 'Curl error: ' . curl_error($ch);
+    else $curl_output =curl_exec($ch);
+    curl_close($ch);  //echo $curl_output; echo 'aa'; die;
+    if($curl_output){
+    echo "sent";
+    }else{
+    echo "not sent";
+    }
+}
+
+function get_userinfo_by_onlineapp_id($application_id = ''){
+	if($application_id !='' && $application_id !=0){
+		$query = db_select('housing_applicant_official_detail', 'haod');
+		$query->innerJoin('housing_online_application', 'hoa', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+		$query->innerJoin('housing_applicant', 'ha', 'ha.housing_applicant_id = haod.housing_applicant_id');
+		$query->innerJoin('users', 'u', 'haod.uid = u.uid');
+		$query->fields('u', array('uid','mail'));
+		$query->addField('ha', 'mobile_no');
+		$query->addField('ha', 'applicant_name');
+		$query->condition('hoa.online_application_id',$application_id,'=');
+		$result = $query->execute();  
+		$data = $result->fetchAssoc();
+		
+		return $data;
+		
+	}else{
+		return '';
+	}
 }

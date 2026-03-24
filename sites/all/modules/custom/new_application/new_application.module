@@ -1,20 +1,33 @@
 <?php
 function new_application_init()
 {
-    global $custom_url; //comment off for live
-    
+    global $custom_url, $user; //comment off for live
+
     if ($_SERVER['REQUEST_URI'] == $custom_url . '/new-apply')
     { //delete $custom_url. for live
-        $result = fetch_new_app_status(array(
-            'draft'
-        ));
+        $result = fetch_new_app_status(array('draft','allow_new_application'));
         $row_count = $result->rowCount();
         if ($row_count > 0)
         {
             $data = $result->fetchObject();
             // print_r($data);die;
+
+            // check for allow new online application for Existing CS/VS Application
+            $sql = "select hoa.online_application_id , status
+                    from housing_online_application hoa 
+                    inner join housing_applicant_official_detail haod on haod.applicant_official_detail_id = hoa.applicant_official_detail_id 
+                    where status = 'allow_new_application' and haod.hrms_id = ".$user->name;
+            $checkAlow = db_query($sql);
+            $row_count_new = $checkAlow->rowCount();
+            if($row_count_new > 0){
+                $vscs_data = $checkAlow->fetchObject();
+                $allow_status = $vscs_data->status;
+            }else{
+                $allow_status = '';
+            }
+
 			///////////debaleena 27-11-2024////////
-			if(isset($data->status) && ($data->status == 'offer_letter_cancel' || $data->status == 'license_cancel' || $data->status == 'ddo_rejected_1' || $data->status == 'housing_sup_reject_1' || $data->status == 'housing_approver_reject_1' || $data->status == 'housing_official_reject' || $data->status == 'applicant_reject' || $data->status == 'ddo_rejected_2' || $data->status == 'housing_sup_reject_2' || $data->status == 'housing_approver_reject_2' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $data->status == 'license_cancel')){
+			if(isset($data->status) && ($data->status == 'offer_letter_cancel' || $data->status == 'license_cancel' || $data->status == 'ddo_rejected_1' || $data->status == 'housing_sup_reject_1' || $data->status == 'housing_approver_reject_1' || $data->status == 'housing_official_reject' || $data->status == 'applicant_reject' || $data->status == 'ddo_rejected_2' || $data->status == 'housing_sup_reject_2' || $data->status == 'housing_approver_reject_2' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $allow_status =='allow_new_application')){ 
 				drupal_goto('new-apply/');
 			}else{
 				drupal_goto('view-application/'.encrypt_url($data->online_application_id));
@@ -36,6 +49,25 @@ function new_application_menu()
             'administer New Application'
         ) ,
     );
+
+    // Done by Subham dt.24-09-2025
+    $items['supporting-doc-upload'] = array(
+      'title' => 'Supporting Document Upload',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('supporting_doc_upload_form'),
+      'file' => 'supporting_doc_upload_form.inc',
+      'access arguments' => array('access content')
+    );
+
+    // Allow New Application for Existing CS/VS Application By Moumita on 18-02-2026
+    $items['allow-new-application/%'] = array(
+      'title' => 'Allow New Application for Existing CS/VS Application',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('allow_new_application',1),
+      'file' => 'allow_new_application.inc',
+      'access arguments' => array('access content')
+    );
+
     return $items;
 }
 
@@ -51,16 +83,16 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
     /*API Call to get HRMS API Data*/
     #sample HRMS ID
     #1999002754,1995002970,1981000029
-    // $userHRMSID = '1981000029';
+    // $userHRMSID = '1981000029'; 
     $userHRMSID = $user->name;
     $userData = getHRMSUserData($userHRMSID); 
     $ddo_data_all = get_ddo_all_data($userData['ddoId']);
-    // echo "<pre>"; print_r($userData); die;
+    // echo '123<pre>'; print_r($userData); die;
     
     
 
     if (!empty($userData)){   
-        //print_r($userData);die; 
+        // print_r($userData);die; 
        
         $form['ddo']['district']['#default_value'] = isset($ddo_data_all['district_code']) ? $ddo_data_all['district_code'] : '';
         $form['ddo']['district']['#disabled'] = true;
@@ -251,8 +283,17 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
 		$query->fields('t2', array(
 			'flat_type'
 		));
-		$query->condition('t1.scale_from', $basicPay, '<');
-		$query->condition('t1.scale_to', $basicPay, '>');
+
+        if($basicPay > 95099){
+            $query->condition('t1.scale_from', 95100, '>='); 
+            $query->isNull('t1.scale_to'); 
+        }else{
+            $query->condition('t1.scale_from', $basicPay, '<=');  //= added by dg 12-06-2025
+            $query->condition('t1.scale_to', $basicPay, '>');
+        }
+
+        $query->condition('t1.flag', 'new', '=');
+		
 		$result = $query->execute();
 		$record = $result->fetchObject();
 		$pay_band_id = $record->pay_band_id;
@@ -299,104 +340,85 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
         // );
         $form['housing_preference'] = array(
             '#type' => 'fieldset',
-            '#title' => t('Housing preference') ,
-            '#collapsible' => FALSE, // Added
-            '#collapsed' => FALSE, // Added
-            
+            '#title' => t('Housing Preference'),
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
         );
 
-        $form['housing_preference']['first_preference'] = array(
-            '#title' => t('First Preference'),
+        /* Done by Subham dt.25-07-2025 */
+        $form['#validate'][] = 'housing_preference_form_validate';
+
+        $form['housing_preference']['preference_selector'] = array(
             '#type' => 'select',
-            '#options' => get_housing_estate_preference($pay_band_id,$treasury_id),
+            '#title' => t('Do you want to select housing preference?'),
+            '#options' => array(
+                '0' => t('No Preference'),
+                '1' => t('Select Housing Preference'),
+            ),
+            '#default_value' => isset($form_state['values']['preference_selector']) ? $form_state['values']['preference_selector'] : '0',
+                '#ajax' => array(
+                'callback' => 'housing_preference_select_ajax_callback',
+                'wrapper' => 'housing-preference-wrapper',
+                'method' => 'replace',
+                'effect' => 'fade',
+            ),
+            '#required' => TRUE,
+            '#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
+            '#suffix' => '</div></div></div>',
+        );
+
+        $form['housing_preference']['preferences_container'] = array(
+            '#type' => 'container',
+            '#attributes' => array('id' => 'housing-preference-wrapper'),
+        );
+
+        if (isset($form_state['values']['preference_selector']) && $form_state['values']['preference_selector'] == '1') {
+            $options = get_housing_estate_preference($pay_band_id, $treasury_id);
+            $options = array('' => t('- Select -')) + $options;
+
+            $form['housing_preference']['preferences_container']['first_preference'] = array(
+            '#type' => 'select',
+            '#title' => t('First Preference'),
+            '#options' => $options,
             '#required' => TRUE,
             '#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#validated' => TRUE,
-            
-        );
-        $form['housing_preference']['second_preference'] = array(
-            '#title' => t('Second Preference'),
+            );
+
+            $form['housing_preference']['preferences_container']['second_preference'] = array(
             '#type' => 'select',
-            '#options' => get_housing_estate_preference($pay_band_id,$treasury_id),
-            '#required' => TRUE,
+            '#title' => t('Second Preference'),
+            '#options' => $options,
             '#prefix' => '<div class="col-md-4"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#validated' => TRUE,
-            
-        );
-        $form['housing_preference']['third_preference'] = array(
-            '#title' => t('Third Preference'),
+            );
+
+            $form['housing_preference']['preferences_container']['third_preference'] = array(
             '#type' => 'select',
-            '#options' => get_housing_estate_preference($pay_band_id,$treasury_id),
-            '#required' => TRUE,
+            '#title' => t('Third Preference'),
+            '#options' => $options,
+            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+            '#suffix' => '</div></div>',
+            );
+
+            $form['housing_preference']['preferences_container']['fourth_preference'] = array(
+            '#type' => 'select',
+            '#title' => t('Fourth Preference'),
+            '#options' => $options,
+            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+            '#suffix' => '</div></div>',
+            );
+
+            $form['housing_preference']['preferences_container']['fifth_preference'] = array(
+            '#type' => 'select',
+            '#title' => t('Fifth Preference'),
+            '#options' => $options,
             '#prefix' => '<div class="col-md-4"><div class="form-floating">',
             '#suffix' => '</div></div></div>',
-            '#validated' => TRUE,
-            
-        );
+            );
+        } /* End dt.25-07-2025 */
 
-        // removed as estate preferences would come based on treasury
-        /*$district_code = 17;
-        $query1 = db_select('housing_estate', "t1");
-        $query1->join('housing_flat', 't2', 't1.estate_id = t2.estate_id');
-        $query1->join('housing_pay_band_categories', 't3', 't2.flat_type_id = t3.flat_type_id');
-        $query1->fields('t1', array(
-            'estate_id',
-            'estate_name',
-        ));
-        $query1->condition('t1.district_code', $district_code, '=');
-        $query1->condition('t3.pay_band_id', $pay_band_id, '=');
-        $query1->groupBy('t1.estate_id, t1.estate_name');
-        $query1->orderBy('t1.estate_name', '');
-        $result = $query1->execute();*/
-
-        //old query 
-        /* $result = db_query("select distinct t2.estate_id, t2.estate_name from housing_estate as t2
-				inner join housing_flat as t1 on t1.estate_id = t2.estate_id
-				where t2.district_code = " . $district_code . " AND 
-                t1.flat_type_id = (select flat_type_id from housing_pay_band_categories where pay_band_id = " . $pay_band_id . ")"); */
-        //old query end
         
-
-        // removed as estate preferences would come based on treasury       
-        /*$rowCount = $result->rowCount();
-        if ($rowCount > 0)
-        {
-            $form['housing_preference']['table_header'] = array(
-                '#markup' => '<table class="table table-bordered">
-									<tr>
-										<th>Housing name</th>
-										<th>Preference</th>
-									</tr>'
-            );
-            $pref_count = 1;
-            foreach ($result as $record)
-            {
-
-                $estate_name = $record->estate_name;
-                $estate_id = $record->estate_id;
-
-                $form['housing_preference']['estate_' . $estate_id] = array(
-                    '#markup' => '<tr><td>' . $estate_name . '</td>'
-                );
-                $form['housing_preference']['estate_preference[' . $estate_id . ']'] = array(
-                    '#type' => 'select',
-                    '#required' => true,
-                    '#options' => array_combine(range(1, $rowCount) , range(1, $rowCount)) ,
-                    '#default_value' => $pref_count,
-                    //'#value' => $pref_count,
-                    '#title' => t('Preference') ,
-                    '#title_display' => 'invisible',
-                    '#prefix' => '<td>',
-                    '#suffix' => '</td></tr>',
-                );
-                $pref_count++;
-            }
-            $form['housing_preference']['table_footer'] = array(
-                '#markup' => '</table>',
-            );
-        }*/
 
         $form['allotment_reason'] = array(
             '#type' => 'fieldset',
@@ -419,7 +441,7 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
         );
 
         $form['allotment_reason']['reason'] = array(
-            '#title' => t('Allotment Reason') ,
+            '#title' => t('Allotment Categories') ,
             '#type' => 'select',
             //'#options' => array(''=>'- Select -'),
             '#options' => allotment_category_list(trim($flat_type)) ,
@@ -432,64 +454,38 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
             
         );
 
-        $form['document_upload'] = array(
-            '#type' => 'fieldset',
-            '#title' => t('Upload Documents') ,
-            '#collapsible' => FALSE, // Added
-            '#collapsed' => FALSE, // Added
-            
-        );
+        
+    	$form['document_upload'] = array(
+	        '#type' => 'fieldset',
+	        '#title' => t('Upload Documents') ,
+	        '#collapsible' => FALSE, // Added
+	        '#collapsed' => FALSE, // Added
+            '#states' => array(
+                'visible' => array(
+                    array(':input[name="reason"]' => array('value' => 'Legal Heir')), 
+                    array(':input[name="reason"]' => array('value' => 'Physically Handicaped or Serious Illness')),
+                    array(':input[name="reason"]' => array('value' => 'Transfer')),
+                    array(':input[name="reason"]' => array('value' => 'Recommended')),
+                    array(':input[name="reason"]' => array('value' => 'Single Earning Lady')),
+                ),
+                'required' => array(
+                    array(':input[name="reason"]' => array('value' => 'Legal Heir')), 
+                    array(':input[name="reason"]' => array('value' => 'Physically Handicaped or Serious Illness')),
+                    array(':input[name="reason"]' => array('value' => 'Transfer')),
+                    array(':input[name="reason"]' => array('value' => 'Recommended')),
+                    array(':input[name="reason"]' => array('value' => 'Single Earning Lady')),
+                ),
+            ),
+	        
+	    );
 
-        $form['document_upload']['file_markup'] = array(
+	    $form['document_upload']['file_markup'] = array(
             '#type' => 'markup',
             '#markup' => '<div class="row">'
 
         );
-
-        $form['document_upload']['file'] = array(
-            '#title' => t('Upload Your Latest Payslip') ,
-            '#type' => 'managed_file',
-            '#description' => t('<b>Allowed Extension: pdf<br>Maximum File Size: 1 MB</b>') ,
-            '#progress_message' => t('Please wait...') ,
-            '#progress_indicator' => 'bar',
-            '#default_value' => variable_get('Upload File', '') ,
-            //'#theme' => 'common_application_thumb_upload',
-            '#upload_validators' => array(
-                'file_validate_extensions' => array(
-                    "pdf"
-                ) ,
-                //'file_validated_size' => array(MAX_FILE_SIZE*1024*1024),
-                
-            ) ,
-            '#upload_location' => 'public://doc/',
-            '#required' => true,
-            '#process' => array(
-                'new_application_element_process'
-            ) ,
-        );
-
-        $form['document_upload']['scaned_sign'] = array(
-            '#title' => t('Upload Your Scanned Signature') ,
-            '#type' => 'managed_file',
-            '#description' => t('<b>Allowed Extensions: jpg jpeg<br>Dimensions: 140 pixels (Width) x 60 pixels (Height)<br>Maximum File Size: 50 KB</b>') ,
-            '#progress_message' => t('Please wait...') ,
-            '#progress_indicator' => 'bar',
-            '#default_value' => variable_get('Upload File', '') ,
-            //'#theme' => 'common_application_thumb_upload',
-            '#upload_validators' => array(
-                'file_validate_extensions' => array(
-                    "jpg jpeg"
-                ) ,
-                //'file_validated_size' => array(MAX_FILE_SIZE*1024*1024),
-                
-            ) ,
-            '#upload_location' => 'public://doc/',
-            '#required' => true,
-            '#process' => array(
-                'new_application_element_process'
-            ) ,
-        );
-
+        
+    //turned on by dg 18-09-2025
         $form['document_upload']['extra_doc'] = array(
             '#title' => t('Upload Allotment Reason Supporting Document') ,
             '#type' => 'managed_file',
@@ -512,6 +508,22 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
             '#process' => array(
                 'new_application_element_process'
             ) ,
+            '#states' => array(
+                'visible' => array(
+                    array(':input[name="reason"]' => array('value' => 'Legal Heir')), 
+                    array(':input[name="reason"]' => array('value' => 'Physically Handicaped or Serious Illness')),
+                    array(':input[name="reason"]' => array('value' => 'Transfer')),
+                    array(':input[name="reason"]' => array('value' => 'Recommended')),
+                    array(':input[name="reason"]' => array('value' => 'Single Earning Lady')),
+                ),
+                'required' => array(
+                    array(':input[name="reason"]' => array('value' => 'Legal Heir')), 
+                    array(':input[name="reason"]' => array('value' => 'Physically Handicaped or Serious Illness')),
+                    array(':input[name="reason"]' => array('value' => 'Transfer')),
+                    array(':input[name="reason"]' => array('value' => 'Recommended')),
+                    array(':input[name="reason"]' => array('value' => 'Single Earning Lady')),
+                ),
+            ),
 
         );
 
@@ -519,81 +531,9 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
             '#type' => 'markup',
             '#markup' => '</div>'
 
-        );
+        );  // Turned off by Subham 24-07-2025
 
-        // define allotment
-        /*$form['define_allotment'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Name of the housing Estates applied for in order of preference (Maximum four)'),
-        '#collapsible' => TRUE, // Added
-        '#collapsed' => TRUE,  // Added
-        );
-        $form['define_allotment']['choice_1'] = array(
-        '#title' => t('Choice 1'),
-        '#type' => 'select',
-        //'#required' => TRUE,
-        '#validated' => TRUE,
-        '#options' => array(''=>'- Select -'),
-        '#prefix' => '<div id="replace_choice1" class="four">',
-        '#suffix' => '</div>',
-        '#ajax' => array(
-        'event' => 'change',
-        'callback' => '_reload_choice2',
-        'effect' => 'fade',
-        'progress' => array(
-        'type' => '',
-        'message' => '',
-        ),
-        ),
-        '#weight' => -10
         
-        );
-        $form['define_allotment']['choice_2'] = array(
-        '#title' => t('Choice 2'),
-        '#type' => 'select',
-        //'#required' => TRUE,
-        '#validated' => TRUE,
-        '#options' => array(''=>'- Select -'),
-        '#prefix' => '<div id="replace_choice2" class="four">',
-        '#suffix' => '</div>',
-        '#ajax' => array(
-        'event' => 'change',
-        'callback' => '_reload_choice3',
-        'effect' => 'fade',
-        'progress' => array(
-        'type' => '',
-        'message' => '',
-        ),
-        ),
-        
-        );
-        $form['define_allotment']['choice_3'] = array(
-        '#title' => t('Choice 3'),
-        '#type' => 'select',
-        //'#required' => TRUE,
-        '#validated' => TRUE,
-        '#options' => array(''=>'- Select -'),
-        '#prefix' => '<div id="replace_choice3" class="four">',
-        '#suffix' => '</div>',
-        '#ajax' => array(
-        'event' => 'change',
-        'callback' => '_reload_choice4',
-        'effect' => 'fade',
-        'progress' => array(
-        'type' => '',
-        'message' => '',
-        ),
-        ),
-        );
-        $form['define_allotment']['choice_4'] = array(
-        '#title' => t('Choice 4'),
-        '#type' => 'select',
-        //'#required' => TRUE,
-        '#validated' => TRUE,
-        '#options' => array(''=>'- Select -'),
-        '#prefix' => '<div id="replace_choice4" class="four">',
-        '#suffix' => '</div>',
-        );*/
 
         $form['official_info']['pay_band']['#ajax'] = array(
             'event' => 'change',
@@ -611,29 +551,13 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
         $form['#attributes'] = array(
             'onsubmit' => 'return validate_new_application_form()'
         );
-        $form['#validate'] = array(
-            'new_application_validate'
-        );
+        // $form['#validate'] = array(
+        //     'new_application_validate'               // Turned off by Subham 24-07-2025
+        // );
         $form['#submit'] = array(
             'new_application_submit'
         );
 
-    }
-
-    $form['#clientside_validation_settings']['settings']['validate_options']['validate_before_ajax'] = 0;
-
-    if (isset($form['document_upload']['file']) > 0 && $form['document_upload']['file']["#type"] == "managed_file")
-    {
-        $form['document_upload']['file']["#upload_validators"]["file_upload_validation"] = array(
-            $form['document_upload']['file']["#upload_validators"]["file_validate_extensions"][0]
-        );
-    }
-
-    if (isset($form['document_upload']['scaned_sign']) > 0 && $form['document_upload']['scaned_sign']["#type"] == "managed_file")
-    {
-        $form['document_upload']['scaned_sign']["#upload_validators"]["file_upload_validation"] = array(
-            $form['document_upload']['scaned_sign']["#upload_validators"]["file_validate_extensions"][0]
-        );
     }
 
     if (isset($form['document_upload']['extra_doc']) > 0 && $form['document_upload']['extra_doc']["#type"] == "managed_file")
@@ -644,12 +568,25 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
     }
 
 }
+/* Done by Subham dt.25-07-2025 */
+function housing_preference_select_ajax_callback($form, &$form_state) {
+  return $form['housing_preference']['preferences_container'];
+}
 
-function new_application_validate(&$form, &$form_state)
+function housing_preference_form_validate($form, &$form_state) {
+  if ($form_state['values']['preference_selector'] == '1') {
+    if (empty($form_state['values']['first_preference'])) {
+      form_set_error('first_preference', t('Atleast First preference is required.'));
+    }
+  }
+} /* End */
+
+
+function new_application_validate(&$form, &$form_state) 
 {
     
-    $file_payslip = file_load($form_state['values']['file']);
-    $file_scaned_sign = file_load($form_state['values']['scaned_sign']);
+    // $file_payslip = file_load($form_state['values']['file']);
+    // $file_scaned_sign = file_load($form_state['values']['scaned_sign']);
     $file_extra_doc = file_load($form_state['values']['extra_doc']);
 
 
@@ -664,7 +601,7 @@ function new_application_validate(&$form, &$form_state)
     //$reason = $form_state['values']['reason'];
     form_set_value($form['allotment_reason']['reason'], $reason, $form_state);
     
-    if (trim($reason) == 'Transfer' || trim($reason) == 'Physically Handicaped Or Serious Illness' || trim($reason) == 'Single Earning Lady' || trim($reason) == 'Recommended' || trim($reason) == 'Legal Heir')
+    if (trim($reason) == 'Transfer' || trim($reason) == 'Physically Handicaped Or Serious Illness' || trim($reason) == 'Single Earning Lady' || trim($reason) == 'Recommended' || trim($reason) == 'Legal Heir' || trim($reason) == 'Judicial Officer On Transfer')
     {
        // echo "kkk";die;
         if ($form['document_upload']['extra_doc']['#value']['fid'] == 0)
@@ -676,9 +613,9 @@ function new_application_validate(&$form, &$form_state)
     {
         if ($form['document_upload']['extra_doc']['#value']['fid'] != 0)
         {
-            form_set_error('extra_doc1', t('You have to choose Allotment Reason Transfer / Officer on Transfer having earmarked Bungalow or Quater in their immediate previous posting / Physically Handicapped Or Serious Illness.'));
+            form_set_error('extra_doc1', t('You have to choose Allotment Reason.'));
         }
-    }
+    } 
 
     /*if((trim($reason) != 'Transfer' && $form['document_upload']['extra_doc']['#value']['fid'] != 0) || (trim($reason) == 'Officer on Transfer having earmarked Bungalow or Quater in their immediate previous posting' && $form['document_upload']['extra_doc']['#value']['fid'] != 0) || (trim($reason) != 'Physically Handicapped Or Serious Illness' && $form['document_upload']['extra_doc']['#value']['fid'] != 0)) {
     //if($form['document_upload']['extra_doc']['#value']['fid'] != 0) {
@@ -687,6 +624,7 @@ function new_application_validate(&$form, &$form_state)
     //}
     }*/
 
+    /* Turned off by Subham 24-07-2025
     if ($file_payslip->filesize > 1048576)
     {
         form_set_error('payslip_file_size', 'The file ' . $file_payslip->filename . ' could not be uploaded, because it exceeds 1 MB, the maximum allowed size for uploads.');
@@ -694,7 +632,7 @@ function new_application_validate(&$form, &$form_state)
     if ($file_scaned_sign->filesize > 51200)
     {
         form_set_error('sign_file_size', 'The file ' . $file_scaned_sign->filename . ' could not be uploaded, because it exceeds 50 KB, the maximum allowed size for uploads.');
-    }
+    } */ // Turned off by Subham 24-07-2025
     if (!empty($file_extra_doc) && isset($file_extra_doc->filesize) && ($file_extra_doc->filesize > 1048576))
     {
         form_set_error('extra_doc_file_size', 'The file ' . $file_extra_doc->filename . ' could not be uploaded, because it exceeds 1 MB, the maximum allowed size for uploads.');
@@ -717,6 +655,11 @@ function new_application_submit($form, &$form_state)
     /*echo '<pre>';
     print_r($form_state);
     die();*/
+
+    // if ($form_state['values']['reason'] != 'General'){
+    //     die('Something went wrong!');
+    // }
+
 
     $action = 'draft';
     if ($form_state['input']['op'] == 'Apply')
@@ -747,6 +690,16 @@ function new_application_submit($form, &$form_state)
     else if ($action == 'applied')
     {
         drupal_set_message('You have successfully applied.');
+
+        $to = $form_state['values']['email'];
+        $dest = $form_state['values']['mobile'];
+        $subject = 'Application Submit';
+        $message = 'Dear '.$form_state['values']['applicant_name'].', your application for RHE has been successfully received by the Dept. You may please check the application status in rhe.wb.gov.in';
+        $name = 'RHE';
+
+        custom_mail_function($to, $subject, $message, $name);
+        $template_id = '1107175508584160894';
+        custom_sms_function($dest, $message, $template_id);
     }
     /*if (isset($form_state['values']['estate_preference']) && !empty($form_state['values']['estate_preference'])) {
     print_r($form_state['values']['estate_preference']);
@@ -770,34 +723,34 @@ function new_application_permission()
 
 function get_housing_estate_preference($pay_band_id='',$treasury_id=''){
     
-        // echo $pay_band_id;die;
-        $district_code = 17;
-        //$treasury_id=11;
+    // echo $pay_band_id;die;
+    $district_code = 17;
+    //$treasury_id=11;
 
-        $query1 = db_select('housing_estate', "t1");
-        $query1->join('housing_flat', 't2', 't1.estate_id = t2.estate_id');
-        $query1->join('housing_pay_band_categories', 't3', 't2.flat_type_id = t3.flat_type_id');
-        $query1->join('housing_treasury_estate_mapping', 't4', 't1.estate_id = t4.estate_id');
-        $query1->fields('t1', array(
-            'estate_id',
-            'estate_name',
-        ));
-        $query1->condition('t1.district_code', $district_code, '=');
-        $query1->condition('t3.pay_band_id', $pay_band_id, '=');
-        $query1->condition('t4.treasury_id', $treasury_id, '=');
-        $query1->condition('t4.is_active', 1, '=');
-        $query1->groupBy('t1.estate_id, t1.estate_name');
-        $query1->orderBy('t1.estate_name', '');
-        $result = $query1->execute();
+    $query1 = db_select('housing_estate', "t1");
+    $query1->join('housing_flat', 't2', 't1.estate_id = t2.estate_id');
+    $query1->join('housing_pay_band_categories', 't3', 't2.flat_type_id = t3.flat_type_id');
+    $query1->join('housing_treasury_estate_mapping', 't4', 't1.estate_id = t4.estate_id');
+    $query1->fields('t1', array(
+        'estate_id',
+        'estate_name',
+    ));
+    $query1->condition('t1.district_code', $district_code, '=');
+    $query1->condition('t3.pay_band_id', $pay_band_id, '=');
+    $query1->condition('t4.treasury_id', $treasury_id, '=');
+    $query1->condition('t4.is_active', 1, '=');
+    $query1->groupBy('t1.estate_id, t1.estate_name');
+    $query1->orderBy('t1.estate_name', '');
+    $result = $query1->execute();
 
-        //echo '<pre>'; print_r($result); die;
+    //echo '<pre>'; print_r($result); die;
 
-        $housing_estate_options=array();
+    $housing_estate_options=array();
 
-        foreach($result as $record){
-           $housing_estate_options[$record->estate_id] = $record->estate_name;
-        }
-        return $housing_estate_options;
+    foreach($result as $record){
+        $housing_estate_options[$record->estate_id] = $record->estate_name;
+    }
+    return $housing_estate_options;
 }
 //end//
 require_once ('new_application_schema.inc');

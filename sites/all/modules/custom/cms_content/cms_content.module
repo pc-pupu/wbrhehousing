@@ -29,7 +29,42 @@ function cms_content_menu() {
       'page arguments' => array(),
       'access arguments' => array('administer CMS Content Management')
     );
-    
+
+    $items['faq'] = array(
+      'title' => 'Frequenty Asked Questions',
+      'page callback' => 'faq_view_page',
+      'file' => 'faq_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['about-us'] = array(
+      'title' => 'About Us',
+      'page callback' => 'about_us_view_page',
+      'file' => 'about_us_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['contact-us'] = array(
+      'title' => 'Contact Us',
+      'page callback' => 'contact_us_view_page',
+      'file' => 'contact_us_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['notice'] = array(
+      'title' => 'Notice',
+      'page callback' => 'notice_view_page',
+      'file' => 'notice_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
+    $items['user-manual'] = array(
+      'title' => 'User Manual',
+      'page callback' => 'user_manual',
+      'file' => 'user_manual_view_page.inc',
+      'access arguments' => array('access content')
+    );
+
     return $items;
 }
 
@@ -62,13 +97,12 @@ function cms_content_list_view() {
     $header['download_content'] = array('data' => 'Download Content', 'width' => '10%');
 		$header['action'] = array('data' => 'Action', 'width' => '10%');
 
-		$rows =array();
+		$rows = array();
 		$output = '';
     $serialNumber = 1;
 		
 		while($data = $result->fetchObject()) {
 			$fields = array();
-      $file_url = file_create_url($data->file_path);
       
       $fields[] = $serialNumber;
 			$fields[] = $data->content_type;
@@ -76,7 +110,17 @@ function cms_content_list_view() {
       $fields[] = date('d/m/Y', strtotime($data->created_date));
       $fields[] = $data->order_no;
       $fields[] = ($data->is_active == 1) ? 'Active' : 'Inactive';
-			$fields[] = l('<span class="btn bg-light btn-sm fa fa-file-pdf-o text-black rounded" style="font-size:20px; display:flex; justify-content:center; align-items:center; width: 30px; height: 30px; margin: 0 auto;"></span>', $file_url, array('html' => TRUE, 'attributes' => array('target' => '_blank')));
+
+      if (!empty($data->file_path)) {
+        $file_url = file_create_url($data->file_path);
+        $fields[] = l(
+            '<span class="btn bg-light btn-sm fa fa-file-pdf-o text-black rounded" style="font-size:20px; display:flex; justify-content:center; align-items:center; width: 30px; height: 30px; margin: 0 auto;"></span>',
+            $file_url,
+            array('html' => TRUE, 'attributes' => array('target' => '_blank'))
+        );
+      } else {
+            $fields[] = '<div style="text-align: center;"><span style="font-size: 0.8em; color: #666;">File not available to download</span></div>';
+      }
 
 			$onclick="return confirm('Are you sure you want to Delete?')";
 			

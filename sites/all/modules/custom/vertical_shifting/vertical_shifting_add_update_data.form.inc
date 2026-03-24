@@ -27,7 +27,7 @@
 				$vertical_shifting_app_arr['file_licence']  =  $file_licence->fid;	
 			}
 		}
-
+		/* Turned off by Subham 24-07-2025
 		if($form_state['values']['vs_scanned_sign'] != 0) {
 			$scanned_sign = file_load($form_state['values']['vs_scanned_sign']);
 			if($scanned_sign->status==0) {
@@ -36,7 +36,7 @@
 				file_usage_add($scanned_sign, 'vertical_shifting', 'VS Scanned Sign', $user->uid);
 				$vertical_shifting_app_arr['scanned_sign']  =  $scanned_sign->fid;	
 			}
-		}
+		}*/ // Turned off by Subham 24-07-2025
 		
 		if($online_application_id != 0) {
 			db_insert('housing_vs_application')
@@ -98,7 +98,7 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
-					
+
 					$file1 = file_load($data->file_id);
 					file_usage_delete($file1, 'vertical_shifting', 'Current Licence', $user->uid);
     				file_delete($file1);

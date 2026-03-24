@@ -161,12 +161,12 @@ function auto_updation_license(){
   $query->addField('haod', 'uid');
   $query->addField('hol', 'possession_date');
   $query->condition('hoa.status','license_generate','=');
-
+  $query->orderBy('hoa.online_application_id', 'ASC');
 
   $result = $query->execute();
   $data_arr = $result->fetchAll();
 
-  // print_r($data_arr);die;
+  print_r($data_arr);die;
   foreach ($data_arr as $data) {
     
     $license_generation_date = $data->date_of_verified;
@@ -255,7 +255,15 @@ function dateDiffInDays($date1, $date2) {
 
 function auto_cancellation_applicant_list(){
 
-  global $base_root, $base_path;
+  global $base_root, $base_path, $user, $user_role;
+  if($user_role == 7 || $user_role == 8){
+    $uid = $user->uid;
+    $getinfo = get_subdiv_det_by_uid($uid);
+    
+    $sql = "AND he.subdiv_id = '".$getinfo['subdiv_id']."' AND he.division_id = '".$getinfo['division_id']."' ";
+  }else{
+    $sql = '';
+  }
   $output1 = '';
   $query = "SELECT hoa.application_no, ha.applicant_name, haod.applicant_designation,hoa.status,hf.floor,hf.flat_no,hb.block_name,he.estate_name
             FROM housing_online_application hoa
@@ -265,7 +273,7 @@ function auto_cancellation_applicant_list(){
             INNER JOIN housing_flat hf ON hf.flat_id = hfo.flat_id
             INNER JOIN housing_estate he ON he.estate_id = hf.estate_id
             INNER JOIN housing_block hb ON hb.block_id = hf.block_id
-            WHERE hoa.status IN ('offer_letter_cancel', 'license_cancel','offer_letter_extended','license_extended')";
+            WHERE hoa.status IN ('offer_letter_cancel', 'license_cancel','offer_letter_extended','license_extended') ".$sql;
             // echo $query;die;
   $result = db_query($query);
 
@@ -556,7 +564,7 @@ function auto_transfer_checking(){
           // echo 'transfer DDO Code with illegal occupant';
           // echo 'data insert with illegal remarks';
 
-          $insarr = array('ddo_code_new'=>$savedDDOCode,'ddo_code_new' => $newDDOCode,'hrms_id' => $hrmsID,'created_datetime' =>date('Y-m-d H:i:s'),'remarks'=>'illegal_occupant');
+          $insarr = array('ddo_code_old'=>$savedDDOCode,'ddo_code_new' => $newDDOCode,'hrms_id' => $hrmsID,'created_datetime' =>date('Y-m-d H:i:s'),'remarks'=>'illegal_occupant');
           $insquery = db_insert('housing_applicant_ddo_transfer')->fields($insarr)->execute();
         }else{
           // echo 'Transfer DDO but in same district';

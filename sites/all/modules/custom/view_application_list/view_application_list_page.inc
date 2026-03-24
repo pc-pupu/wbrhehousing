@@ -27,7 +27,7 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 			$statusMsg = 'Housing Supervisor(Level-1) Rejected ';
 		}else if($status == 'housingapprover_approved_1'){    //debaleena 04-09-2024
 			$statusMsg = 'Housing Approver Verified ';
-		}else if($status == 'housingapprover_reject1'){
+		}else if($status == 'housing_approver_reject_1'){   //upated by dg 04-11-2025
 			$statusMsg = 'Housing Approver Rejected ';
 		}else if($status == 'housing_official_approved'){
 			$statusMsg = 'Housing Official Verified ';
@@ -45,7 +45,7 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 			$statusMsg = 'Allotted ';
 		}else if($status == 'housingapprover_approved_2'){    //debaleena 12-09-2024
 			$statusMsg = 'Housing Approver Verified ';
-		}else if($status == 'housingapprover_reject2'){
+		}else if($status == 'housing_approver_reject_2'){   //upated by dg 04-11-2025
 			$statusMsg = 'Housing Approver Rejected ';
 		}
 
@@ -83,6 +83,7 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 			$entityMsg = 'Renew Licence ';
 		}
 		// echo $statusMsg;die;	
+		if(!empty($entityMsg))
 		drupal_set_title($statusMsg.'Application List for '.$entityMsg);
 			
 		
@@ -256,7 +257,7 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 						$reject_status = 'housing_sup_reject_1';
 					}else if($status == 'housing_sup_approved_1'){
 						$update_status = 'housingapprover_approved_1';     //debaleena 04-09-2024
-						$reject_status='housingapprover_reject1';
+						$reject_status='housing_approver_reject_1';   //updated by dg 04-11-2025
 					}else if($status == 'allotted'){
 						$update_status = 'housing_official_approved';
 						$reject_status='housing_official_reject';
@@ -268,24 +269,37 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 						$reject_status='housing_sup_reject_2';
 					}else if($status == 'housing_sup_approved_2'){
 						$update_status = 'housingapprover_approved_2';     //debaleena 12-09-2024
-						$reject_status='housingapprover_reject2';
+						$reject_status='housing_approver_reject_2';   //updated by dg 04-11-2025
 					}
 
-
-					
-					
-
+					if(!empty($data->computer_serial_no)){
+							$computer_serial_no = $data->computer_serial_no;
+					}else{
+							$computer_serial_no = 'vs_cs';
+					}
 				
 
 					$onclick="return confirm('Are you sure you want to approve?')";
 					$onclick1="return confirm('Are you sure you want to reject?')";
-					if($reject_status == 'housing_sup_reject_1' || $reject_status == 'housing_official_reject' || $reject_status == 'housing_sup_reject_2' || $reject_status == 'housingapprover_reject2' || $reject_status == 'housingapprover_reject1')
+					$onclick2="return confirm('Are you sure you want to convert?')";
+
+					// covert to general category
+
+					if($data->allotment_category !='General' && $data->allotment_category !='Recommended'){
+						$conver_btn_link = l('<span class="badge text-bg-warning rounded fa fa-random" > </span>','convrt-to-gen-cat/'.encrypt_url($data->online_application_id).'/'.encrypt_url($data->allotment_category),array('html'=>TRUE, 'attributes' => array('onclick' => $onclick2)));
+					}else{
+						$conver_btn_link = '';
+					}
+
+
+					if($reject_status == 'housing_sup_reject_1' || $reject_status == 'housing_official_reject' || $reject_status == 'housing_sup_reject_2' || $reject_status == 'housing_approver_reject_2' || $reject_status == 'housing_approver_reject_1')
 					{
 						// echo "kkk";die;
 						$fields[] = l('<span class="badge text-bg-success rounded fa fa-check">
-						</span>' ,'application-approve/'.encrypt_url($data->online_application_id).'/'.encrypt_url($update_status).'/'.encrypt_url($status).'/'.encrypt_url($entity), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick))).'&nbsp;'.
+						</span>' ,'application-approve/'.encrypt_url($data->online_application_id).'/'.encrypt_url($update_status).'/'.encrypt_url($status).'/'.encrypt_url($entity).'/'.encrypt_url($computer_serial_no).'/'.encrypt_url($data->flat_type), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick))).'&nbsp;'.
+						
 						l('<span class="badge text-bg-danger rounded fa fa-times" > </span>' ,'application_detail/'.encrypt_url($data->online_application_id).'/'.'action-list'.'/'.
-						encrypt_url($reject_status),array('html'=>TRUE));
+						encrypt_url($reject_status),array('html'=>TRUE)).'&nbsp;'.$conver_btn_link;
 
 					}else{
 						//echo "hhh";die;
@@ -302,17 +316,12 @@ function view_app_page($status ='', $entity = '',$page_status ='') {
 						// 	array('html'=>TRUE, 'attributes' => array('onclick' => $onclick1))
 						// );
 
-
-
 						$fields[] = l('<span class="badge text-bg-success rounded fa fa-check">
-						</span>','application-approve/'.encrypt_url($data->online_application_id).'/'.encrypt_url($update_status).'/'.encrypt_url($status).'/'.encrypt_url($entity), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick))).'&nbsp;'.
-						l('<span class="badge text-bg-danger rounded fa fa-times" > </span>','update_status/'.encrypt_url($data->online_application_id).'/'.encrypt_url($reject_status).'/'.encrypt_url($status).'/'.encrypt_url($entity),array('html'=>TRUE, 'attributes' => array('onclick' => $onclick1)));
+						</span>','application-approve/'.encrypt_url($data->online_application_id).'/'.encrypt_url($update_status).'/'.encrypt_url($status).'/'.encrypt_url($entity).'/'.encrypt_url($computer_serial_no).'/'.encrypt_url($data->flat_type), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick))).'&nbsp;'.
+						
+						l('<span class="badge text-bg-danger rounded fa fa-times" > </span>','update_status/'.encrypt_url($data->online_application_id).'/'.encrypt_url($reject_status).'/'.encrypt_url($status).'/'.encrypt_url($entity).'/'.encrypt_url($computer_serial_no),array('html'=>TRUE, 'attributes' => array('onclick' => $onclick1))).'&nbsp;'.$conver_btn_link;
 
 					}	
-
-
-
-
 				}
 			}
 				

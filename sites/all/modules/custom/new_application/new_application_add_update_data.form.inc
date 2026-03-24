@@ -17,52 +17,76 @@
 		//print_r($form_state);die;
 
 		// debolina start
-		if($form_state['values']['first_preference'] != 0 && $form_state['values']['second_preference'] && $form_state['values']['third_preference']!=0) {
+		// if($form_state['values']['first_preference'] != 0 && $form_state['values']['second_preference']!= 0 && $form_state['values']['third_preference']!=0) {      // Turned off by Subham as the modified checking 
+		// 	$estate_preference_arr=array();																																			is below dt.25-07-2025
+		// 	$estate_preference_arr[1]=array(
+		// 		'estate_id'=>$form_state['values']['first_preference'],
+		// 	);
+		// 	$estate_preference_arr[2]=array(
+		// 		'estate_id'=>$form_state['values']['second_preference'],
+		// 	);
+		// 	$estate_preference_arr[3]=array(
+		// 		'estate_id'=>$form_state['values']['third_preference'],
+		// 	);
+			// print_r($estate_preference_arr);die;
 
-			$estate_preference_arr=array();
-			$estate_preference_arr[1]=array(
-				'estate_id'=>$form_state['values']['first_preference'],
+		$estate_preference_arr = array();
+
+		if (!empty($form_state['values']['preference_selector']) && $form_state['values']['preference_selector'] == '1') {      // Modified checking added by Subham dt.25-07-2025
+			// If "Select Housing Preference" selected
+			$estate_preference_arr[1] = array(
+				'estate_id' => $form_state['values']['first_preference'],
 			);
-			$estate_preference_arr[2]=array(
-				'estate_id'=>$form_state['values']['second_preference'],
+			$estate_preference_arr[2] = array(
+				'estate_id' => !empty($form_state['values']['second_preference']) ? $form_state['values']['second_preference'] : NULL,
 			);
-			$estate_preference_arr[3]=array(
-				'estate_id'=>$form_state['values']['third_preference'],
+			$estate_preference_arr[3] = array(
+				'estate_id' => !empty($form_state['values']['third_preference']) ? $form_state['values']['third_preference'] : NULL,
 			);
-			//print_r($estate_preference_arr);die;
-
-			$transaction = db_transaction();
-			try{
-				$haveData= false;
-				$estateDetailsInsertQuery = db_insert('housing_new_application_estate_preferences')->fields(array(
-		        'estate_id',
-		        'preference_order',
-		        'online_application_id',
-		        'created'
-		    ));
-
-
-				$counter=1;
-				foreach ($estate_preference_arr as $value) {
-					$estateDetailsData = array(
-											'estate_id' => $value['estate_id'],
-											'preference_order' => $counter,
-											'online_application_id' => $online_application_id,
-											'created' => date('d-m-y h:i:s')
-										);
-					$counter++;
-					// print_r($estateDetailsData);die;
-					$estateDetailsInsertQuery->values($estateDetailsData)->execute();
-				}
-			}catch (Exception $e){
-				// One of the INSERTs failed, rollback the whole batch.
-		    $transaction->rollback();
-		    // Rethrow the exception for the calling code.
-		    //throw $e;
-		    watchdog_exception('new_allotment', $e);
-		   // drupal_set_message(t($e), 'error');
+			$estate_preference_arr[4] = array(
+				'estate_id' => !empty($form_state['values']['fourth_preference']) ? $form_state['values']['fourth_preference'] : NULL,
+			);
+			$estate_preference_arr[5] = array(
+				'estate_id' => !empty($form_state['values']['fifth_preference']) ? $form_state['values']['fifth_preference'] : NULL,
+			);
+			// print_r($estate_preference_arr);die;
+		} else {
+		// If "No Preference" selected
+			for ($i = 1; $i <= 5; $i++) {
+				$estate_preference_arr[$i] = array('estate_id' => NULL);
 			}
+		}
+		
+		// Insert into DB
+		$transaction = db_transaction();
+		try{
+			$haveData= false;
+			$estateDetailsInsertQuery = db_insert('housing_new_application_estate_preferences')->fields(array(
+			'estate_id',
+			'preference_order',
+			'online_application_id',
+			'created'
+		));
 
+			$counter=1;
+			foreach ($estate_preference_arr as $value) {
+				$estateDetailsData = array(
+										'estate_id' => $value['estate_id'],
+										'preference_order' => $counter,
+										'online_application_id' => $online_application_id,
+										'created' => date('Y-m-d h:i:s')
+									);
+				$counter++;
+				$estateDetailsInsertQuery->values($estateDetailsData);
+			}
+			$estateDetailsInsertQuery->execute();
+		}catch (Exception $e){
+			// One of the INSERTs failed, rollback the whole batch.
+		$transaction->rollback();
+		// Rethrow the exception for the calling code.
+		//throw $e;
+		watchdog_exception('new_allotment', $e);
+		// drupal_set_message(t($e), 'error');
 		}
 
 		//debolina end
@@ -115,7 +139,7 @@
 		
 		
 		
-		
+		/* // Turned off by Subham 24-07-2025
 		if($form_state['values']['file'] != 0){
 			// file exists
 			$file_payslip = file_load($form_state['values']['file']);
@@ -143,7 +167,7 @@
 				$new_allotment_app_arr['scaned_sign']  =  $file_scaned_sign->fid;
 			}
 		}
-		
+		*/
 		if(trim($form['allotment_reason']['reason']['#value']) == 'Transfer' || trim($form['allotment_reason']['reason']['#value']) == 'Physically Handicaped Or Serious Illness' || trim($form['allotment_reason']['reason']['#value']) == 'Recommended' || trim($form['allotment_reason']['reason']['#value']) == 'Single Earning Lady' || trim($form['allotment_reason']['reason']['#value']) == 'Legal Heir') {
 			
 			if($form_state['values']['extra_doc'] != 0){
@@ -157,23 +181,23 @@
 					file_usage_add($file_extra_doc, 'new_application', 'Allotment Reason Supporting Document', $user->uid);
 					
 					$new_allotment_app_arr['extra_doc']  =  $file_extra_doc->fid;
+					$new_allotment_app_arr['extra_doc_path']  =  $file_extra_doc->uri;
 				}
 			}
 		} else {
 			if($form_state['values']['extra_doc'] == 0) {
 				$new_allotment_app_arr['extra_doc'] = NULL;
 			}
-		}
-		
+		} // Turned off by Subham 24-07-2025 -> open on 19-11-2025 by Moumita
+		// $new_allotment_app_arr['extra_doc'] = NULL;
 		
 		if($online_application_id != 0) {
 			db_insert('housing_new_allotment_application')
 			->fields($new_allotment_app_arr)
 			->execute();
 		}
-		
-
    }
+
    function update_new_allotment_application($form, &$form_state, $online_application_id){
    		global $user;
 		/* update new alltment application*/  
@@ -213,6 +237,7 @@
 			}
 		}*/
 
+		/*  Turned off by Subham 24-07-2025
         // deleted	
 		if($form_state['values']['file'] == 0){	
 			$file_payslip = file_load($form_state['values']['file']) ;
@@ -281,7 +306,7 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
-					
+					/* Turned off by Subham 24-07-2025
 					$file_payslip1 = file_load($data->file_id);
 					file_usage_delete($file_payslip1, 'new_application', 'Payslip Document', $user->uid);
     				file_delete($file_payslip1);
@@ -293,7 +318,7 @@
 				/*$path_parts = pathinfo($file_payslip->filename);
 				$file_payslip->filename = 'payslip_doc_'.$user->uid.'_'.time().'.'.$path_parts['extension'];*/
 			//code end
-			
+				/* Turned off by Subham 2
 				$file_payslip->status = FILE_STATUS_PERMANENT;
 				file_save($file_payslip);
 				file_usage_add($file_payslip, 'new_application', 'Payslip Document', $user->uid);
@@ -327,7 +352,7 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
-					
+					/* Turned off by Subham 24-07-2025
 					$file_scaned_sign1 = file_load($data->file_id);
 					file_usage_delete($file_scaned_sign1, 'new_application', 'Scaned Signature', $user->uid);
     				file_delete($file_scaned_sign1);
@@ -339,7 +364,7 @@
 				/*$path_parts = pathinfo($file_scaned_sign->filename);
 				$file_scaned_sign->filename = 'scaned_sign_doc_'.$user->uid.'_'.time().'.'.$path_parts['extension'];*/
 			//code end
-			
+				/* Turned off by Subham 24-07-2025
 				$file_scaned_sign->status = FILE_STATUS_PERMANENT;
 				file_save($file_scaned_sign);
 				file_usage_add($file_scaned_sign, 'new_application', 'Scaned Signature', $user->uid);
@@ -374,7 +399,7 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
-					
+					/* Turned off by Subham 24-07-2025
 					$file_extra_doc1 = file_load($data->file_id);
 					file_usage_delete($file_extra_doc1, 'new_application', 'Allotment Reason Supporting Document', $user->uid);
     				file_delete($file_extra_doc1);
@@ -386,7 +411,7 @@
 				/*$path_parts = pathinfo($file_extra_doc->filename);
 				$file_extra_doc->filename = 'reason_supporting_doc_'.$user->uid.'_'.time().'.'.$path_parts['extension'];*/
 			//code end
-			
+				/*
 				$file_extra_doc->status = FILE_STATUS_PERMANENT;
 				file_save($file_extra_doc);
 				file_usage_add($file_extra_doc, 'new_application', 'Allotment Reason Supporting Document', $user->uid);
@@ -398,8 +423,8 @@
 		if($form_state['values']['extra_doc'] == 0) {
 			$new_allotment_app_arr['extra_doc'] = NULL;
 		}
-	}
-		
+	}*/
+		$new_allotment_app_arr['extra_doc'] = NULL;
 		
 		if($online_application_id != 0) {
 			db_update('housing_new_allotment_application')

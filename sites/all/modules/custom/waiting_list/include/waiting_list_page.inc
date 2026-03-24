@@ -16,7 +16,7 @@
 			'#prefix' => '<div class="row"><div class="col-md-8"><div class="form-floating">',//sd 20-06-2024
 			'#suffix' => '</div></div>',//sd 20-06-2024
 			'#weight' =>2,
-			'#element_validate' => array('validate_application_number') // Done by Subham 31-01-2025
+			//'#element_validate' => array('validate_application_number') // Done by Subham 31-01-2025
 		);
 		$form['search'] = array(
 			'#value' => t('Search'),
@@ -71,33 +71,61 @@
 				 /*$wait_no = get_individual_waiting_no($data->application_no);
 		 		 $fields[] = array('data' => $wait_no != 0 ? $wait_no : '', 'class' => array('text-font-r'));*/
 				 $flat_type_wait_no = flat_type_wise_waiting_no($data->application_no, $data->flat_type_id);
-				 //echo $flat_type_wait_no;die;
+				 // echo $flat_type_wait_no;die;
 
 		 		// $fields[] = array('data' => $flat_type_wait_no != 0 ? $flat_type_wait_no : 'Pending', 'class' => array('text-font-r'));
 				$fields[] = array('data' => $flat_type_wait_no, 'class' => array('text-font-r'));   //by debaleena 11.06.24
 				 $rows[] = $fields;
 		 }
+		 //added by dg 23-07-2025 //
+		$variables = array(
+				'attributes' => array('class'=>array('table table-list table-striped')),
+				'header' => $header,
+				'rows' => $rows,
+				'sticky' => true,
+				'empty' => t("No data found!") // The message to be displayed if table is empty
+			);
+			
+			if(count($rows) > 0) {
+				// Render using Drupal's render API.
+				$build['datatable'] = array(
+				'#theme' => 'datatable',
+				'#header' => $header,
+				'#rows' => $rows,
+				'#attributes' => array(),
+				);
+				
+				// Or, render using a theme function.
+				$variables = array(
+				'attributes' => array('class'=>array('table table-list table-striped')),
+				'header' => $header,
+				'rows' => $rows,
+				);
+				
+				$output = theme('datatable', $variables);
+			}
+			else {
+				$output = '<div>
+								<table class="datatable_no_data_found table table-list">
+									<tr class="tr_no_data_found">
+										<th class="th_no_data_found"></th>
+									</tr>
+									<tr class="tr_no_data_found">
+										<td class="td_no_data_found">No data found!</td>
+									</tr>
+								</table>
+							</div>';
+			}
 		
-		$output = theme_table(
-		array(
-		  'header' => $header,
-		  'rows' => $rows,
-		  'attributes' => array('class' => array('table table-list')),
-		  'sticky' => true,
-		  'caption' => '',
-		  'colgroups' => array(),
-		  'empty' => t("No data found!") // The message to be displayed if table is empty
-		)
-	  ).theme('pager');
-	  
-	  return $output;
+		return $output;
+		//end//
 	}
 
 	/* Done by Subham 31-01-2025 */
 	function validate_application_number($element, &$form_state) {
 		$input = $form_state['values'][$element['#name']];
 	
-		if (!preg_match('/^[A-Za-z-]+-\d{8}-\d{4}$/', $input)) {
+		if (!preg_match('/^[A-Z]{2}-[A-Z]{3}-\d{8}-\d+$/', $input)) {
 			form_set_error($element['#name'], t('Invalid Application Number. Enter Proper Application Number'));
 		}
 	}

@@ -183,7 +183,7 @@ jQuery(document).ready(function(){
 });
 /*End*/
 
-/*Done by Subham 13-06-2025*/
+/*Done by Subham 24-07-2025*/
 jQuery(document).ready(function(){
     jQuery("#edit-issue-date").datepicker({
         dateFormat: "dd/mm/yy",
@@ -192,23 +192,65 @@ jQuery(document).ready(function(){
         yearRange: "1947:" + new Date().getFullYear(),
         minDate: new Date(1947, 0, 1),
         maxDate: new Date(),
-        autoSize: true
-    }); 
-});
-/*End*/
+        autoSize: true,
+        onSelect: function(selectedDate) {
+            var parts = selectedDate.split('/');
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10) - 1; // zero-based month
+            var year = parseInt(parts[2], 10);
 
-/*Done by Subham 13-06-2025*/
-jQuery(document).ready(function(){
+            var issueDate = new Date(year, month, day);
+            // Set minDate for expiry datepicker = issueDate (same day)
+            // Set maxDate = exactly 3 years after issueDate
+            var maxExpiryDate = new Date(issueDate);
+            maxExpiryDate.setFullYear(maxExpiryDate.getFullYear() + 3);
+
+            // Update expiry datepicker options dynamically
+            jQuery("#edit-expiry-date").datepicker("option", "minDate", issueDate);
+            jQuery("#edit-expiry-date").datepicker("option", "maxDate", maxExpiryDate);
+        }
+    });
+	/*End*/
+
+	/*Done by Subham 24-07-2025*/
     jQuery("#edit-expiry-date").datepicker({
         dateFormat: "dd/mm/yy",
         changeMonth: true,
         changeYear: true,
-        yearRange: "1947:+15", // Allows selection starting from 2000 to current year +15 years ahead
-        minDate: new Date(1947, 0, 1), // Optional: restricts selection before 2000
+        yearRange: "1947:+15",
+        minDate: new Date(1947, 0, 1), 
         autoSize: true
-    }); 
+    });
 });
 /*End*/
+
+
+// /*Done by Subham 13-06-2025*/								// Turned off 24-07-2025 by Subham
+// jQuery(document).ready(function(){
+//     jQuery("#edit-issue-date").datepicker({
+//         dateFormat: "dd/mm/yy",
+//         changeMonth: true,
+//         changeYear: true,
+//         yearRange: "1947:" + new Date().getFullYear(),
+//         minDate: new Date(1947, 0, 1),
+//         maxDate: new Date(),
+//         autoSize: true
+//     }); 
+// });
+// /*End*/
+
+// /*Done by Subham 13-06-2025*/
+// jQuery(document).ready(function(){
+//     jQuery("#edit-expiry-date").datepicker({
+//         dateFormat: "dd/mm/yy",
+//         changeMonth: true,
+//         changeYear: true,
+//         yearRange: "1947:+15", // Allows selection starting from 2000 to current year +15 years ahead
+//         minDate: new Date(1947, 0, 1), // Optional: restricts selection before 2000
+//         autoSize: true
+//     }); 
+// });
+// /*End*/
 
 /*Done by Subham 30-06-2025*/
 jQuery(document).ready(function(){
@@ -224,36 +266,84 @@ jQuery(document).ready(function(){
 });
 /*End*/
 
-
-jQuery(document).ready(function () {
+// jQuery(document).ready(function () {   //previous code
 	
-	var minDateStr = Drupal.settings.application_status_check.date_only; // e.g., '2025-05-06'
-	var minDateObj = new Date(minDateStr); // Converts string to Date object
-	var maxDateObj = new Date(minDateObj); 
-	maxDateObj.setDate(minDateObj.getDate() + 14); // Add 14 days
+// 	var minDateStr = Drupal.settings.application_status_check.date_only; // e.g., '2025-05-06'
+// 	var minDateObj = new Date(minDateStr); // Converts string to Date object
+// 	var maxDateObj = new Date(minDateObj); 
+// 	maxDateObj.setDate(minDateObj.getDate() + 14); // Add 14 days
   
-	jQuery("#edit-extension").datepicker({
-	  dateFormat: "dd/mm/yy",
-	  minDate: minDateObj,
-	  maxDate: maxDateObj,
-	  changeMonth: true,
-	  changeYear: true,
-	  yearRange: "-0:+70",
-	  autoSize: true
-	});
-});
-
-// jQuery(document).ready(function(){
 // 	jQuery("#edit-extension").datepicker({
-// 	dateFormat: "dd/mm/yy",
-// 	minDate: '0',
-// 	maxDate: '14',
-// 	changeMonth: true,
-// 	changeYear: true,
-// 	yearRange: "-0:+70",
-// 	autoSize: true
-// });	
+// 	  dateFormat: "dd/mm/yy",
+// 	  minDate: minDateObj,
+// 	  maxDate: maxDateObj,
+// 	  changeMonth: true,
+// 	  changeYear: true,
+// 	  yearRange: "-0:+70",
+// 	  autoSize: true
+// 	});
 // });
+
+
+/* added by dg because of getting error for previous code */ 
+jQuery(document).ready(function ($) {
+  if (
+    typeof Drupal !== "undefined" &&
+    Drupal.settings.application_status_check &&
+    Drupal.settings.application_status_check.current_date &&
+    Drupal.settings.application_status_check.extension_upto_date
+  ) {
+
+    // Min date (date_only)
+    var minDateStr = Drupal.settings.application_status_check.current_date;
+    var minParts = minDateStr.split('-');
+    var minDateObj = new Date(minParts[0], minParts[1] - 1, minParts[2]);
+
+    // Max date (extension_upto_date)
+    var maxDateStr = Drupal.settings.application_status_check.extension_upto_date;
+    var maxParts = maxDateStr.split('-');
+    var maxDateObj = new Date(maxParts[0], maxParts[1] - 1, maxParts[2]);
+
+    $("#edit-extension").datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      minDate: minDateObj,
+      maxDate: maxDateObj,
+      autoSize: true
+    });
+  }
+});
+/* end */
+
+// jQuery(document).ready(function () {
+	
+// 	var minDateStr = Drupal.settings.application_status_check.date_only; // e.g., '2025-05-06'
+// 	var minDateObj = new Date(minDateStr); // Converts string to Date object
+// 	var maxDateObj = new Date(minDateObj); 
+// 	maxDateObj.setDate(minDateObj.getDate() + 14); // Add 14 days
+  
+// 	jQuery("#edit-extension").datepicker({
+// 	  dateFormat: "dd/mm/yy",
+// 	  minDate: minDateObj,
+// 	  maxDate: maxDateObj,
+// 	  changeMonth: true,
+// 	  changeYear: true,
+// 	  yearRange: "-0:+70",
+// 	  autoSize: true
+// 	});
+// });
+
+jQuery(document).ready(function(){  //by dg 07-12-2025
+	jQuery("#edit-extension-license").datepicker({
+	dateFormat: "dd/mm/yy",
+	changeMonth: true,
+	changeYear: true,
+	yearRange: "-0:+70",
+	autoSize: true,
+	minDate: +1, // Set minDate to tomorrow
+});	
+});
 
 //end///
 

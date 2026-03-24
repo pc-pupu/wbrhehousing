@@ -1,0 +1,210 @@
+<?php // Done by Subham dt.11-08-2025
+function manage_ddo_menu() {
+    $items = array();
+
+    $items['ddo-add'] = array(
+      'title' => 'Add DDO Information',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ddo_add_form'),
+      'file' => 'ddo_add_form.inc',
+      // 'access arguments' => array('access content')
+      'access arguments' => array('administer DDO Management')
+    );
+
+    $items['ddo-edit/%'] = array(
+      'title' => 'Edit DDO Information',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ddo_edit_form',1),
+      'file' => 'ddo_edit_form.inc',
+      // 'access arguments' => array('access content')
+      'access arguments' => array('administer DDO Management')
+    );
+
+    $items['ddo-delete/%'] = array(
+      'page callback' => 'ddo_delete',
+      'page arguments' => array(1),
+      // 'access arguments' => array('access content')
+      'access arguments' => array('administer DDO Management')
+    );
+
+    $items['ddo-list'] = array(
+      'title' => 'DDO List',
+      'page callback' => 'ddo_list_view',
+      // 'access arguments' => array('access content')
+      'access arguments' => array('administer DDO Management')
+    );
+
+    $items['ddo-change/%'] = array(
+      'title' => 'DDO Declaration',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('ddo_change',1),
+      'file' => 'ddo_change.inc',
+      'access arguments' => array('access content')
+      // 'access arguments' => array('administer DDO Management')
+    );
+
+
+
+    return $items;
+}
+
+function manage_ddo_permission() {
+  return array(
+    'administer DDO Management' => array(
+      'title' => t('administer DDO Management'),
+      'description' => t('perform administer for DDO Management.')
+    ),
+    'applicant DDO Management' => array(
+      'title' => t('Applicant DDO Management'),
+      'description' => t('Applicant DDO Change Declaration.')
+    )
+  );	
+}
+
+function ddo_list_view() {
+  global $base_root, $base_path;
+  $output = '';
+
+  if (db_table_exists('housing_ddo')) { 
+    $query = db_select('housing_ddo', 'hdo');
+    $query->innerJoin('housing_treasury', 'ht', 'ht.treasury_id = hdo.treasury_id');
+    $query->innerJoin('housing_district', 'hds','hds.district_code = hdo.district_code');
+    $query->fields('hdo', array('ddo_id', 'ddo_designation', 'ddo_code', 'is_active'));
+    $query->addField('ht', 'treasury_name');
+    $query->addField('hds', 'district_name');
+    $query->orderBy('ddo_id', 'ASC');
+  
+    $result = db_query($query);
+
+    $header['serial_no'] = array('data' => 'Serial No.', 'width' => '5%');
+    $header['ddo_designation'] = array('data' => 'DDO Designation', 'width' => '8%');
+    $header['ddo_code'] = array('data' => 'DDO Code', 'width' => '10%');
+    $header['is_active'] = array('data' => 'Activation Status', 'width' => '8%');
+    $header['district'] = array('data' => 'District', 'width' => '10%');
+    $header['respective_treasury'] = array('data' => 'Respective Treasury', 'width' => '10%');
+    $header['action'] = array('data' => 'Action', 'width' => '10%');
+
+    $rows = array();
+    $output = '';
+    $counter = 1;
+		
+    while($data = $result->fetchObject()) {
+      $fields = array();
+    
+      $fields[] = $counter;
+      $fields[] = $data->ddo_designation;
+      $fields[] = $data->ddo_code;
+      $fields[] = ($data->is_active == 'Y') ? 'Active' : 'Inactive';
+      $fields[] = $data->district_name;
+      $fields[] = $data->treasury_name;
+
+      $onclick="return confirm('Are you sure you want to Delete?')";
+      
+      $edit_link = l('<i class="fa fa-edit"></i> Edit', 'ddo-edit/' . encrypt_url($data->ddo_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+
+      $delete_link = l('<i class="fa fa-trash"></i> Delete', 'ddo-delete/' . encrypt_url($data->ddo_id), array('html' => true, 'attributes' => array('onclick'=> $onclick, 'class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+
+      $fields[] = $edit_link . ' &nbsp;&nbsp; ' . $delete_link;
+      $counter++;
+  
+      $rows[] = $fields;
+    }
+
+    $variables = array(
+      'attributes' => array('class'=>array('table table-list table-striped')),
+      'header' => $header,
+      'rows' => $rows,
+      'sticky' => true,
+      'empty' => t("No data found!") 
+    );
+
+    if(count($rows) > 0) {
+        $build['datatable'] = array(
+          '#theme' => 'datatable',
+          '#header' => $header,
+          '#rows' => $rows,
+          '#attributes' => array(),
+        );
+        
+        $variables = array(
+          'attributes' => array('class'=>array('table table-list table-striped')),
+          'header' => $header,
+          'rows' => $rows,
+        );
+        
+        $output = theme('datatable', $variables);
+    }
+    else {
+        $output = '<div>
+                        <table class="datatable_no_data_found table table-list">
+                            <tr class="tr_no_data_found">
+                                <th class="th_no_data_found"></th>
+                            </tr>
+                            <tr class="tr_no_data_found">
+                                <td class="td_no_data_found">No data found!</td>
+                            </tr>
+                        </table>
+                    </div>';
+    }
+	  return $output;
+  }
+}
+
+function ddo_delete($ddo_id_enc = '') {
+   $ddo_id_dec = decrypt_url($ddo_id_enc);
+   db_delete('housing_ddo')
+    ->condition('ddo_id', $ddo_id_dec)
+    ->execute();
+
+  drupal_set_message(t('Record deleted successfully.'));
+  drupal_goto('ddo-list'); 
+}
+
+function fetch_respective_treasury($district = '') {
+    $options = array();
+    if($district !== '' && is_numeric($district)){
+      $query = db_select('housing_treasury', 'ht');
+      $query->fields('ht', array('treasury_id', 'treasury_name','district_code'));
+      $query->condition('ht.district_code',$district, '=');
+      $query->orderBy('treasury_id','asc');
+      $result = $query->execute();
+
+      if($result->rowCount() > 0) {
+        foreach($result as $data) {
+          $options[$data->treasury_id] = $data->treasury_name;
+        }
+      } else {
+          $options[''] = 'No Data Found';	
+      }
+      return $options;
+    }
+}
+
+function get_ddo_designation_by_ddoid($ddo_code = '') {
+  //echo $ddo_code;die;
+  $options = array();
+  $query = db_select('housing_ddo', 'hd');
+  $query->fields('hd', array('ddo_id', 'ddo_designation','ddo_code'));
+  $query->condition('hd.is_active','Y', '=');
+  // if($ddo_code!=''){
+  //   $query->condition('hd.ddo_code',$ddo_code, '=');
+  // }
+  if ($ddo_code != '') {
+    $query->where('TRIM(hd.ddo_code) = :ddo_code', array(':ddo_code' => trim($ddo_code)));
+  }
+  
+  $result = $query->execute();
+
+  if($result->rowCount() > 0) {
+    if($ddo_code != ''){
+      $data = $result->fetchObject();
+      // echo '<pre>'; print_r($data); die;
+      return array('ddo_id' => $data->ddo_id , 'ddo_designation' => $data->ddo_designation, 'ddo_code' => $data->ddo_code); // return perticular ddo designation
+    }else{
+      $data = $result->fetchAllKeyed();
+      return $data; // return array
+    }    
+  } else {
+    return  array();	
+  }
+}

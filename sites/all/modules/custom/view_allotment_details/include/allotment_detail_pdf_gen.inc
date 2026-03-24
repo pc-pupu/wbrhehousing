@@ -8,11 +8,22 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 	$result = fetch_allotment_details();
 	$data = $result->fetchObject();
 
-	//print_r($data);die;
+	// print_r($data);die;
+
+	if(strpos($data->application_no, 'NA') == true)
+	{
+		$application_type = 'Fresh';
+	}else if(strpos($data->application_no, 'VS') == true){
+		$application_type = 'Vertical Shifting';
+	}else if(strpos($data->application_no, 'CS') == true){
+		$application_type = 'Category Shifting';
+	}else{
+		$application_type = 'Fresh';
+	}
 	
-	$page_output = '';
+	$page_output = ''; // PDF Content modifid by Subham dt.27-11-2025
 	$page_output = '
-	<div>
+	<div style="border: 1px solid #000; padding: 20px;">
 		<table style="font-family: Arial, sans-serif;">
 			<tr><td align="center" colspan="2"><font size="6"><b>GOVERNMENT OF WEST BENGAL</b></font></td></tr>
 			<tr><td align="center" colspan="2"><font size="4">DEPARTMENT OF HOUSING : Allotment Branch</font></td></tr>
@@ -25,10 +36,7 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 			<br><br><br>
 			<tr>
 				<td colspan="2">
-					From: The Commissioner<br>
-						  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Housing Department<br>
-						  		   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and<br>
-						  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The Competent Authority under the West Bengal<br>
+					From: The Competent Authority under the West Bengal<br>
 						  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Govt. Premises (Regulation of Occupancy) Act, 1984
 				</td>
 			</tr>
@@ -37,19 +45,18 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 				<td colspan="2">
 					To &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$data->applicant_name.'</b><br><br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C/O&nbsp;<b>'.$data->guardian_name.'</b><br><br>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Sub. : </b>Allotment of flat at <b>'.$data->estate_name.'</b>,<br><br> 
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>'.$data->estate_address.'</b> housing estate located in <b>'.$data->district_name.'</b>.
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Sub. : </b>Allotment of flat no.: <b>'.$data->block_name.'/'.$data->flat_no.'</b> and flat type: <b>'.$data->flat_type.'</b> at <b>'.$data->estate_name.'</b>.
 				</td>
 			</tr>
 			<br><br><br><br>
 			<tr>
 				<td colspan="2">
-					Madam/Sir,<br>
+					Madam/Sir,<br><br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I am directed to inform you that this Department has been considering to allot you one R.H.E. Flat by 
-					way of fresh allotment at the above mentioned Housing Estate subject to your eligibility for the same. You are, therefore, requested to 
-					download this offer letter and to fill up the prescribed Form for application for Licence for fresh allotment within 7(Seven) days from 
+					way of '.$application_type.' allotment at the above mentioned Housing Estate subject to your eligibility for the same. You are, therefore, requested to 
+					download this offer letter and to fill up the prescribed Form for application for Licence for '.$application_type.' allotment within 15(Fifteen) days from 
 					the date of receipt of this letter failing which the offer will be treated as cancelled.<br>
-					<br>
+					<br><br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Please note that this letter does not entitle you to the grant of a licence.
 				</td>
 			</tr>
@@ -58,15 +65,14 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 				<td>
 				</td>
 				<td align="center">
-					Yours faithfully,<br><br><br><br>
-					COMMISSIONER<br>
-					&<br>
+					Yours faithfully,<br><br>
 					COMPETENT AUTHORITY UNDER<br>
 					THE WEST BENGAL GOVT. PREMISES<br>
 					(REGULATION OF OCCUPANCY) ACT, 1984
-					
-					
 				</td>
+			</tr>
+			<tr>
+			<td align="center" colspan="2" style="padding-top: 250px; white-space: nowrap;">Note: This is computer generated document and does not require signature.</td>
 			</tr>
 		</table>
 	</div>';
@@ -75,7 +81,6 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 	return pdf_using_mpdf_api($page_output, $file_name);
 	
 }
-
 
 function generate_application_form_pdf($online_application_id = '',$file_name = ''){
 	// error_reporting(E_ALL);

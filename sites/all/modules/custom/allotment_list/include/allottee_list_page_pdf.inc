@@ -13,10 +13,25 @@
 			$data1 = $result1->fetchObject();
 			
 		}
-		
-		if($allotment_process_type != 'NAL') {
+		// added by Moumita on 30-11-2025
+		$est_arr = array();
+		if($allotment_process_type != 'NAL' && $allotment_process_type != 'MSR') {
 			$result_rhe = fetch_shifting_allotment_rhe_detail($allotment_process_date, $allotment_process_no, $allotment_process_type);
+			$all_data = $result_rhe->fetchAll();
+			
+			$unique = [];
+			$temp = [];
+			if(!empty($all_data)){
+				foreach ($all_data as $obj) {
+					if (!in_array($obj->estate_id, $temp)) {
+						$temp[] = $obj->estate_id;
+						$unique[] = $obj;
+					}
+				}
+			}
+
 		}
+		// echo '<pre>';print_r($unique);die;
 		
 		$page_output = '';
 		
@@ -64,6 +79,7 @@
 					<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Flat Allotted</b></font></th>
 					<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Floor</b></font></th>
 					<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Name of R.H.E.</b></font></th>
+					<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Name of Block.</b></font></th>
 					<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Date of Retirement</b></font></th>
 					<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Remarks</b></font></th>
 					<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
@@ -156,13 +172,14 @@
 							<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 							<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
 							<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->estate_name.'</font></td>
+							<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'</font></td>
 							<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
 							<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$remarks.'</font></td>
 							<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
 							<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
 						</tr></tbody>';
 						$i++;
-					}
+					}   // block name added by dg th and td on 14-11-2025
 			
 				} else {
 						if($data_roaster->roaster_vacancy_position == 1 || $data_roaster->roaster_vacancy_position == 21) {
@@ -194,14 +211,13 @@
 			<br><br><br><br><br><br>
 			<table width="100%" align="center">
 				<tr>
-					<td align="center" width="35%">
-						<b>Competent Authority &<br>
-						Commissioner<br>
+					<td style="font-size:15px;" align="center" width="35%">
+						<b>Competent Authority<br>
 						Housing Department</b>
 					</td>
-					<td width="25%"></td>
-					<td align="center" width="40%">
-						<b>Secretary<br>
+					<td width="45%"></td>
+					<td style="font-size:15px;" align="center" width="40%">
+						<b>Principal Secretary<br>
 						Housing Department</b>
 					</td>
 				</tr>
@@ -217,7 +233,8 @@
 			<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
 		</div><br>';
 		
-				while($data_rhe = $result_rhe->fetchObject()) {
+				// while($data_rhe = $result_rhe->fetchObject()) {
+				foreach($unique as $data_rhe){
 					$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type, $data_rhe->estate_id);
 					$page_output .= '<br><div align="center"><font style="font-size: 16px;">Proposal for allotment of \''.trim($data1->flat_type).'\' Type flats at '.$data_rhe->estate_name.'
 					<br><br>
@@ -231,15 +248,16 @@
 								<th align="left" width="4%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Sl. No.</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Name</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>1. Date of Possession<br>2. Date of Application<br>3. Date of Retirement</b></font></th>
-								<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Allotted Flat No.</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Type of Flat</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Floor</b></font></th>
 								<th align="center" width="16%" style="border: 1px solid black; border-collapse: collapse;" colspan="2"><font size="5"><b>By way of shifting</b></font></th>
 								<th align="right" width="14%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Remarks</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application Status</b></font></th>
 							</tr>
 							<tr bgcolor="#999999">
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From</b></font></th>
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To</b></font></th>	
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From(Block/Flat No)</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To(Block/Flat No)</b></font></th>
 							</tr>
 						</thead>
 					';
@@ -253,23 +271,23 @@
 							} else {
 								$floor = $data->floor;	
 							}
-						
+						$allotment_status=fetchAllotmentStatus($data->online_application_id);  //added by dg 14-11-2025
 						$page_output .='
 						<tbody>
 							<tr>
 								<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_type.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->occupied_flat_vs.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_vs.'/'.$data->occupied_flat_vs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'/'.$data->flat_no.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'Floor Shifting'.'</font></td>
-							</tr>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
 						</tbody>';
 						$i++;
-						}
+						}  //after floor block name added by dg 14-11-2025
 					}
 					$page_output .='</table>
 				</div>';
@@ -279,14 +297,13 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td align="center" width="35%">
-							<b>Competent Authority &<br>
-							Commissioner<br>
+						<td style="font-size:15px;" align="center" width="35%">
+							<b>Competent Authority<br>
 							Housing Department</b>
 						</td>
-						<td width="25%"></td>
-						<td align="center" width="40%">
-							<b>Secretary<br>
+						<td width="45%"></td>
+						<td style="font-size:15px;" align="center" width="40%">
+							<b>Principal Secretary<br>
 							Housing Department</b>
 						</td>
 					</tr>
@@ -295,15 +312,18 @@
 				
 			} else if($allotment_process_type == 'CSAL') {
 				$page_output .= '
-		<div align="center">
-			<font style="font-size: 14px;"><b>Date of Allotment - '.implode('/', array_reverse(explode('-', $allotment_process_date))).'</b></font>
-		</div>
-		<br>
-		<div align="right">
-			<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
-		</div><br>';
-		
-				while($data_rhe = $result_rhe->fetchObject()) {
+				<div align="center">
+					<font style="font-size: 14px;"><b>Date of Allotment - '.implode('/', array_reverse(explode('-', $allotment_process_date))).'</b></font>
+				</div>
+				<br>
+				<div align="right">
+					<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
+				</div><br>';
+				
+				// echo '<pre>'; print_r($unique); die;
+				// while($data_rhe = $unique->fetchObject()) {
+				foreach($unique as $data_rhe){
+				
 					$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type, $data_rhe->estate_id);
 					$page_output .= '<br><div align="center"><font style="font-size: 16px;">Proposal for allotment of \''.trim($data1->flat_type).'\' Type flats at '.$data_rhe->estate_name.'
 					<br><br>
@@ -317,15 +337,16 @@
 								<th align="left" width="4%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Sl. No.</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Name</b></font></th>
 								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>1. Date of Possession<br>2. Date of Application<br>3. Date of Retirement</b></font></th>
-								<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Allotted Flat No.</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Type of Flat</b></font></th>
 								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Floor</b></font></th>
 								<th align="center" width="16%" style="border: 1px solid black; border-collapse: collapse;" colspan="2"><font size="5"><b>By way of shifting</b></font></th>
 								<th align="right" width="14%" style="border: 1px solid black; border-collapse: collapse;" rowspan="2"><font size="5"><b>Remarks</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application Status</b></font></th>
 							</tr>
 							<tr bgcolor="#999999">
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From</b></font></th>
-								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To</b></font></th>	
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>From(Block/Flat No)</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>To(Block/Flat No)</b></font></th>	
 							</tr>
 						</thead>
 					';
@@ -339,19 +360,20 @@
 							} else {
 								$floor = $data->floor;	
 							}
-						
+						$allotment_status=fetchAllotmentStatus($data->online_application_id);  //added by dg 14-11-2025
 						$page_output .='
 						<tbody>
 							<tr>
 								<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_type.'</font></td>
 								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->occupied_flat_cs.'</font></td>
-								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name_cs.'/'.$data->occupied_flat_cs.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'/'.$data->flat_no.'</font></td>
 								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'Category Shifting'.'</font></td>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
 							</tr>
 						</tbody>';
 						$i++;
@@ -365,14 +387,97 @@
 				<br><br><br><br><br><br>
 				<table width="100%" align="center">
 					<tr>
-						<td align="center" width="35%">
-							<b>Competent Authority &<br>
-							Commissioner<br>
+						<td style="font-size:15px;" align="center" width="35%">
+							<b>Competent Authority<br>
 							Housing Department</b>
 						</td>
-						<td width="25%"></td>
-						<td align="center" width="40%">
-							<b>Secretary<br>
+						<td width="45%"></td>
+						<td style="font-size:15px;" align="center" width="40%">
+							<b>Principal Secretary<br>
+							Housing Department</b>
+						</td>
+					</tr>
+				</table>
+				</div>';
+				
+			}else if($allotment_process_type == 'MSR') {  //added by dg 14-11-2025
+
+				$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type);
+				
+				$page_output .= '<div align="left"><font style="font-size: 16px;">Proposal for allotment of flats at Government Rental Housing Estate at Different R.H.E. of Flat  (Manual Allotment)</font></div>';
+				
+				$page_output .= '<br>
+				<div align="center">
+					<font style="font-size: 14px;"><b>Date of Allotment - '.implode('/', array_reverse(explode('-', $allotment_process_date))).'</b></font>
+				</div>
+				<br>
+				<div align="right">
+					<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
+				</div>
+				<br>
+				<div>
+					<table style="font-family: Arial, sans-serif; border: 1px solid black; border-collapse: collapse;" align="center" width="100%">
+						<thead>
+							<tr bgcolor="#999999">
+								<th align="left" width="4%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Sl. No.</b></font></th>
+								<th align="center" width="18%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Name and designation</b></font></th>
+								<th align="center" width="20%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>1. Application No.<br>2. Place of Posting<br>3. Date of Application</b></font></th>
+								<th align="center" width="10%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Flat Allotted</b></font></th>
+								<th align="center" width="8%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Floor</b></font></th>
+								<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Name of R.H.E.</b></font></th>
+								<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Name of Block</b></font></th>
+								<th align="center" width="12%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Date of Retirement</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Allotment Approval Status</b></font></th>
+								<th align="right" width="16%" style="border: 1px solid black; border-collapse: collapse;"><font size="5"><b>Application Status</b></font></th>
+							</tr>
+						</thead>
+					';
+					$i = 1;
+					if($result->rowCount() > 0) {
+						while($data = $result->fetchObject()) {
+							if(trim($data->floor) == 'F') {
+								$floor = '1st';	
+							} else if(trim($data->floor) == 'S') {
+								$floor = '2nd';	
+							} else {
+								$floor = $data->floor;	
+							}
+						$allotment_status=fetchAllotmentStatus($data->online_application_id);
+						$page_output .='
+						<tbody>
+							<tr>
+								<td align="left" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$i.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->applicant_name.'<br>'.$data->applicant_designation.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.'1. '.$data->application_no.'<br>'.'2. '.$data->applicant_posting_place.'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->flat_no.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$floor.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->estate_name.'</font></td>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->block_name.'</font></td>
+								<td align="center" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.implode('/', array_reverse(explode('-', $data->date_of_retirement))).'</font></td>
+								
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$allotment_status.'</font></td>
+								<td align="right" style="border: 1px solid black; border-collapse: collapse;"><font size="4">'.$data->status_description.'</font></td>
+							</tr>
+						</tbody>';
+						
+						$i++;
+						}
+					}
+					$page_output .='</table>
+				</div>';
+			
+				
+				$page_output .='<div>
+				<br><br><br><br><br><br>
+				<table width="100%" align="center">
+					<tr>
+						<td style="font-size:15px;" align="center" width="35%">
+							<b>Competent Authority<br>
+							Housing Department</b>
+						</td>
+						<td width="45%"></td>
+						<td style="font-size:15px;" align="center" width="40%">
+							<b>Principal Secretary<br>
 							Housing Department</b>
 						</td>
 					</tr>

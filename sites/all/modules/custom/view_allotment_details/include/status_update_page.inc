@@ -37,7 +37,7 @@ function status_update_page($online_application_id = '', $status = '') {
 			// db_insert('housing_process_flow')->fields($ins_arr)->execute();
 
 			/////end////
-			drupal_set_message('You accepted the allotment.');
+			drupal_set_message('You have accepted the allotment. Please accept this Declaration to finalize your acceptance.');
 			// drupal_goto('view_allotment_details');
 			drupal_goto('download-and-upload/'.$online_application_id);
 			

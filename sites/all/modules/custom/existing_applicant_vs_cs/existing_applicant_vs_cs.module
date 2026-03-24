@@ -1,0 +1,117 @@
+<?php
+function existing_applicant_vs_cs_menu() {
+  $items = array();
+
+  $items['legacy-vs-cs'] = array(
+    'title' => 'Flat wise Existing Applicant Details',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('existing_applicant_vs_cs_form'),
+    'file' => 'existing_applicant_vs_cs_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+	);
+
+  $items['legay-vs-or-cs-form/%'] = array(
+    'title' => 'Form For Existing Applicant VS/CS',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('legacy_vs_cs_form',1),
+    'file' => 'legacy_vs_cs_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+    
+  );
+
+   $items['legacy-vs-list-wohrms'] = array(
+    'title' => 'Existing Applicant\'s List for Floor Shifting (without HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_vs_list_view_wohrms_form'),
+    'file' => 'legacy_vs_list_view_wohrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+    $items['legacy-vs-wohrms-edit/%'] = array(
+    'title' => 'Form for Edit Existing Applicant\'s Data for Floor Shifting (Without HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_vs_wohrms_edit_form', 1),
+    'file' => 'legacy_vs_list_view_wohrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  $items['legacy-vs-list-whrms'] = array(
+    'title' => 'Existing Applicant\'s List for Floor Shifting (with HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_vs_list_view_whrms_form'),
+    'file' => 'legacy_vs_list_view_whrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  $items['legacy-vs-whrms-edit/%'] = array(
+    'title' => 'Form for Edit Existing Applicant\'s Data for Floor Shifting (With HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_vs_whrms_edit_form', 1),
+    'file' => 'legacy_vs_list_view_whrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  $items['legacy-cs-list-wohrms'] = array(
+    'title' => 'Existing Applicant\'s List for Category Shifting (without HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments'=> array('legacy_cs_list_view_wohrms_form'),
+    'file' => 'legacy_cs_list_view_wohrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+   $items['legacy-cs-wohrms-edit/%'] = array(
+    'title' => 'Form for Edit Existing Applicant\'s Data for Category Shifting (Without HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_cs_wohrms_edit_form', 1),
+    'file' => 'legacy_cs_list_view_wohrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  $items['legacy-cs-list-whrms'] = array(
+    'title' => 'Existing Applicant\'s List for Category Shifting (with HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_cs_list_view_whrms_form'),
+    'file' => 'legacy_cs_list_view_whrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  $items['legacy-cs-whrms-edit/%'] = array(
+    'title' => 'Form for Edit Existing Applicant\'s Data for Category Shifting (With HRMS ID)',
+    'page callback'=>'drupal_get_form',
+    'page arguments' => array('legacy_cs_whrms_edit_form', 1),
+    'file' => 'legacy_cs_list_view_whrms_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+  );
+
+  return $items;
+}
+
+function existing_applicant_vs_cs_permission() {
+  return array(
+    'administer Existing Applicant for VS CS' => array(
+      'title' => t('administer Existing Applicant for VS CS'),
+      'description' => t('perform administer for Existing Applicant for VS CS.')
+    )
+  );	
+ }
+
+
+// function legacy_vs_cs_pay_band_type_callback($form, &$form_state) {
+// 	//echo $form['official_info']['pay_band'];
+//   return $form['official_info']['pay_band'];
+// }
+
+
+
+function flat_type_name_by_band($pay_band_id) {
+  $query = db_select('housing_pay_band_categories', 'hpc');
+  $query->innerjoin('housing_flat_type', 'hft', 'hpc.flat_type_id = hft.flat_type_id');
+  $query->fields('hft', array('flat_type'));
+  $query->condition('hpc.pay_band_id', $pay_band_id);
+  $query->range(0, 1); // only first match
+
+  $result = $query->execute()->fetchField();
+  // echo $result;die;
+  return $result ? $result : 'Not Found';
+}
+

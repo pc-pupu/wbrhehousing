@@ -1,18 +1,33 @@
 <?php
 // Done by Subham dt.28-05-2025
 function user_tagging_form($form, &$form_state) {
+    global $user;
+
+    // data fetch from hrms log table as read only mode
+    $query = db_select('housing_hrms_applicant_login_log','hlog')->fields('hlog',array('json_decrypted_data'))->condition('hrms_id',$user->name)->execute();
+    $result = $query->fetchObject(); 
+    if(!empty($result))
+    $data = json_decode($result->json_decrypted_data); 
+    
+    if(!empty($data)){
+        $name = $data->name;
+        $mobile = $data->mobile;
+    }else{
+        $name = '';
+        $mobile = '';
+    }
 
     $form['personal_info'] = array(
         '#prefix' => '<div class="row">',
         '#suffix' => '</div>',
     );
-						
+                        
     $form['personal_info']['applicant_name'] = array(
         '#title' => t('Applicant\'s Name'),
         '#type' => 'textfield',
-        '#prefix' => '<div class="col-md-6"><div class="form-floating">',
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
         '#suffix' => '</div></div>',
-        '#default_value' => '',
+        '#default_value' => $name,
         '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
         '#required' => TRUE,
     );
@@ -22,7 +37,8 @@ function user_tagging_form($form, &$form_state) {
         '#type' => 'textfield',
         '#maxlength' => 10,
         '#required' => TRUE,
-        '#prefix' => '<div class="col-md-6"><div class="form-floating">',
+        '#default_value' => $mobile,
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
         '#suffix' => '</div></div>',
         '#element_validate' => array('element_validate_mobile'),
         '#attributes' => array('id' => 'mobile_no', 'class'=>array('form-control')),
@@ -36,26 +52,27 @@ function user_tagging_form($form, &$form_state) {
         '#element_validate' => array('element_validate_email'),
         '#attributes' => array('oninput'=>"this.value=this.value.toLowerCase()", 'class'=>array('form-control')),
         '#default_value' => '',
+        '#required' => TRUE,
     );
 
-    $form['personal_info']['identification_no'] = array(
+    /*$form['personal_info']['identification_no'] = array(                 // Turned off 24-07-2025 by Subham
         '#title' => t('Any Identification No. (HRMS/Aadhaar/PAN)'),
         '#type' => 'textfield',
         '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()",'class'=>array('form-control')),
         '#prefix' => '<div class="col-md-4"><div class="form-floating">',
         '#suffix' => '</div></div>',
         '#required' => TRUE,
-    );
-
+    );*/
+    /*
     $form['personal_info']['dob'] = array(
-		'#title' => t('Date of Birth'),
-		'#type' => 'textfield',
-		'#attributes' => array('id' => 'edit-date-of-birth', 'class'=>array('form-control')),
-		'#required' => TRUE,
-		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-		'#suffix' => '</div></div>',
-		'#element_validate' => array('element_validate_date', 'element_validate_dob_before_license_issue')
-	);
+        '#title' => t('Date of Birth'),
+        '#type' => 'textfield',
+        '#attributes' => array('id' => 'edit-date-of-birth', 'class'=>array('form-control')),
+        '#required' => TRUE,
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#element_validate' => array('element_validate_date', 'element_validate_dob_before_license_issue')
+    );*/
 
     $form['personal_info']['license_no'] = array(
         '#title' => t('Licence No.'),
@@ -67,23 +84,80 @@ function user_tagging_form($form, &$form_state) {
     );
 
     $form['personal_info']['license_issue_date'] = array(
-		'#title' => t('License Issue Date'),
-		'#type' => 'textfield',
-		'#attributes' => array('id' => 'edit-issue-date', 'class'=>array('form-control')),
-		'#required' => TRUE,
-		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-		'#suffix' => '</div></div>',
-		'#element_validate' => array('element_validate_date')
-	);
+        '#title' => t('License Issue Date'),
+        '#type' => 'textfield',
+        '#attributes' => array('id' => 'edit-issue-date', 'class'=>array('form-control')),
+        '#required' => TRUE,
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#element_validate' => array('element_validate_date')
+    );
 
     $form['personal_info']['license_expiry_date'] = array(
-		'#title' => t('License Expiry Date'),
-		'#type' => 'textfield',
-		'#attributes' => array('id' => 'edit-expiry-date', 'class'=>array('form-control')),
-		'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-		'#suffix' => '</div></div>',
-		'#element_validate' => array('element_validate_date', 'element_validate_expiry_date')
-	);
+        '#title' => t('License Expiry Date'),
+        '#type' => 'textfield',
+        '#attributes' => array('id' => 'edit-expiry-date', 'class'=>array('form-control')),
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#element_validate' => array('element_validate_date', 'element_validate_expiry_date')
+    );
+
+    $form['personal_info']['physical_application_vs_cs'] = array(
+      '#type' => 'radios',
+      '#title' => t('Select "Yes" if you have previously submitted a physical application for Vertical Shifting or Category Shifting.'),
+      '#options' => array(
+        'yes' => t('Yes'),
+        'no'  => t('No'),
+      ),
+      '#default_value' => 'no',
+      '#title_display' => 'before', // show title above radios
+      '#prefix' => '<div style="color:red; font-weight:bold;">',
+      '#suffix' => '</div>',
+      '#required' => TRUE,
+    );
+
+    $form['personal_info']['physical_application_no'] = array(   // added by dg 18-08-2025
+        '#title' => t('Physical Application No.'),
+        '#type' => 'textfield',
+        
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#attributes' => array(
+            'id' => 'edit-physical-application-no',
+            'class' => array('form-control'),
+        ),
+        '#states' => array(
+            'visible' => array(
+            ':input[name="physical_application_vs_cs"]' => array('value' => 'yes'),
+            ),
+            'required' => array(
+            ':input[name="physical_application_vs_cs"]' => array('value' => 'yes'),
+            ),
+        ),
+    );
+
+    $form['personal_info']['application_type'] = array(
+        '#title' => t('Application Type'),
+        '#type' => 'select',
+        '#options' => array(
+            '' => t('-Select-'),
+            'VS' => t('Floor Shifting'),
+            'CS' => t('Category Shifting'),
+        ),
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#attributes' => array('id' => 'edit-application-type','class' => array('form-select')),
+        '#states' => array(
+            'visible' => array(
+            ':input[name="physical_application_vs_cs"]' => array('value' => 'yes'),
+            ),
+            'required' => array(
+            ':input[name="physical_application_vs_cs"]' => array('value' => 'yes'),
+            ),
+        ),
+    );
+
+
 
     $form['flat_info'] = array(
         '#prefix' => '<div class="row">',
@@ -125,7 +199,7 @@ function user_tagging_form($form, &$form_state) {
             '#required' => TRUE,
             '#prefix' => '<div class="col-md-4" id="flat_type_replace_updated"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#attributes' => array('class'	=> array('form-select')), 
+            '#attributes' => array('class'  => array('form-select')), 
             '#ajax' => array(
                 'event' => 'change',
                 'callback' => '_reload_rhewise_flat_info_callback',
@@ -144,7 +218,7 @@ function user_tagging_form($form, &$form_state) {
             '#required' => TRUE,
             '#prefix' => '<div class="col-md-4" id="block_name_replace_updated"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#attributes' => array('class'	=> array('form-select')), 
+            '#attributes' => array('class'  => array('form-select')), 
             '#ajax' => array(
                 'event' => 'change',
                 'callback' => '_reload_rhewise_flat_info_callback',
@@ -168,7 +242,7 @@ function user_tagging_form($form, &$form_state) {
             '#required' => TRUE,
             '#prefix' => '<div class="col-md-4" id="floor_no_replace_updated"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#attributes' => array('class'	=> array('form-select')), 
+            '#attributes' => array('class'  => array('form-select')), 
             '#ajax' => array(
                 'event' => 'change',
                 'callback' => '_reload_rhewise_flat_info_callback',
@@ -184,7 +258,7 @@ function user_tagging_form($form, &$form_state) {
         '#suffix' => '</div></div>',
     );
 
-    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0 && $floor_no != 0) {
+    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0 && !empty($floor_no)) {
        $form['flat_info']['updated_flat_no'] = array(
             '#title' => t('Flat No.'),
             '#type' => 'select',
@@ -192,7 +266,7 @@ function user_tagging_form($form, &$form_state) {
             '#required' => TRUE,
             '#prefix' => '<div class="col-md-4" id="flat_no_replace_updated"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#attributes' => array('class'	=> array('form-select')),
+            '#attributes' => array('class'  => array('form-select')),
             '#ajax' => array(
                 'event' => 'change',
                 'callback' => '_reload_rhewise_flat_info_callback',
@@ -213,11 +287,10 @@ function user_tagging_form($form, &$form_state) {
         '#submit' => array('user_tagging_submit')
     );
 
-    $form['submit_row']['exit_btn'] = array(
-        '#type' => 'markup',
-        '#markup' => l('Exit', 'user/logout', array('html'=>true, 'attributes'=>array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'))))
-    );
-                     
+    // $form['submit_row']['exit_btn'] = array(
+    //     '#type' => 'markup',
+    //     '#markup' => l('Exit', 'user/logout', array('html'=>true, 'attributes'=>array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder'))))
+    // );
     return $form;
 }
 
@@ -225,37 +298,60 @@ function user_tagging_submit($form, &$form_state) {
     global $user;
     $form_data = array();
 
-    $form_data['applicant_name'] = trim($form_state['values']['applicant_name']);
-    $form_data['mobile_no'] = trim($form_state['values']['mobile_no']);
-    $form_data['email'] = trim($form_state['values']['email']);
-    $form_data['identification_no'] = trim($form_state['values']['identification_no']);
-    $form_data['dob'] = date('Y-m-d',strtotime($form_state['values']['dob']));
-    $form_data['license_no'] = trim($form_state['values']['license_no']);
-    $form_data['license_issue_date'] = date('Y-m-d',strtotime($form_state['values']['license_issue_date']));
-    $form_data['license_expiry_date'] = ($form_state['values']['license_expiry_date']!='') ? date('Y-m-d',strtotime($form_state['values']['license_expiry_date'])) : $form_state['values']['license_issue_date'];
-    $form_data['flat_id'] = trim($form_state['values']['updated_flat_no']);
-    $form_data['created_date'] = date('Y-m-d H:i:s');
-    $form_data['status'] = '1';
-    $form_data['flag'] = 'new';  // New or Tagged
-    $form_data['hrms_id'] = $user->name;
-    $form_data['uid'] = $user->uid;
+    // echo '<pre>'; print_r($form_state);
+    if($form_state['values']['physical_application_vs_cs'] == 'yes' && ($form_state['values']['physical_application_no'] == '' || $form_state['values']['application_type'] == '')){
+        // echo "k";die;
+        if($form_state['values']['physical_application_no'] == ''){
+            drupal_set_message('Physical Application No. is required when "Yes" is selected. ', 'error');
+        }
+        if($form_state['values']['application_type'] == ''){
+            drupal_set_message('Application Type is required when "Yes" is selected. ', 'error');
+        }
+    }else if($form_state['values']['physical_application_vs_cs'] == 'no' || ($form_state['values']['physical_application_vs_cs'] == 'yes' && $form_state['values']['physical_application_no'] != '' && $form_state['values']['application_type'] != '')){
 
-    echo '<pre>'; print_r($form_data);die;
-    
-    $chk_duplicate_data = db_select('housing_user_tagging', 'hut')
-        ->fields('hut',array('flat_id'))
-        ->condition('flat_id', $form_data['flat_id'])
-        ->execute()
-        ->fetchObject();
-    
-    if ($chk_duplicate_data) {
-        drupal_set_message('This flat is already tagged. Duplicate entries are not allowed.','error');
-    }else{
-        db_insert('housing_user_tagging')
-        ->fields($form_data)
-        ->execute();
-        drupal_set_message(t('Your data has been submitted for departmental approval. Please wait until the approval process is complete.'));
+        $form_data['applicant_name'] = trim($form_state['values']['applicant_name']);
+        $form_data['mobile_no'] = trim($form_state['values']['mobile_no']);
+        $form_data['email'] = trim($form_state['values']['email']);
+        $form_data['physical_application_no'] = trim($form_state['values']['physical_application_no']);  //aded by dg 18-08-2025
+        $form_data['application_type'] = trim($form_state['values']['application_type']);  //aded by dg 18-08-2025
+
+        // $form_data['identification_no'] = trim($form_state['values']['identification_no']); // Turned off 24-07-2025 by Subham
+        // $form_data['dob'] = date('Y-m-d',strtotime($form_state['values']['dob']));
+        $form_data['license_no'] = trim($form_state['values']['license_no']);
+
+
+        $form_data['license_issue_date'] = DateTime::createFromFormat('d/m/Y', $form_state['values']['license_issue_date'])->format('Y-m-d');
+        $form_data['license_expiry_date'] = ($form_state['values']['license_expiry_date']!='') ? DateTime::createFromFormat('d/m/Y', $form_state['values']['license_expiry_date'])->format('Y-m-d') : NULL;
+        
+        // date('Y-m-d',strtotime($form_state['values']['license_expiry_date'])) 
+
+
+        $form_data['flat_id'] = trim($form_state['values']['updated_flat_no']);
+        $form_data['created_date'] = date('Y-m-d H:i:s');
+        $form_data['status'] = '1';
+        $form_data['flag'] = 'new';  // New or Tagged
+        $form_data['hrms_id'] = $user->name;
+        $form_data['uid'] = $user->uid;
+
+        // echo '<pre>'; print_r($form_data);die;
+        
+        $chk_duplicate_data = db_select('housing_user_tagging', 'hut')
+            ->fields('hut',array('flat_id'))
+            ->condition('flat_id', $form_data['flat_id'])
+            ->execute()
+            ->fetchObject();
+        
+        if ($chk_duplicate_data) {
+            drupal_set_message('This flat is already tagged. Duplicate entries are not allowed.','error');
+        }else{
+            db_insert('housing_user_tagging')
+            ->fields($form_data)
+            ->execute();
+            drupal_set_message(t('Your data has been submitted for departmental approval. Please wait until the approval process is complete.'));
+        }
     }
+    
+  
 }
 
 function _reload_rhewise_flat_info_callback($form, &$form_state) {
@@ -269,107 +365,4 @@ function _reload_rhewise_flat_info_callback($form, &$form_state) {
     return array('#type' => 'ajax', '#commands' => $commands);
 }
 
-/*Fetch Flat List*/
-function rhe_list_fetch() {
-    $rhe_options = array(''=>'- Select -');
-    $query = db_select('housing_estate', 'he')->fields('he');
-    $query->orderBy('estate_name','ASC');
-    $result = $query->execute();
-    foreach($result as $val) {
-        $str = $val->estate_name;
-        if($val->estate_address != null){
-            $str = $str.' | '.$val->estate_address;
-        }
-        $rhe_options[$val->estate_id] = $str;
-    }
-    
-    return $rhe_options;
-}
 
-/*Fetch Floor Number*/
-function fetch_floor_no($rhe_name = '', $flat_type = '', $block_name = '') {
-    $floor_no_options = array('' => '- Select -');
-    if($rhe_name !== '' && $flat_type !== '' && $block_name !== ''  && is_numeric($rhe_name) && is_numeric($flat_type) && is_numeric($block_name)) {
-        $query = db_select('housing_flat', 'hf');
-        $query->fields('hf', array('flat_id', 'estate_id', 'flat_type_id', 'block_id','floor'));
-        $query->condition('hf.estate_id', $rhe_name, '=');
-        $query->condition('hf.flat_type_id', $flat_type, '=');
-        $query->condition('hf.block_id', $block_name, '=');
-
-        $query->orderBy('flat_id', 'ASC');
-        $result = $query->execute();
-        
-        if($result->rowCount() > 0) {
-            foreach($result as $val) {
-                $floor_no_options[$val->floor] = $val->floor;
-            }
-            return $floor_no_options;
-        } else {
-            $floor_no_options[''] = 'No Data Found';
-            return $floor_no_options;		
-        }
-    }
-}
-
-/*Fetch Flat Number*/
-function fetch_flat_no($rhe_name = '', $flat_type = '', $block_name = '', $floor_no = '') {
-    $flat_no_options = array('' => '- Select -');
-    if($rhe_name !== '' && $flat_type !== '' && $block_name !== '' && $floor_no !== '' && is_numeric($rhe_name) && is_numeric($flat_type) && is_numeric($block_name)) {
-        $query = db_select('housing_flat', 'hf');
-        $query->fields('hf', array('flat_id', 'estate_id', 'flat_type_id', 'block_id','floor','flat_no'));
-        $query->condition('hf.estate_id', $rhe_name, '=');
-        $query->condition('hf.flat_type_id', $flat_type, '=');
-        $query->condition('hf.block_id', $block_name, '=');
-        $query->condition('hf.floor', $floor_no, '=');
-    
-        $query->orderBy('flat_id', 'ASC');
-        $result = $query->execute();
-        
-        if($result->rowCount() > 0) {
-            foreach($result as $val) {
-                $flat_no_options[$val->flat_id] = $val->flat_no;
-            }
-            return $flat_no_options;
-        } else {
-            $flat_no_options[''] = 'No Data Found';
-            return $flat_no_options;		
-        }
-    }
-}
-
-/*License Expiry date validation (Expiry Date Should not more than 3 yrs from the date of license issue date)*/
-function element_validate_expiry_date($element, &$form_state) {
-  if (!empty($form_state['values']['license_issue_date']) && !empty($form_state['values']['license_expiry_date'])) {
-    $issue = trim($form_state['values']['license_issue_date']);
-    $expiry = trim($form_state['values']['license_expiry_date']);
-
-    $issue_date = DateTime::createFromFormat('d/m/Y', $issue);
-    $expiry_date = DateTime::createFromFormat('d/m/Y', $expiry);
-
-    $interval = $issue_date->diff($expiry_date);
-
-    if ($interval->y > 3 || ($interval->y == 3 && ($interval->m > 0 || $interval->d > 0))) {
-      form_set_error('license_expiry_date', t('The license expiry date cannot be more than 3 years after the issue date.'));
-    }
-  }
-}
-
-/*DOB Validation {(DOB should before license expiry date)}*/
-function element_validate_dob_before_license_issue($element, &$form_state) {
-  if (!empty($form_state['values']['dob']) && !empty($form_state['values']['license_issue_date'])) {
-    $dob = trim($form_state['values']['dob']);
-    $license_issue = trim($form_state['values']['license_issue_date']);
-
-    $dob_date = DateTime::createFromFormat('d/m/Y', $dob);
-    $issue_date = DateTime::createFromFormat('d/m/Y', $license_issue);
-
-    if ($dob_date && $issue_date) {
-      if ($dob_date > $issue_date) {
-        form_set_error('dob', t('Date of Birth cannot be after License Issue Date.'));
-      }
-    }
-    else {
-      form_set_error('dob', t('Please enter valid dates in dd/mm/yyyy format.'));
-    }
-  }
-}

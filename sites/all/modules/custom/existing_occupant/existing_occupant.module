@@ -70,6 +70,7 @@
 		// 	// 'access arguments' => array('administer Existing Occupant List')
 		// );
 
+		//~~ This link is only for RHE Division & Subdivision ~~\\
 		// Done by Subham dt.24-06-2025
 		$items['rhewise_occupant_draft_list'] = array(
 			'title' => 'Existing Occupant List Without HRMS ID',
@@ -79,6 +80,29 @@
 			'access arguments' => array('administer Existing Occupant')
 			// 'access arguments' => array('administer Existing Occupant List')
 		);
+		//~~ End ~~\\
+
+		//~~ This link is for other official users except Division & Subdivision ~~\\
+		// Done by Subham dt.22-08-2025
+		$items['existing-occupant-list-wohrms'] = array(
+			'title' => 'Existing Occupant List Without HRMS ID',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=> array('existing_occupant_list_wohrms_form'),   
+			'file' => 'include/existing_occupant_draft_list_form.inc', 
+			'access arguments' => array('administer Existing Occupant')
+		);
+
+		//~~ This link is for other official users except Division & Subdivision ~~\\
+		// Done by Subham dt.22-08-2025
+		$items['existing-occupant-list-whrms'] = array(
+			'title' => 'Existing Occupant List With HRMS ID',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=> array('existing_occupant_list_whrms_form'),   
+			'file' => 'include/existing_occupant_list_form.inc',
+			'access arguments' => array('administer Existing Occupant')
+			// 'access arguments' => array('administer Existing Occupant List')
+		);
+		//~~ End ~~\\
 
 		//menu for division user
 		$items['rhewise_occupantlist'] = array(
@@ -112,6 +136,7 @@
 		// 	'access arguments' => array('access content')
 		// );
 
+		//~~ This link is only for RHE Division & Subdivision ~~\\
         /*Done by Subham dt.24-06-2025*/
 		$items['view-occupant-list'] = array(
 			'title' => 'Existing Occupant List With HRMS ID',
@@ -121,20 +146,23 @@
 			'access arguments' => array('administer Existing Occupant')
 			// 'access arguments' => array('administer Existing Occupant List')
 		);
-
-		$items['view-unauthorised-occupants'] = array(
-			'title' => 'Unauthorised Occupant List',
-			'page callback' => 'view_unauthorised_occupants_list',
-			'file' => 'include/view_unauthorised_occupants_list.inc',
-			'access arguments' => array('administer Unauthorised Occupant List')
-		);
+		//~~ End ~~\\
 		
-		$items['view-unauthorised-occupants-store/%'] = array(
-			'page callback' => 'unauthorised_occupants_list_store',
-			'page arguments' => array(1),
-			'file' => 'include/view_unauthorised_occupants_list.inc',
-			'access arguments' => array('administer Unauthorised Occupant List')
-		);
+		/* comment out because the url has been modified at unauthorized_occupant.module by Subham on 10-07-2025 */
+		// $items['view-unauthorised-occupants'] = array(
+		// 	'title' => 'Unauthorised Occupant List',
+		// 	'page callback' => 'view_unauthorised_occupants_list',
+		// 	'file' => 'include/view_unauthorised_occupants_list.inc',
+		// 	'access arguments' => array('administer Unauthorised Occupant List')
+		// );
+		
+		// $items['view-unauthorised-occupants-store/%'] = array(
+		// 	'page callback' => 'unauthorised_occupants_list_store',
+		// 	'page arguments' => array(1),
+		// 	'file' => 'include/view_unauthorised_occupants_list.inc',
+		// 	'access arguments' => array('administer Unauthorised Occupant List')
+		// );
+		/** End */
 
 		$items['existing-occupant-view-det/%'] = array(
 			'title' => 'View Existing Occupant Details',	
@@ -177,14 +205,18 @@
 	  		'file' => 'include/existing_occupant_draft_list_form.inc',
 	  		'access arguments' => array('access content'),
 		);
-		$items['unauthorized-occupant'] = array(
-	  		'title' => 'Unauthorised Occupant List (without HRMS)',
-			'page callback' => 'drupal_get_form',
-			'page arguments' => array('unauthorized_occupant_draft_list'),
-	  		'file' => 'include/view_unauthorised_occupants_list.inc',
-	  		'access arguments' => array('access content'),
-		);
 		// ennd moumita
+		
+		/* comment out because the url has been modified at unauthorized_occupant.module by Subham on 10-07-2025 */
+		// $items['unauthorized-occupant'] = array(
+	  	// 	'title' => 'Unauthorised Occupant List (without HRMS)',
+		// 	'page callback' => 'drupal_get_form',
+		// 	'page arguments' => array('unauthorized_occupant_draft_list'),
+	  	// 	'file' => 'include/view_unauthorised_occupants_list.inc',
+	  	// 	'access arguments' => array('access content'),
+		// );
+		
+		/** End */
 
 
 		return $items;
@@ -358,6 +390,36 @@
 			$query->orderBy('flat_id', 'ASC');
 			$result = $query->execute();
 			
+			if($result->rowCount() > 0) {
+				foreach($result as $val) {
+					$flat_no_options[$val->flat_id] = $val->flat_no;
+				}
+				return $flat_no_options;
+			} else {
+				$flat_no_options[''] = 'No Data Found';
+				return $flat_no_options;		
+			}
+		}
+	}
+
+	function flatno_under_rhe_updated($rhe_name = '', $flat_type = '', $block_name = '') { // function created by dg 22-08-2025
+		$flat_no_options = array('' => '- Select -');
+		if($rhe_name !== '' && $flat_type !== '' && $block_name !== '' && is_numeric($rhe_name) && is_numeric($flat_type) && is_numeric($block_name)) {
+			$query = db_select('housing_flat', 'hf');
+			$query->leftJoin('housing_flat_occupant', 'hfo', 'hf.flat_id = hfo.flat_id');
+			$query->leftJoin('housing_existing_occupant_draft', 'heod', 'hf.flat_id = heod.flat_id');
+			$query->addField('hf', 'flat_id');
+			$query->addField('hf', 'flat_no');
+			$db_and = db_and();
+			$db_and->condition('hf.estate_id', $rhe_name, '=');
+			$db_and->condition('hf.flat_type_id', $flat_type, '=');
+			$db_and->condition('hf.block_id', $block_name, '=');
+			//$db_and->condition('hfo.flat_id', NULL, 'is');
+			//$db_and->condition('heod.flat_id', NULL, 'IS');
+			$query->condition($db_and);
+			$query->orderBy('flat_id', 'ASC');
+			$result = $query->execute();
+			// echo $query;die;
 			if($result->rowCount() > 0) {
 				foreach($result as $val) {
 					$flat_no_options[$val->flat_id] = $val->flat_no;
@@ -791,15 +853,16 @@
 		$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
 		$query->innerJoin('users', 'u', 'u.uid = haod.uid');
 		$query->innerJoin('housing_ddo', 'hd', 'hd.ddo_id = haod.ddo_id');
-		$query->innerJoin('housing_district', 'hdis', 'hdis.district_code = hd.district_code');
+		$query->leftJoin('housing_district', 'hdis', 'hdis.district_code = hd.district_code');
 		$query->innerJoin('housing_occupant_license', 'hol', 'hol.flat_occupant_id = hfo.flat_occupant_id');
 		$query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
-		$query->innerJoin('housing_district', 'hdis_present', 'hdis_present.district_code = ha.present_district');
-		$query->innerJoin('housing_district', 'hdis_permanent', 'hdis_permanent.district_code = ha.permanent_district');
-		$query->innerJoin('housing_district', 'hdis_office', 'hdis_office.district_code = haod.office_district');
+		$query->leftJoin('housing_district', 'hdis_present', 'hdis_present.district_code = ha.present_district');
+		$query->leftJoin('housing_district', 'hdis_permanent', 'hdis_permanent.district_code = ha.permanent_district');
+		$query->leftJoin('housing_district', 'hdis_office', 'hdis_office.district_code = haod.office_district');
 
-		$query->condition('hoa.status', 'existing_occupant', '=');
+		//$query->condition('hoa.status', 'existing_occupant', '='); // turned off by dg because if any existing occupant data become vs cs applied, then view details data is not showing
 		$query->condition('haod.uid',$uid);
+		// $query->condition('haod.is_active',1);  // added by dg 28-07-2025 // offed by Moumita 22-09-2025
 
 		$query->fields('ha', array('applicant_name','applicant_name','guardian_name','date_of_birth','mobile_no','gender','permanent_street','permanent_city_town_village','permanent_post_office','permanent_pincode','permanent_district','permanent_present_same','present_street','present_city_town_village','present_post_office','present_pincode','present_district'));
 		$query->addField('he', 'estate_name');
@@ -820,7 +883,7 @@
 		$query->addField('hdis_permanent', 'district_name', 'permanent_district_name');
 		$query->addField('hdis_office', 'district_name', 'office_district_name');
 
-		$result =$query->execute();
+		$result =$query->execute(); //echo '<pre>'; print_r($result); echo '</pre>';
 		$data = $result->fetchObject();
 		
 
@@ -1089,7 +1152,7 @@
 		    <div class="table-bottom">
 		        <table class="table table-list">
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>
 		          </tr>
 		           <tr>
 		            <th style="background-color:#00000000" width="50%">Application Number:</th>
@@ -1104,7 +1167,7 @@
 		            <td>'.(isset($data->date_of_application) ? $data->date_of_application : 'Not Avalaible').'</td>
 		          </tr>
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Personal Information (According to Service Book)</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Personal Information (According to Service Book)</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">Applicant\'s Name:</th>
@@ -1138,7 +1201,7 @@
 		            <td>'.(isset($data->mail) ? $data->mail : 'Not Avalaible').'</td>
 		          </tr>
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Official Information</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Official Information</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">Employee HRMS ID:</th>
@@ -1170,7 +1233,7 @@
 		          </tr>
 
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Office Name and Address</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Office Name and Address</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">Name of the Office:</th>
@@ -1185,7 +1248,7 @@
 		            <td>'.(isset($data->office_phone_no) ? $data->office_phone_no : 'Not Avalaible').'</td>
 		          </tr>
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Office Name and Address</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Office Name and Address</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">DDO District.:</th>
@@ -1200,7 +1263,7 @@
 		            <td>'.(isset($data->ddo_address) ? $data->ddo_address : 'Not Avalaible').'</td>
 		          </tr>
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Information for Allotment</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Information for Allotment</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">Estate Name:</th>
@@ -1223,7 +1286,7 @@
 		            <td>'.(isset($data->floor) ? $data->floor : 'Not Avalaible').'</td>
 		          </tr>
 		          <tr>
-		            <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Information for License</th>
+		            <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Information for License</th>
 		          </tr>
 		          <tr>
 		            <th style="background-color:#00000000">License No :</th>
@@ -1293,4 +1356,17 @@ function rhe_wise_flat_occupant_delete($val = '', $occupant_id_enc = '', $flat_i
 		drupal_goto('view-occupant-list');
 		
 	}
+}
+
+/* added by dg 28-07-2025 */
+function update_pay_band_callback($form, &$form_state) {
+    	return $form['official_info']['pay_band_wrapper'];
+	}
+
+function update_pay_band_callback_pa($form, &$form_state) {
+  return array(
+    '#markup' => render($form['official_info']['pay_band_wrapper']) .
+                render($form['official_info']['pay_band']) .
+                render($form['official_info']['pay_band_wrapper_close']),
+  );
 }

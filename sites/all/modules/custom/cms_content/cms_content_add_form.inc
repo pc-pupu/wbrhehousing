@@ -17,10 +17,21 @@ function cms_content_add_form($form, &$form_state) {
                 'about_us' => t('About Us'),
                 'contact_us' => t('Contact Us'),
                 'what_is_new' => t('What\'s New'),
+                'notice' => t('Notice'),
         ),
         '#required' => TRUE,
-        '#prefix' => '<div class="row"><div class="col-md-2"><div class="form-floating">',
+        '#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
         '#suffix' => '</div></div>'
+    );
+
+    $form['cms_info']['link_title'] = array(
+        '#title' => t('Link Title'),
+        '#type' => 'textfield',
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#default_value' => '',
+        '#attributes' => array('class'=>array('form-control')),
+        // '#required' => TRUE
     );
 
     $form['cms_info']['content_title'] = array(
@@ -33,13 +44,12 @@ function cms_content_add_form($form, &$form_state) {
         '#required' => TRUE
     );
 
-    $form['cms_info']['link_title'] = array(
-        '#title' => t('Link Title'),
-        '#type' => 'textfield',
-        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+    $form['cms_info']['content_description'] = array(
+        '#title' => t('Content Description'),
+        '#type' => 'textarea',
+        '#prefix' => '<div class="col-md-12"><div class="form-floating">',
         '#suffix' => '</div></div>',
         '#default_value' => '',
-        '#attributes' => array('class'=>array('form-control')),
         '#required' => TRUE
     );
 
@@ -47,21 +57,12 @@ function cms_content_add_form($form, &$form_state) {
         '#title' => t('Order No.'),
         '#type' => 'textfield',
         '#element_validate' => array('element_validate_numeric_positive'),
-        '#prefix' => '<div class="col-md-2"><div class="form-floating">',
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
         '#suffix' => '</div></div>',
         '#default_value' => $order_no,
         '#attributes' => array('class' => array('numeric_positive','form-control')),
         '#disabled' => TRUE,
         '#required' => TRUE
-    );
-
-    $form['cms_info']['meta_keyword_text_box'] = array(
-        '#title' => t('Meta Keyword'),
-        '#type' => 'textfield',
-        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
-        '#suffix' => '</div></div>',
-        '#default_value' => '',
-        '#attributes' => array('class'=>array('form-control')),
     );
 
     $form['cms_info']['don'] = array(
@@ -75,14 +76,13 @@ function cms_content_add_form($form, &$form_state) {
         '#element_validate' => array('element_validate_date')
     );
 
-    $form['cms_info']['content_description'] = array(
-        '#title' => t('Content Description'),
+    $form['cms_info']['meta_keyword_text_box'] = array(
+        '#title' => t('Meta Keyword'),
         '#type' => 'textfield',
         '#prefix' => '<div class="col-md-4"><div class="form-floating">',
-        '#suffix' => '</div></div></div>',
+        '#suffix' => '</div></div>',
         '#default_value' => '',
-        '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
-        '#required' => TRUE
+        '#attributes' => array('class'=>array('form-control')),
     );
 
     $form['meta_desc_text'] = array(
@@ -150,7 +150,7 @@ function cms_content_add_submit($form, &$form_state) {
     $form_data['order_no']                  =  trim($values['order_no']);
     $form_data['meta_keyword']              =  trim($values['meta_keyword_text_box']);
     $form_data['meta_description']          =  trim($values['meta_desc_text']);
-    $form_data['date_of_notification']      =  trim($values['don']);
+    $form_data['date_of_notification']      =  trim(implode('-', array_reverse(explode('/', $values['don']))));
     $form_data['created_date']              =  date('Y-m-d H:i:s');
     $form_data['content_description']       =  trim($values['content_description']);
     $form_data['is_active']                 =  trim($values['is_active_radio']);
@@ -181,20 +181,21 @@ function cms_content_add_submit($form, &$form_state) {
         }
     }
 
+    // print_r($form_data);die;
     $duplicate_content_exists = db_select('housing_cms', 'hc')
         ->fields('hc')
         ->condition('content_title', $form_data['content_title'])
         ->condition('link_title', $form_data['link_title'])
-        ->condition('content_description', $form_data['content_description'])
         ->execute()
         ->fetchObject();
 
     if ($duplicate_content_exists) {
-        drupal_set_message(t('Duplicate content. Please change content title or description.'), 'error');
+        drupal_set_message(t('Duplicate content. Please change content title.'), 'error');
     } else {
         db_insert('housing_cms')
         ->fields($form_data)
         ->execute();
         drupal_set_message(t('Content added successfully.'));
     }
+    drupal_goto('cms-content-list');
 }

@@ -24,12 +24,13 @@ function fetch_applicant_occupant_list_menu(){
         'access arguments' => array('administer_existing_occupant_applicant_list')
     );
     
+    /* turned off by subham 21-07-2025 
     $items['physical-applicant-list'] = array(
         'title' => 'List of Physical Applications',
         'page callback' => 'fetch_physical_applicant_list',
         'page arguments' => array(),
         'access arguments' => array('administer_existing_occupant_applicant_list')
-    );
+    ); */
 
     $items['physical-applicant-details/%'] = array(
         'title' => 'Physical Applicant Details',
@@ -278,30 +279,9 @@ function fetch_existing_occupant_list() {
     return $output;
 }
    
-/////////////////////////////subham///////////////////////////////
-//  $output = $result->fetchAll();
-
-//     if (count($output) > 0) {
-//         $output1 .= '<table class="table table-list">';
-//         $output1 .= '<tr><th>Serial No</th><th>Application No</th><th>&emsp;Applicant Name</th><th>Designation</th><th>&emsp;&emsp;&emsp;View</th>';
-//         $serialNumber = 1;
-//         foreach ($output as $data) {
-//             $output1 .= '<tr>';
-//             $output1 .= '<td>&emsp;'.$serialNumber.'</td>';
-//             $output1 .= '<td>'.$data->application_no.'</td>';
-//             $output1 .= '<td>'.$data->applicant_name.'</td>';
-//             $output1 .= '<td>'.$data->applicant_designation.'</td>';
-//             $output1 .= '<td>' . l(t('View Details'), $base_root.$base_path.'existing-occupant-details/'. encrypt_url($data->application_no), array('html' => true, 'attributes' => array('class' => array('btn', 'bg-success', 'btn-sm', 'px-3', 'rounded-pill', 'text-white', 'fw-bolder')))) . '</td>';
-//             $output1 .= '</tr>';
-//             $serialNumber++;
-//         }
-//         $output1 .= '</table>';
-//     } else {
-//         $output1 .= '<p>No data found!</p>';
-//     }
-//     return $output1;
 
 
+/* turned off by subham 21-07-2025 
 function fetch_physical_applicant_list() {
     global $base_root, $base_path;
     $output1 = '';
@@ -386,26 +366,5 @@ function fetch_physical_applicant_list() {
 
    return $output;
 
-////////////////////subham////////////////////////////
-    // $output = $result->fetchAll();
 
-    // if (count($output) > 0) {
-    //     $output1 .= '<table class="table table-list">';
-    //     $output1 .= '<tr><th>Serial No</th><th>Application No</th><th>&emsp;Applicant Name</th><th>Designation</th><th>&emsp;&emsp;&emsp;View</th>';
-    //     $serialNumber = 1;
-    //     foreach ($output as $data) {
-    //         $output1 .= '<tr>';
-    //         $output1 .= '<td>&emsp;'.$serialNumber.'</td>';
-    //         $output1 .= '<td>'.$data->application_no.'</td>';
-    //         $output1 .= '<td>'.$data->applicant_name.'</td>';
-    //         $output1 .= '<td>'.$data->applicant_designation.'</td>';
-    //         $output1 .= '<td>' . l(t('View Details'), $base_root.$base_path.'physical-applicant-details/'. encrypt_url($data->application_no), array('html' => true, 'attributes' => array('class' => array('btn', 'bg-success', 'btn-sm', 'px-3', 'rounded-pill', 'text-white', 'fw-bolder')))) . '</td>';
-    //         $output1 .= '</tr>';
-    //         $serialNumber++;
-    //     }
-    //     $output1 .= '</table>';
-    // } else {
-    //     $output1 .= '<p>No data found!</p>';
-    // }
-    // return $output1;
-}
+} */

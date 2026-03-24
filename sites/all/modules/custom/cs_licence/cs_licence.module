@@ -51,6 +51,7 @@
 			'#collapsed' => TRUE,  // Added
 		);
 		
+		/* Turned off by Subham 24-07-2025
 		$form['document_upload']['file'] = array(
 			'#title' => t('Upload Necessary Document(Latest Payslip)'),
 			'#type' => 'managed_file',
@@ -69,7 +70,7 @@
 			'#required' => TRUE,
 			'#process' => array('cs_licence_element_process'),
 		
-		);
+		); */ // Turned off by Subham 24-07-2025
 		
 		$form['allotment_info'] = array(
 			'#type' => 'fieldset',
@@ -151,9 +152,10 @@
 	  
   	}
 	
+	/* Turned off by Subham 24-07-2025
 	if(isset($form) > 0 && isset($form['document_upload']['file']) && $form['document_upload']['file']["#type"] == "managed_file") {
 		$form['document_upload']['file']["#upload_validators"]["file_upload_validation"] = array($form['document_upload']['file']["#upload_validators"]["file_validate_extensions"][0]);
-	}
+	}*/ // Turned off by Subham 24-07-2025
   }
   
   	function cs_licence_validate(&$form, &$form_state) {
@@ -203,11 +205,11 @@
 				}		
 			}
 		}
-		
+		/* // Turned off by Subham 24-07-2025
 		$file_payslip = file_load($form_state['values']['file']);
 		if($file_payslip->filesize > 1048576) {
 			form_set_error('payslip_file_size', 'The file '.$file_payslip->filename.' could not be uploaded, because it exceeds 1 MB, the maximum allowed size for uploads.');	
-		}
+		}*/ // Turned off by Subham 24-07-2025
 		
 	}
 	

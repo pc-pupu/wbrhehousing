@@ -629,7 +629,8 @@ function existing_occupant_edit_form_submit($form, &$form_state) {
     $personal_info_array = array(
         'applicant_name' => $val['occupant_name'],
         'guardian_name' => $val['occupant_father_name'],
-        'date_of_birth' => $val['dob'],
+        //'date_of_birth' => $val['dob'],
+        'date_of_birth' => trim(implode('-', array_reverse(explode('/', $val['dob'])))), //added by dg 22-07-2025
         'mobile_no' => $val['mobile'],
         'gender'=> $val ['gender'],
 
@@ -662,15 +663,17 @@ function existing_occupant_edit_form_submit($form, &$form_state) {
         'pay_band_id' => $val['pay_band'],
         'pay_in_the_pay_band' => $val['pay_in'],
         
-        'date_of_joining' => $val['doj'],
-        'date_of_retirement' => $val['dor'],
+        //'date_of_joining' => $val['doj'],
+        'date_of_joining' => trim(implode('-', array_reverse(explode('/', $val['doj'])))), //added by dg 22-07-2025
+        //'date_of_retirement' => $val['dor'],
+        'date_of_retirement' => trim(implode('-', array_reverse(explode('/', $val['dor'])))), //added by dg 22-07-2025
         
         'office_name'=> $val['office_name'],
         'office_street'=> $val['office_street'],
         'office_city_town_village'=> $val['office_city'],
         'office_post_office'=> $val['office_post_office'],
         'office_pin_code'=> $val['office_pincode'],
-        'office_district'=> $val['office_district'],
+        // 'office_district'=> $val['office_district'],
         'office_phone_no'=> $val['office_phone_no'],
     );
     // echo "<pre>";print_r($official_info_array);
@@ -685,7 +688,8 @@ function existing_occupant_edit_form_submit($form, &$form_state) {
     // license table update
     $license_array = array(
         'existing_occupant_license_no' => $val['license_no'],
-        'license_issue_date' => $val['dol'],
+        //'license_issue_date' => $val['dol'],
+        'license_issue_date' => trim(implode('-', array_reverse(explode('/', $val['dol'])))), //added by dg 22-07-2025
         'authorised_or_not' =>$val['authorised_or_not']
     );
     // echo "<pre>";print_r($license_array);die;

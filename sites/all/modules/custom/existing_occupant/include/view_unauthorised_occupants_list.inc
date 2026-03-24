@@ -8,16 +8,17 @@ function view_unauthorised_occupants_list(){
     $query->leftJoin('housing_occupant_license', 'hol', 'hol.flat_occupant_id = hfo.flat_occupant_id');
     $query->addField('ha', 'applicant_name');
     $query->addField('hoa', 'application_no');
-    $query->fields('hol', array('license_no', 'possession_date', 'license_expiry_date', 'flat_occupant_id', 'authorised_or_not'));
-    $query->condition('hol.license_expiry_date', $current_date, '<');
+    $query->fields('hol', array('license_no', 'possession_date', 'license_expiry_date', 'flat_occupant_id', 'authorised_or_not','existing_occupant_license_no'));
+    //$query->condition('hol.license_expiry_date', $current_date, '<');
     $or = db_or()
-          ->isNull('hol.authorised_or_not')
+          //->isNull('hol.authorised_or_not')  //off by dg 02-07-2025
+          ->condition('hol.license_expiry_date', $current_date, '<') //added by dg 02-07-2025
           ->condition('hol.authorised_or_not', 'unauthorised');
 
     $query->condition($or);
     //$query->condition('hol.authorised_or_not', NULL, 'IS');
     $result = $query->execute();
-    
+    // echo $query;die;
     
     $header['Sl No.'] = array('data' => 'Sl No.');
     $header['Applicant Name'] = array('data' => 'Applicant Name');
@@ -42,7 +43,7 @@ function view_unauthorised_occupants_list(){
         $fields[] = $data->license_expiry_date ? date('d-m-Y', strtotime($data->license_expiry_date)) : '';
         $onclick = "return confirm('Are you sure you want to mark this applicant as Unauthorised?')";
 
-        if($data->authorised_or_not == ''){
+        if($data->authorised_or_not == '' || ($data->authorised_or_not == 'authorised' && $data->license_expiry_date < $current_date)){
            $fields[] = l('<span class="btn bg-info btn-sm text-black rounded" style="font-size:12px"><b>Mark as Unauthorised</b></span>',
             'view-unauthorised-occupants-store/' . encrypt_url($data->flat_occupant_id), array('html' => TRUE,'attributes' => array('onclick' => $onclick))
             ); 

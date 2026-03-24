@@ -11,8 +11,12 @@
 	
 	function element_validate_alphabatic_text($element, &$form_state) {
 		$value = trim($element['#value']);
-		if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\w\s]+[a-zA-Z0-9]*$/",$value)) {
-			form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
+		// if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\w\s]+[a-zA-Z0-9]*$/",$value)) {
+		// 	form_set_error($element['#name'], t('" %name " must be alphabatic.', array('%name' => $element['#title'])));
+		// }
+		// changed on 22-07-2025 By Moumita
+		if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/,()&:\w\s]+[a-zA-Z0-9]*$/", $value)) {
+			form_set_error($element['#name'], t('" %name " must be alphanumeric.', array('%name' => $element['#title'])));
 		}
 	}
 	
@@ -43,8 +47,11 @@
 	
 	function element_validate_streetaddress($element, &$form_state) {
 		$value = trim($element['#value']);
-	//	if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\w\s]+[a-zA-Z0-9]*$/",$value)) {
-		if($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\(\)\w\s]+[a-zA-Z0-9]*$/",$value)){
+		// if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/\,\&\w\s]+[a-zA-Z0-9]*$/",$value)) {
+		// 	form_set_error($element['#name'], t('" %name " must be alphanumeric. Only special characters . , - / allowed.', array('%name' => $element['#title'])));
+		// } 
+		// changed on 22-07-2025 By Moumita
+		if ($value !== '' && !preg_match("/^[a-zA-Z0-9][\.\-\/,()&:\w\s]+[a-zA-Z0-9]*$/", $value)) {
 			form_set_error($element['#name'], t('" %name " must be alphanumeric. Only special characters . , - / allowed.', array('%name' => $element['#title'])));
 		}
 	}
@@ -103,44 +110,113 @@
 		}*/
 	}
 	
-	function element_validate_age($element, &$form_state) {
-		if(!empty($form_state['values']['dob'])) {
+	// function element_validate_age($element, &$form_state) {
+	// 	if(!empty($form_state['values']['dob'])) {
 		   
-			 $dob = trim($form_state['values']['dob']);
-			 if(!empty($dob)) {
-			 	$date = DateTime::createFromFormat('d/m/Y', $dob);
-				$dob= $date->format('Y-m-d');
-				if(!validateAge($dob)){
-					form_set_error('dob', 'Check Date of Birth. Minimum age should be 18 Years.');
-				}
-			 }else{
-			 	form_set_error('dob', 'Date of Birth Can\'t be empty.');
-			 }
-		}
-	}
+	// 		 $dob = trim($form_state['values']['dob']);
+	// 		 if(!empty($dob)) {
+	// 		 	$date = DateTime::createFromFormat('d/m/Y', $dob);
+	// 			$dob= $date->format('Y-m-d');
+	// 			if(!validateAge($dob)){
+	// 				form_set_error('dob', 'Check Date of Birth. Minimum age should be 18 Years.');
+	// 			}
+	// 		 }else{
+	// 		 	form_set_error('dob', 'Date of Birth Can\'t be empty.');
+	// 		 }
+	// 	}
+	// } 
 	
-	function element_validate_joining_age($element, &$form_state) {
-		if(!empty($form_state['values']['doj'])) {
-			$dob = trim($form_state['values']['dob']);
-			$doj = trim($form_state['values']['doj']);
-			if(!empty($doj)) {
-				$date1 = DateTime::createFromFormat('d/m/Y', $dob);
-				$dob = $date1->format('Y-m-d');
-				$date2 = DateTime::createFromFormat('d/m/Y', $doj);
-				$doj = $date2->format('Y-m-d');
+	function element_validate_age($element, &$form_state) {  // Updated by Subham dt.03-12-2025
+	    if (!empty($form_state['values']['dob'])) {
+
+	        $dob_input = trim($form_state['values']['dob']);
+
+	        if (!empty($dob_input)) {
+
+	            $date = DateTime::createFromFormat('d/m/Y', $dob_input);
+	            $errors = DateTime::getLastErrors();
+
+	            // Check for invalid date format
+	            if ($date === false || $errors['error_count'] > 0 || $errors['warning_count'] > 0) {
+	                form_set_error('dob', 'Invalid date format. Please use DD/MM/YYYY.');
+	                return;
+	            }
+
+	            $dob = $date->format('Y-m-d');
+
+	            if (!validateAge($dob)) {
+	                form_set_error('dob', 'Check Date of Birth. Minimum age should be 18 Years.');
+	            }
+
+	        } else {
+	            form_set_error('dob', 'Date of Birth can\'t be empty.');
+	        }
+	    }
+	} // End
+	
+	// function element_validate_joining_age($element, &$form_state) {
+	// 	if(!empty($form_state['values']['doj'])) {
+	// 		$dob = trim($form_state['values']['dob']);
+	// 		$doj = trim($form_state['values']['doj']);
+	// 		if(!empty($doj)) {
+	// 			$date1 = DateTime::createFromFormat('d/m/Y', $dob);
+	// 			$dob = $date1->format('Y-m-d');
+	// 			$date2 = DateTime::createFromFormat('d/m/Y', $doj);
+	// 			$doj = $date2->format('Y-m-d');
 				
-				$d1 = new DateTime($dob);
-				$d2 = new DateTime($doj);
+	// 			$d1 = new DateTime($dob);
+	// 			$d2 = new DateTime($doj);
 				
-				$diff = $d2->diff($d1);
+	// 			$diff = $d2->diff($d1);
 				
-				if($diff->y < 18) {
-					//echo $diff1->y;
-					form_set_error('doj', t('Check Date of Joining. Minimum age should be 18 Years for Joining.'));
-				}
-			}
-		}
-	}
+	// 			if($diff->y < 18) {
+	// 				//echo $diff1->y;
+	// 				form_set_error('doj', t('Check Date of Joining. Minimum age should be 18 Years for Joining.'));
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	function element_validate_joining_age($element, &$form_state) { // Updated by Subham dt.03-12-2025
+	    if (!empty($form_state['values']['doj'])) {
+
+	        $dob_input = trim($form_state['values']['dob']);
+	        $doj_input = trim($form_state['values']['doj']);
+
+	        if (empty($dob_input) || empty($doj_input)) {
+	            return;
+	        }
+
+	        $date1 = DateTime::createFromFormat('d/m/Y', $dob_input);
+	        $errors1 = DateTime::getLastErrors();
+
+	        if ($date1 === false || $errors1['error_count'] > 0 || $errors1['warning_count'] > 0) {
+	            form_set_error('dob', t('Invalid Date of Birth format. Use DD/MM/YYYY.'));
+	            return;
+	        }
+
+	        $date2 = DateTime::createFromFormat('d/m/Y', $doj_input);
+	        $errors2 = DateTime::getLastErrors();
+
+	        if ($date2 === false || $errors2['error_count'] > 0 || $errors2['warning_count'] > 0) {
+	            form_set_error('doj', t('Invalid Date of Joining format. Use DD/MM/YYYY.'));
+	            return;
+	        }
+
+	        $dob = $date1->format('Y-m-d');
+	        $doj = $date2->format('Y-m-d');
+
+	        $d1 = new DateTime($dob);
+	        $d2 = new DateTime($doj);
+
+	        $diff = $d2->diff($d1);
+
+	        if ($diff->y < 18) {
+	            form_set_error('doj', t('Check Date of Joining. Minimum age should be 18 years.'));
+	        }
+	    }
+	} // End
+
 	
 	function element_validate_flat_type($element, &$form_state) {
 		$value = trim($element['#value']);
@@ -324,4 +400,67 @@
 			$form_state['rebuild'] = TRUE;
 		}
 	}
+
+	/* by dg for existing occupant entry 24-07-2025 */
+	function mobile_no_validate_existing_occupant($element, &$form_state) {
+		global $user;
+		$value = trim($element['#value']);
+		
+		if($value !== '' && is_numeric($value)) {
+		
+			$query = db_select('housing_applicant', 'ha');
+			$query->fields('ha', array('mobile_no'));
+			$query->condition('ha.housing_applicant_id', $form_state['values']['housing_applicant_id'], '!=');
+		
+			$result = $query->execute();
+			while($data = $result->fetchObject()) {
+				if($data->mobile_no != $value) {
+			
+					$query1 = db_select('housing_applicant','applicant');
+					$query1->addExpression('mobile_no','mobile');
+					$query1->condition('mobile_no', $value);
+					$query1->condition('applicant.housing_applicant_id', $form_state['values']['housing_applicant_id'], '!=');
+					$result1 = $query1->execute();
+					
+					
+					if($result1->rowCount() > 0)
+						form_set_error($element['#name'], t('Mobile no "%name" already exist.', array('%name' => $element['#value'])));
+				}
+			
+			}
+		}
+	}
+
+	function hrms_validate_existing_applicant($element, &$form_state) {
+		global $user;
+		$value = trim($element['#value']);
+		
+		if($value !== '' && is_numeric($value)) {
+		
+			$query = db_select('users', 'u');
+			$query->innerJoin('housing_applicant_official_detail', 'haod', 'u.uid = haod.uid');
+			$query->fields('u', array('name'));
+			$query->condition('haod.hrms_id', $value, '!=');
+		
+			$result = $query->execute();
+			while($data = $result->fetchObject()) {
+				if($data->name != $value) {
+			
+					$query1 = db_select('users','users');
+					$query1->innerJoin('housing_applicant_official_detail', 'haod', 'users.uid = haod.uid');
+					$query1->addExpression('name','name');
+					$query1->condition('name', $value);
+					$query1->condition('haod.hrms_id', $value, '!=');
+					$result1 = $query1->execute();
+					
+					
+					if($result1->rowCount() > 0)
+						form_set_error($element['#name'], t('HRMS ID "%name" already exist.', array('%name' => $element['#value'])));
+				}
+			
+			}
+		}
+	}
+
+	/* end */
 	

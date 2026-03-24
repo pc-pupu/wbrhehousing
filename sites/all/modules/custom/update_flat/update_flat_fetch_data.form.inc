@@ -207,46 +207,105 @@
 		$query->addField('he', 'estate_name');
 		$query->addField('he', 'estate_address');
 		$query->addField('hd', 'district_name');
-		$query->addField('hb', 'block_name');	
+		$query->addField('hb', 'block_name');
 		$query->addField('hfs', 'flat_status');
 		$query->addField('hfs', 'flat_status_code');
 		$query->addField('hfs', 'is_occupied');
 		$query->addField('hft', 'flat_type');
 		$query->addField('hf', 'remarks');
 
-		/*Added by Moumita 21-05-2025 ~~~~~~~ Turned off by Subham dt.22-05-2025*/
-		// $floor_order_alias = "CASE 
-		// 	WHEN hf.floor = 'Ground' THEN 0
-		// 	WHEN hf.floor = 'First' THEN 1
-		// 	WHEN hf.floor = 'Second' THEN 2
-		// 	WHEN hf.floor = 'Third' THEN 3
-		// 	WHEN hf.floor = 'Fourth' THEN 4
-		// 	WHEN hf.floor = 'Fifth' THEN 5
-		// 	WHEN hf.floor = 'Sixth' THEN 6
-		// 	WHEN hf.floor = 'Seventh' THEN 7
-		// 	WHEN hf.floor = 'Eighth' THEN 8
-		// 	WHEN hf.floor = 'Top' THEN 9
-		// 	ELSE 10
-		// END"; 
+		// Complex expression to handle mixed flat_no values for sorting
+		// This uses PostgreSQL's REGEXP_REPLACE to extract leading digits
+		// and then tries to cast them to INTEGER.
+		// If the result of REGEXP_REPLACE is an empty string (meaning no leading digits),
+		// or if the cast fails, it defaults to 0 or NULL, depending on your preference.
+		// For sorting, a CASE statement is used to give a numeric preference.
+		$query->addExpression(
+		    "CASE
+		        WHEN hf.flat_no ~ '^[0-9]+$' THEN CAST(hf.flat_no AS INTEGER) -- Directly cast if purely numeric
+		        WHEN hf.flat_no ~ '^([0-9]+)/([0-9]+)$' THEN CAST(SPLIT_PART(hf.flat_no, '/', 1) AS INTEGER) -- If like 'X/Y', take X
+		        WHEN hf.flat_no ~ '^[0-9]+' THEN CAST(SUBSTRING(hf.flat_no FROM '^[0-9]+') AS INTEGER) -- Extract leading numbers
+		        ELSE NULL -- For truly non-numeric like 'A-1', 'B', etc.
+		    END",
+		    'flat_no_sort_key'
+		);
 
-		$query->addExpression('CAST(hf.flat_no AS INTEGER)', 'flat_no_numeric');  //added by dg as dept requirement23-05-2025
 		$query->orderBy('hb.block_name', 'ASC');
-		$query->orderBy('flat_no_numeric', 'ASC');
-		//$query->orderBy('block_name', 'ASC');
 
-		//$query->orderBy('flat_no', 'ASC');
-		// $query->orderBy($floor_order_alias, 'ASC');   // Turned off by Subham dt.22-05-2025
-		/*END*/
-		
+		// Order by the numeric sort key first, handling NULLs (non-numeric values) last
+		$query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
+
+		// Then, for rows where flat_no_sort_key is the same (e.g., all non-numeric, or same leading number),
+		// sort by the original flat_no string for consistent ordering.
+		$query->orderBy('hf.flat_no', 'ASC');
+
 		if($rhe_name != 0){
-			$db_and = db_and();
-			$db_and->condition('he.estate_id',$rhe_name,'=');
-			$query->condition($db_and);
+		    $db_and = db_and();
+		    $db_and->condition('he.estate_id',$rhe_name,'=');
+		    $query->condition($db_and);
 		}
+
+		// echo $query;die; // Uncomment to see the generated SQL query
+		return $query->execute();
+
+
+
+		// $query = db_select('housing_flat', 'hf');
+		// $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+		// $query->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
+		// $query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+		// $query->innerJoin('housing_flat_status', 'hfs', 'hfs.flat_status_id = hf.flat_status_id');
+		// $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+		// $query->addField('hf', 'flat_id');
+		// $query->addField('hf', 'flat_no');
+		// $query->addField('hf', 'estate_id');
+		// $query->addField('hf', 'flat_type_id');
+		// $query->addField('hf', 'block_id');
+		// $query->addField('hf', 'floor');
+		// $query->addField('hf', 'flat_status_id');
+		// $query->addField('he', 'estate_name');
+		// $query->addField('he', 'estate_address');
+		// $query->addField('hd', 'district_name');
+		// $query->addField('hb', 'block_name');	
+		// $query->addField('hfs', 'flat_status');
+		// $query->addField('hfs', 'flat_status_code');
+		// $query->addField('hfs', 'is_occupied');
+		// $query->addField('hft', 'flat_type');
+		// $query->addField('hf', 'remarks');
+
+		// /*Added by Moumita 21-05-2025 ~~~~~~~ Turned off by Subham dt.22-05-2025*/
+		// // $floor_order_alias = "CASE 
+		// // 	WHEN hf.floor = 'Ground' THEN 0
+		// // 	WHEN hf.floor = 'First' THEN 1
+		// // 	WHEN hf.floor = 'Second' THEN 2
+		// // 	WHEN hf.floor = 'Third' THEN 3
+		// // 	WHEN hf.floor = 'Fourth' THEN 4
+		// // 	WHEN hf.floor = 'Fifth' THEN 5
+		// // 	WHEN hf.floor = 'Sixth' THEN 6
+		// // 	WHEN hf.floor = 'Seventh' THEN 7
+		// // 	WHEN hf.floor = 'Eighth' THEN 8
+		// // 	WHEN hf.floor = 'Top' THEN 9
+		// // 	ELSE 10
+		// // END"; 
+
+		// $query->addExpression('CAST(hf.flat_no AS INTEGER)', 'flat_no_numeric');  //added by dg as dept requirement23-05-2025
+		// $query->orderBy('hb.block_name', 'ASC');
+		// $query->orderBy('flat_no_numeric', 'ASC');
+		// //$query->orderBy('block_name', 'ASC');
+
+		// //$query->orderBy('flat_no', 'ASC');
+		// // $query->orderBy($floor_order_alias, 'ASC');   // Turned off by Subham dt.22-05-2025
+		// /*END*/
 		
-		// $query->orderBy('flat_id', 'ASC');
+		// if($rhe_name != 0){
+		// 	$db_and = db_and();
+		// 	$db_and->condition('he.estate_id',$rhe_name,'=');
+		// 	$query->condition($db_and);
+		// }
 		
-		// echo $query;die;
-		return $query->execute();	
+		// // $query->orderBy('flat_id', 'ASC');
+		
+		// // echo $query;die;
+		// return $query->execute();	
 		
 	}

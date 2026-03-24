@@ -2,6 +2,8 @@
 
 	function existing_applicant_edit_form($form, &$form_state, $online_application_id = '') {
 
+		global $base_root, $base_path;
+
 		$online_application_id = decrypt_url($online_application_id);
 		
 		if (!empty($online_application_id) && is_numeric($online_application_id)) {
@@ -15,7 +17,7 @@
 			$query->condition('hoa.online_application_id', $online_application_id);
 			$query->fields('ha', array());
 			$query->fields('haod', array());
-			$query->fields('hnaa', array('allotment_category'));
+			$query->fields('hnaa', array('allotment_category','extra_doc','extra_doc_path'));
 			$query->fields('hoa', array());
 			$query->fields('u', array('mail'));
 			$query->fields('hd', array('ddo_designation','district_code'));
@@ -114,7 +116,7 @@
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 		);
 		
-	//Permanent Address
+		//Permanent Address
 		$form['prrsonal_info']['permanent_address'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('Permanent Address'),
@@ -163,7 +165,7 @@
 			// 	'width' => '500',
 			// 	//'placeholder' => '- Select -',
 			// 	'allowClear' => TRUE
-   //      	)
+   		//      	)
 		);
 		$form['prrsonal_info']['permanent_address']['permanent_pincode'] = array(
 			'#title' => t('Pincode'),
@@ -176,7 +178,7 @@
 			'#suffix' => '</div></div></div>',
 			'#attributes' => array('class' => array('numeric_positive'), 'class'=>array('form-control')),
 		);
-	//end
+		//end
 	
 		// Turned off checkbox 23-04-2025	
 
@@ -297,7 +299,7 @@
 				'#suffix' => '</div>',
 			);*/
 		// }
-	//end
+		//end
 	
 		$form['prrsonal_info']['mobile'] = array(
 			'#title' => t('Mobile no'),
@@ -307,7 +309,7 @@
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			'#element_validate' => array('element_validate_mobile'),
+			'#element_validate' => array('element_validate_mobile','mobile_no_validate_existing_occupant'), //added by dg mobile_no_validate_existing_occupant 24-07-2025
 			'#attributes' => array('id' => 'mobile_no', 'class'=>array('form-control')),
 		);
 		$form['prrsonal_info']['email'] = array(
@@ -360,7 +362,7 @@
 			'#attributes' => array('class' => array('numeric_positive'), 'class'=>array('form-control')),
 			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			'#element_validate' => array('element_validate_hrms_id'),
+			'#element_validate' => array('element_validate_hrms_id','hrms_validate_existing_applicant'), //hrms_validate_existing_applicant add by dg 4-07-2025
 			//'#required' => TRUE,
 		);
 		$form['official_info']['app_designation'] = array(
@@ -374,27 +376,113 @@
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 			//'#attributes' => array('id' => 'edit-app-designation', 'oncopy' => "return false", 'onpaste' => "return false"),
 		);
+		$form['official_info']['app_posting_place'] = array(
+			'#title' => t('Place of Posting'),
+			'#type' => 'textfield',
+			'#default_value' => !empty($data->app_posting_place) ? $data->app_posting_place : 'NA',  //empty checking added by dg 29-07-2025
+			'#required' => TRUE,
+			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
+			'#suffix' => '</div></div></div>',
+			'#element_validate' => array('element_validate_alphabatic_text'), 
+			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array(' form-control')),
+		); 
+
+		/* by dg 28-07-2025 */	
+		$form['official_info']['row_open'] = array(
+			'#type' => 'markup',
+			'#markup' => '<div class="row">',
+		);
+
+		
+		if($data->pay_band_id <= 5){
+			$pay_band_type = 'new';
+		}else if($data->pay_band_id > 5){
+			$pay_band_type = 'old';
+		}
+
+		$form['official_info']['pay_band_type'] = array(
+			'#title' => t('Pay Band Type'),
+			'#type' => 'radios',
+			'#required' => TRUE,
+			'#options' => array('old' => 'Old', 'new' => 'New'),
+			'#default_value' => $pay_band_type,
+			'#prefix' => '<div class="col-md-4"><div class="form-floating">',  
+			'#suffix' => '</div></div>', 
+			'#ajax' => array(
+				'callback' => 'update_pay_band_callback_pa',
+				'wrapper' => 'pay-band-wrapper',
+				'event' => 'change',
+			),
+		);
+
+		$form['official_info']['pay_band_wrapper'] = array(
+			'#type' => 'markup',
+			'#markup' => '<div id="pay-band-wrapper" class="col-md-4"><div class="form-floating">', 
+		);
+
+		
+		// $selected_type = isset($pay_band_type) ? $pay_band_type : $form_state['values']['pay_band_type'];
+
+		$selected_type = isset($form_state['values']['pay_band_type']) ? $form_state['values']['pay_band_type']:$pay_band_type;
+
+
 		
 		$form['official_info']['pay_band'] = array(
 			'#title' => t('Basic Pay Range'),
 			'#type' => 'select',
-			'#default_value' => $data->pay_band_id,
-			'#options' => pay_band_list(),
 			'#required' => TRUE,
+			'#default_value' => $data->pay_band_id,
+			'#options' => pay_band_list_eo_pa($selected_type),
+			'#attributes' => array('class' => array('form-control', 'form-select')),
 			'#validated' => TRUE,
-			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-			'#suffix' => '</div></div></div>',
 		);
+
+		
+		$form['official_info']['pay_band_wrapper_close'] = array(
+			'#type' => 'markup',
+			'#markup' => '</div></div>', 
+		);
+
+		
 		$form['official_info']['pay_in'] = array(
 			'#title' => t('Basic Pay'),
 			'#type' => 'textfield',
 			'#default_value' => $data->pay_in_the_pay_band,
 			'#required' => TRUE,
-			'#element_validate' => array('element_validate_numeric_positive'), 
-			'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
-		 	'#suffix' => '</div></div>',
-			'#attributes' => array('class' => array('numeric_positive form-control')),
+			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
+			'#suffix' => '</div></div>',
+			'#attributes' => array(
+				'class' => array('form-control', 'form-text', 'required', 'numeric_positive'),
+			),
 		);
+
+		
+		$form['official_info']['row_close'] = array(
+			'#type' => 'markup',
+			'#markup' => '</div>', 
+		);
+			/* by dg end 28-07-2025 */
+		
+		// $form['official_info']['pay_band'] = array(
+		// 	'#title' => t('Basic Pay Range'),
+		// 	'#type' => 'select',
+		// 	'#default_value' => $data->pay_band_id,
+		// 	'#options' => pay_band_list(),
+		// 	'#required' => TRUE,
+		// 	'#validated' => TRUE,
+		// 	'#prefix' => '<div class="col-md-4"><div class="form-floating">',
+		// 	'#suffix' => '</div></div></div>',
+		// );
+		// $form['official_info']['pay_in'] = array(
+		// 	'#title' => t('Basic Pay'),
+		// 	'#type' => 'textfield',
+		// 	'#default_value' => $data->pay_in_the_pay_band,
+		// 	'#required' => TRUE,
+		// 	'#element_validate' => array('element_validate_numeric_positive'), 
+		// 	'#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
+		//  	'#suffix' => '</div></div>',
+		// 	'#attributes' => array('class' => array('numeric_positive form-control')),
+		// );
 		
 		/*$form['official_info']['grade_pay'] = array(
 			'#title' => t('Grade Pay'),
@@ -416,16 +504,7 @@
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()"),
 		);*/
 		
-		$form['official_info']['app_posting_place'] = array(
-			'#title' => t('Place of Posting'),
-			'#type' => 'textfield',
-			'#default_value' => $data->applicant_posting_place,
-			'#required' => TRUE,
-			'#prefix' => '<div class="col-md-4"><div class="form-floating">',
-			'#suffix' => '</div></div>',
-			'#element_validate' => array('element_validate_alphabatic_text'), 
-			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class' => array(' form-control')),
-		); 
+		
 		$form['official_info']['app_headquarter'] = array(
 			'#title' => t('Headquarter'),
 			'#type' => 'textfield',
@@ -439,7 +518,7 @@
 		$form['official_info']['doj'] = array(
 			'#title' => t('Date of Joining'),
 			'#type' => 'textfield',
-			'#default_value' => $doj,
+			'#default_value' => !empty($doj) ? $doj : '', //empty checking by dg 29-07-2025
 			'#attributes' => array('readonly' => 'readonly', 'id' => 'edit-doj', 'class' => array('numeric_positive form-control')),
 			//'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
@@ -568,8 +647,8 @@
 						  'message' => '',
 						), 
 			 ),
-			'#required' => TRUE,
-			'#validated' => TRUE,
+			//'#required' => TRUE,
+			//'#validated' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 		);
@@ -593,8 +672,8 @@
 						 ),
 			 ),
 			//'#default_value' => $designation,
-			'#required' => TRUE,
-			'#validated' => TRUE,
+			//'#required' => TRUE,
+			//'#validated' => TRUE,
 			'#prefix' => '<div id="replace_designation" class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
 		);
@@ -642,7 +721,7 @@
 			'#validated' => TRUE,
 			'#prefix' => '<div id="replace_allotment_category" class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div></div>',
-			'#attributes' => array('class' => array('form-control')),
+			'#attributes' => array('class' => array('form-control'),'id' => 'check_allotment_reason'),
 		 );
 		 
 		 $form['allotment_reason']['doa'] = array(
@@ -662,10 +741,10 @@
 			'#type' => 'textfield',
 			'#default_value' => $data->computer_serial_no,
 			'#required' => TRUE,
-			'#element_validate' => array('element_validate_numeric_positive'),
+			//'#element_validate' => array('element_validate_numeric_positive'),
 			'#prefix' => '<div id="computr_serial_no" class="col-md-4"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			'#attributes' => array('class' => array('numeric_positive form-control'), 'readonly' => 'readonly'),
+			'#attributes' => array('class' => array('form-control'), 'readonly' => 'readonly'),
 		);
 		/* added by debaleena 01-08-2024 */   
 		$form['allotment_reason']['confirm_computer_serial_no'] = array(
@@ -705,8 +784,67 @@
 		
 		/* end */
 
+		$form['document_upload']['file_markup'] = array(
+            '#type' => 'markup',
+            '#markup' => '<div class="row">'
+
+        );
+
+        if (!empty($data->extra_doc_path)) {
+			// $file_url = file_create_url($data->extra_doc_path);
+
+			$file_url = $base_root.$base_path.$data->extra_doc_path;
+
+			$img_url = l(
+			    '<span class="btn bg-light btn-sm fa fa-file-pdf-o text-black rounded" style="font-size:20px; display:flex; justify-content:center; align-items:center; width: 30px; height: 30px; margin: 0 auto;"></span>',
+			    $file_url,
+			    array('html' => TRUE, 'attributes' => array('target' => '_blank'))
+			);
+		} else {
+		    $img_url = '<div style="text-align: center;"><span style="font-size: 0.8em; color: #666;">File not available to download</span></div>';
+		}
+
+
+        $form['document_upload']['file_show'] = array(
+            '#type' => 'markup',
+            '#markup' => '<div class="col-md-6">Already Uploaded File :'.$img_url.'</div>'
+        );
 		
-		$form['allotment_reason']['remarks'] = array(
+        
+        $form['document_upload']['extra_doc'] = array(
+            '#title' => t('Upload Allotment Reason Supporting Document') ,
+            '#type' => 'managed_file',
+            '#description' => t('<b>Allowed Extension: pdf<br>Maximum File Size: 1 MB</b>') ,
+            '#progress_message' => t('Please wait...') ,
+            //'#progress_indicator' => 'bar',
+            //'#default_value' => variable_get('Upload File', '') ,
+            //'#theme' => 'common_application_thumb_upload',
+            '#upload_validators' => array(
+                'file_validate_extensions' => array(
+                    "pdf"
+                ) ,
+                //'file_validated_size' => array(MAX_FILE_SIZE*1024*1024),
+            ) ,
+            '#upload_location' => 'public://doc/extra_doc/',
+            //'#required' => TRUE,
+            //'#validated' => TRUE,
+            '#prefix' => '<div id="extra_doc" class="col-md-6">',
+            '#suffix' => '</div>',
+            '#process' => array(
+                'new_application_element_process'
+            ) ,
+
+        );
+
+
+        $form['document_upload']['file_markup_end'] = array(
+            '#type' => 'markup',
+            '#markup' => '</div>'
+
+        );
+
+		
+		$form['allotment_remarks']['remarks'] = array(
 			'#title' => t('Remarks'),
 			'#type' => 'textarea',
 			'#default_value' => $data->remarks,
@@ -854,9 +992,23 @@
 	
 	function existing_applicant_edit_form_submit($form, &$form_state) {
 		
-		
+		global $user;
 		$computer_serial_no = trim($form_state['values']['computer_serial_no']);
 		$confirm_computer_serial_no = trim($form_state['values']['confirm_computer_serial_no']);
+
+		// Sanitize integer-like input fields by removing any non-digit characters.
+		//added by jyoti on 11-12-2025 start
+		$raw = isset($form_state['values']) ? $form_state['values'] : array();
+		$mobile_clean = isset($raw['mobile']) ? preg_replace('/\D+/', '', $raw['mobile']) : '';
+		$hrms_id_clean = isset($raw['hrms_id']) ? preg_replace('/\D+/', '', $raw['hrms_id']) : '';
+		$pay_band_clean = isset($raw['pay_band']) ? preg_replace('/\D+/', '', $raw['pay_band']) : '';
+		$pay_in_clean = isset($raw['pay_in']) ? preg_replace('/[^0-9\-]/', '', $raw['pay_in']) : ''; // allow minus only if needed
+		$present_pincode_clean = isset($raw['present_pincode']) ? preg_replace('/\D+/', '', $raw['present_pincode']) : '';
+		$permanent_pincode_clean = isset($raw['permanent_pincode']) ? preg_replace('/\D+/', '', $raw['permanent_pincode']) : '';
+		$office_pincode_clean = isset($raw['office_pincode']) ? preg_replace('/\D+/', '', $raw['office_pincode']) : '';
+		$office_phone_no_clean = isset($raw['office_phone_no']) ? trim($raw['office_phone_no']) : '';
+			//added by jyoti on 11-12-2025 end
+
 
 		if($computer_serial_no == $confirm_computer_serial_no)
 		{
@@ -942,8 +1094,16 @@
 				$applicant_personal_detail_arr['permanent_post_office']  =  strtoupper(trim($form_state['values']['permanent_post_office']));
 			if($form_state['values']['permanent_district'] != '')
 				$applicant_personal_detail_arr['permanent_district']  =  trim($form_state['values']['permanent_district']);
-			if($form_state['values']['permanent_pincode'] != '')
-				$applicant_personal_detail_arr['permanent_pincode']  =  trim($form_state['values']['permanent_pincode']);
+
+			// if($form_state['values']['permanent_pincode'] != '')
+			// 	$applicant_personal_detail_arr['permanent_pincode']  =  trim($form_state['values']['permanent_pincode']);
+
+			// added by jyoti on 11-12-2025
+			if($mobile_clean != '')
+				$applicant_personal_detail_arr['mobile_no'] 			=  $mobile_clean;
+			if($permanent_pincode_clean != '')
+				$applicant_personal_detail_arr['permanent_pincode']  =  $permanent_pincode_clean;
+
 			
 			if(($form_state['values']['permanent_street'] != '') && ($form_state['values']['permanent_city_town_village'] != '') && ($form_state['values']['permanent_post_office'] != '') && ($form_state['values']['permanent_district'] != '') && ($form_state['values']['permanent_pincode'] != ''))
 				// $applicant_personal_detail_arr['permanent_present_same']  =  trim($form_state['values']['chk_permanent_address']);
@@ -958,8 +1118,13 @@
 				$applicant_personal_detail_arr['present_post_office']  =  strtoupper(trim($form_state['values']['present_post_office']));
 			if($form_state['values']['present_district'] != '')
 				$applicant_personal_detail_arr['present_district']  =  trim($form_state['values']['present_district']);
-			if($form_state['values']['present_pincode'] != '')
-				$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
+
+			// if($form_state['values']['present_pincode'] != '')
+			// 	$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
+
+			// added by jyoti on 11-12-2025
+			if($present_pincode_clean != '')
+				$applicant_personal_detail_arr['present_pincode']  =  $present_pincode_clean;
 			
 			
 			db_update('housing_applicant')
@@ -971,12 +1136,23 @@
 			/*update applicant_official_detail  data*/
 			$app_off_detail_arr = array();
 			$app_off_detail_arr['uid']  =  $hidden_users_uid;
-			if($form_state['values']['hrms_id'] != '')
-				$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
+
+			// if($form_state['values']['hrms_id'] != '')
+			// 	$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
+
+			// added by jyoti on 11-12-2025
+			if($hrms_id_clean != '')
+				$app_off_detail_arr['hrms_id']  =  $hrms_id_clean;
 			
 			$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
-			$app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
-			$app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
+
+			// $app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
+			// $app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
+
+			// Ensure pay band and pay_in are integers (or numeric strings) before storing.
+			$app_off_detail_arr['pay_band_id']  =  ($pay_band_clean !== '') ? (int) $pay_band_clean : NULL; // added by jyoti on 11-12-2025
+			$app_off_detail_arr['pay_in_the_pay_band']  =  ($pay_in_clean !== '') ? $pay_in_clean : NULL; // added by jyoti on 11-12-2025
+
 			$app_off_detail_arr['applicant_posting_place']  =  strtoupper(trim($form_state['values']['app_posting_place']));
 			if($form_state['values']['app_headquarter'] != '')
 				$app_off_detail_arr['applicant_headquarter']  =  strtoupper(trim($form_state['values']['app_headquarter']));
@@ -992,11 +1168,18 @@
 				$app_off_detail_arr['office_post_office']  =  strtoupper(trim($form_state['values']['office_post_office']));
 			
 			$app_off_detail_arr['office_district']  =  trim($form_state['values']['office_district']);
-			$app_off_detail_arr['office_pin_code']  =  trim($form_state['values']['office_pincode']);
+			// $app_off_detail_arr['office_pin_code']  =  trim($form_state['values']['office_pincode']);
+
+			$app_off_detail_arr['office_pin_code']  =  ($office_pincode_clean !== '') ? $office_pincode_clean : NULL; // added by jyoti on 11-12-2025
+
 			if($form_state['values']['office_phone_no'] != '')
 				$app_off_detail_arr['office_phone_no']  =  trim($form_state['values']['office_phone_no']);
 			
-			$app_off_detail_arr['ddo_id']  =   trim($form_state['values']['designation']);
+			//$app_off_detail_arr['ddo_id']  =   trim($form_state['values']['designation']);
+			$designation = trim($form_state['values']['designation']); //by dg 27-08-2025
+			if ($designation !== '') {
+			    $app_off_detail_arr['ddo_id'] = (int) $designation;
+			}
 			//$app_off_detail_arr['housing_applicant_id'] = $housing_applicant_id;
 			
 			// echo "<pre>";print_r($app_off_detail_arr);
@@ -1030,6 +1213,41 @@
 			$new_allotment_app_arr['flat_type_id'] = fetch_rhe_flat_id(trim($form_state['values']['rhe_flat_type']));
 			$new_allotment_app_arr['allotment_category']  =  trim($form_state['values']['reason']);
 			// echo "<pre>";print_r($new_allotment_app_arr);die;
+
+
+
+			/*  added on 14-10-2025 by dg & moumita*/
+
+			if(trim($form['allotment_reason']['reason']['#value']) == 'Transfer' || trim($form['allotment_reason']['reason']['#value']) == 'Physically Handicaped Or Serious Illness' || trim($form['allotment_reason']['reason']['#value']) == 'Recommended' || trim($form['allotment_reason']['reason']['#value']) == 'Single Earning Lady' || trim($form['allotment_reason']['reason']['#value']) == 'Legal Heir') {
+			
+				if($form_state['values']['extra_doc'] != 0){
+					// file exists
+					$file_extra_doc = file_load($form_state['values']['extra_doc']);
+
+					// print_r($file_extra_doc); die;
+					
+					if($file_extra_doc->status == 0)
+					{ 
+						$file_extra_doc->status = FILE_STATUS_PERMANENT;
+						file_save($file_extra_doc);
+						file_usage_add($file_extra_doc, 'new_application', 'Allotment Reason Supporting Document', $user->uid);
+						
+						$new_allotment_app_arr['extra_doc']  =  $file_extra_doc->fid;
+						$uri = explode('/', $file_extra_doc->uri);
+						$new_allotment_app_arr['extra_doc_path']  =  $uri[2].'/'.$uri[3].'/'.$uri[4];
+					}
+				}
+			} else {
+				if($form_state['values']['extra_doc'] == 0) {
+					$new_allotment_app_arr['extra_doc'] = NULL;
+				}
+			}
+			
+
+
+
+			/*END*/
+
 
 			db_update('housing_new_allotment_application')
 			->fields($new_allotment_app_arr)

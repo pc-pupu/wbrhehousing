@@ -2,13 +2,24 @@
 
 	function view_allotment_details_page() {
 		global $base_root, $base_path, $user;
-		
+		// echo $user->uid;die;
 		$output = '';
-		$result = fetch_allotment_details();
+		// ~~~~~~~ Query added by subham dt.26-11-2025 for fetching and pass online application id as a parameter to below funcn. ~~~~~~~~//
+		$query = db_select('housing_applicant_official_detail', 'haod');
+		$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->condition('haod.uid', $user->uid, '=');
+		$query->condition('haod.is_active','1','=');
+
+		$query->addField('hoa', 'online_application_id');
+		$rslt = $query->execute()->fetchAssoc();
+		// print_r($rslt);die;
+		//~~~~~~~~ End  ~~~~~~~~//
+
+		$result = fetch_allotment_details($rslt['online_application_id']);  // parameter added by subham dt.26-11-2025
 		// print_r($result);die;
 		// get document info
-		$fetchDoc = get_applicant_upload_docs();
-		// print_r($fetchDoc);die;
+		$fetchDoc = get_applicant_upload_docs($rslt['online_application_id']);  // parameter added by subham dt.26-11-2025
+		 
 		
 		if($fetchDoc->rowCount() >0){
 			$doc_arr = $fetchDoc->fetchAllKeyed($key_index = 8, $value_index = 7);
@@ -31,11 +42,22 @@
 			$current_pay_slip_url = '';
 		}
 		
-		$result1 = fetch_allotment_details();
+		$result1 = fetch_allotment_details($rslt['online_application_id']);   // parameter added by subham dt.26-11-2025
 		$data1 = $result1->fetchObject();
-		// print_r($data1);die;
-		//$rows = array();
-		//$header = array();
+
+		// housing_license_offer_letter_extension data added by Moumita on 09-03-2026
+
+		$query_extension = db_select('housing_license_offer_letter_extension', 'hlole')->fields('hlole',array('extended_upto'))->condition('hlole.online_application_id', $rslt['online_application_id'], '=')->orderBy('id', 'DESC')->execute();
+		
+		if($query_extension->rowCount() > 0){
+			$extension_data = $query_extension->fetchObject();
+			// print_r($extension_data);die;
+			$extended_upto = isset($extension_data->extended_upto) ? date("Y-m-d", strtotime($extension_data->extended_upto)) : NULL;
+		}else{
+			$extended_upto = NULL;
+		}
+		
+
 		$header[] = array('data' => 'Allotment No', 'width' => '20%');
 		$header[] = array('data' => 'Allotment Date', 'width' => '10%');
 		$header[] = array('data' => 'District', 'width' => '15%');
@@ -57,23 +79,20 @@
 			$fields[] = $data->allotment_no;
 			$fields[] = implode('/', array_reverse(explode('-', $data->allotment_date)));
 			$fields[] = $data->district_name;
-			$fields[] = $data->flat_type;
-			$fields[] = $data->block_name;  //debaleena 29-07-2024
-			$fields[] = $data->flat_no;   //debaleena 29-07-2024
-			$fields[] = $data->floor;  //debaleena 29-07-2024
-			$fields[] =	$data->estate_name.',<br>'.$data->estate_address;
+			$fields[] = ($data->status =='allotted' ) ? '--' : $data->flat_type;
+			$fields[] = ($data->status =='allotted' ) ? '--' : $data->block_name;  //debaleena 29-07-2024
+			$fields[] = ($data->status =='allotted' ) ? '--' : $data->flat_no;   //debaleena 29-07-2024
+			$fields[] = ($data->status =='allotted' ) ? '--' : $data->floor;  //debaleena 29-07-2024
+			$fields[] =	($data->status =='allotted' ) ? '--' : $data->estate_name.',<br>'.$data->estate_address;
 			//$fields[] =	$data->estate_address;
 			//$fields[] = $data->flat_no;
 			if($data->accept_reject_status == '' ) {
 				$fields[] = 'In Progress';	
-			}
-			else if($data->accept_reject_status == 'Accept') {
+			}else if($data->accept_reject_status == 'Accept') {
 				$fields[] = 'You '.$data->accept_reject_status.'ed the Offer of Allotment.';	
-			}
-			else if($data->accept_reject_status == 'Reject') {
+			}else if($data->accept_reject_status == 'Reject') {
 				$fields[] = 'You '.$data->accept_reject_status.'ed the Offer of Allotment.';	
-			}
-			else if($data->accept_reject_status == 'Cancel') {
+			}else if($data->accept_reject_status == 'Cancel') {
 				$fields[] = 'Your Offer of Allotment has been '.$data->accept_reject_status.'led because you have not accept Offer of Allotment within one month from the Date of Allotment.';	
 			}
 
@@ -115,40 +134,23 @@
 			$current_date = date('Y-m-d'); 
 			$allotment_approve_or_reject_date = strtotime($data1->allotment_approve_or_reject_date);
 			$final_date = date("Y-m-d", strtotime("+15 days", $allotment_approve_or_reject_date));
-
-			// echo $current_date ; 
-			// echo $final_date ; die;
-			// echo $data1->accept_reject_status ;die;
 			
-			if($current_date <= $final_date && $data1->accept_reject_status != 'Cancel') {
+			if((($current_date <= $final_date) || ($current_date <= $extended_upto)) && $data1->accept_reject_status != 'Cancel') {
 				
 				if($data1->accept_reject_status == NULL || $data1->status == 'offer_letter_extended') {
 					$onclick="return confirm('Are you sure you want to accept your allotment?')";
 					$onclick1="return confirm('Are you sure you want to reject your allotment?')";
 					
 					return l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'view_allotment_details').'/images/accept_icon.png" title="Accept Offer" alt="Accept Icon">Accept Offer', 'status_update/'.encrypt_url($data1->online_application_id).'/'.encrypt_url('Accept'), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick, 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'view_allotment_details').'/images/reject_icon.png" title="Reject Offer" alt="Reject Icon">Reject Offer', 'status_update/'.encrypt_url($data1->online_application_id).'/'.encrypt_url('Reject'), array('html'=>TRUE, 'attributes' => array('onclick' => $onclick1, 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).$output;
-				}
-				else if($data1->accept_reject_status == 'Accept') {
-					return l('<img height="20" width="20" src="'.$base_path.drupal_get_path('module', 'view_allotment_details').'/images/pdf_icon.png" title="Download Offer Letter" alt="PDF Icon">Download Offer Letter', 'allotment_detail_pdf_gen/'.encrypt_url($data1->online_application_id).'/'.encrypt_url($data1->allotment_no), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'
-					
-					<br><br><br>
-					'.$license_application_signed_form_url.'
-					
-					<br><br><br>
-					'.$declaration_signed_form_url.'
-					
-					<br><br><br>
-					'.$current_pay_slip_url.$output;
-				}
-				else if($data1->accept_reject_status == 'Reject') {
+				}else if($data1->accept_reject_status == 'Accept') {
+					return l('<img height="20" width="20" src="'.$base_path.drupal_get_path('module', 'view_allotment_details').'/images/pdf_icon.png" title="Download Offer Letter" alt="PDF Icon">Download Offer Letter', 'allotment_detail_pdf_gen/'.encrypt_url($data1->online_application_id).'/'.encrypt_url($data1->allotment_no), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).$output;
+				}else if($data1->accept_reject_status == 'Reject') {
 					return $output;
 				}
-			}
-			else {
+			}else {
 				return $output;
 			}
-		}
-		else {
+		}else {
 			return $output;
 		}
 	}

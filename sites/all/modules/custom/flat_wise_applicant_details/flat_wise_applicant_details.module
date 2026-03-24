@@ -1,0 +1,187 @@
+<?php
+function flat_wise_applicant_details_menu() {
+  $items = array();
+
+  $items['flat-wise-applicant-details-view'] = array(
+    'title' => 'Flat wise Applicant Details',
+    'page callback'=>'drupal_get_form',
+    'page arguments'=>array('flat_wise_applicant_details_form'),
+    'file' => 'flat_wise_applicant_details_form.inc',
+    'access arguments' => array('access content'),
+    // 'access arguments' => array('administer Flat Wise Applicant Details View'),
+  );
+
+  return $items;
+}
+
+function flat_wise_applicant_details_permission() {
+    return array(
+        'administer Flat Wise Applicant Details View' => array(
+            'title' => t('Administer Flat Wise Applicant Details View'),
+            'description' => t('Perform Administer to see Flat wise Applicant Details.'),
+        ),
+    );	
+}
+
+function view_flat_occupant_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
+    $results = array();
+    /*EO Draft Data Fetch*/
+    $query1 = db_select('housing_existing_occupant_draft', 'heod');
+            
+    $query1->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+    $query1->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+    $query1->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+    $query1->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+    $query1->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
+
+    $query1->addField('heod', 'applicant_name');
+    $query1->fields('he', array('estate_name', 'estate_address'));
+    $query1->addField('hft', 'flat_type');
+    $query1->fields('hf', array('floor', 'flat_no'));
+    $query1->addField('hd', 'district_name');
+    $query1->addField('hb', 'block_name');
+    $query1->addField('heod', 'housing_existing_occupant_draft_id');
+
+    $query1->addExpression(
+        "CASE
+            WHEN hf.flat_no ~ '^[0-9]+$' THEN CAST(hf.flat_no AS INTEGER) 
+            WHEN hf.flat_no ~ '^([0-9]+)/([0-9]+)$' THEN CAST(SPLIT_PART(hf.flat_no, '/', 1) AS INTEGER) 
+            WHEN hf.flat_no ~ '^[0-9]+' THEN CAST(SUBSTRING(hf.flat_no FROM '^[0-9]+') AS INTEGER) 
+            ELSE NULL 
+        END",
+        'flat_no_sort_key'
+    );
+
+    $query1->orderBy('hb.block_name', 'ASC');
+    $query1->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
+    $query1->orderBy('hf.flat_no', 'ASC');
+
+    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0){
+        $db_and1 = db_and();
+        $db_and1->condition('hf.estate_id', $rhe_name, '=');
+        $db_and1->condition('hf.flat_type_id', $flat_type, '=');
+        $db_and1->condition('hf.block_id', $block_name, '=');
+        $query1->condition($db_and1);
+    }
+
+    $results1 = $query1->execute()->fetchAll();
+
+    /*EO Data Fetch*/
+    $query2 = db_select('housing_applicant', 'ha');
+
+    $query2->innerJoin('housing_applicant_official_detail', 'haod', 'ha.housing_applicant_id = haod.housing_applicant_id');
+    $query2->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+    $query2->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+    $query2->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+    $query2->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+    $query2->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
+    $query2->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+    $query2->innerJoin('users', 'u', 'u.uid = haod.uid');
+    $query2->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+
+    $or_cond = db_or()
+        ->condition('hoa.status', 'existing_occupant')
+        ->condition('hoa.status', 'flat_possession_taken');
+
+    $query2->condition($or_cond);
+
+    $query2->addField('hoa', 'online_application_id');
+    
+
+    $query2->addField('ha', 'applicant_name');
+    $query2->addField('he', 'estate_name');
+    $query2->addField('hft', 'flat_type');
+    $query2->addField('haod', 'hrms_id');
+    $query2->addField('u', 'status');
+    $query2->addField('haod', 'uid');
+    $query2->fields('hf', array('flat_id','flat_no','floor'));
+    $query2->addField('hb', 'block_name');
+    $query2->addField('hd', 'district_name');
+
+    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0){
+        $db_and2 = db_and();
+        $db_and2->condition('hf.estate_id', $rhe_name, '=');
+        $db_and2->condition('hf.flat_type_id', $flat_type, '=');
+        $db_and2->condition('hf.block_id', $block_name, '=');
+        $query2->condition($db_and2);
+    }
+
+    $results2 = $query2->execute()->fetchAll();
+
+    if (!empty($results1) && !empty($results2)) {
+        $results = array_merge($results1, $results2);
+    } elseif (!empty($results1)) {
+        $results = $results1;
+    } elseif (!empty($results2)) {
+        $results = $results2;
+    }
+
+    $header['Serial No.'] = array('data' => 'Serial No.');
+    // $header['District'] = array('data' => 'District');
+    // $header['Estate Name'] = array('data' => 'Estate Name');
+    // $header['Flat Type'] = array('data' => 'Flat Type');
+    // $header['Block Name'] = array('data' => 'Block Name');
+    // $header['Flat No.'] = array('data' => 'Flat No.');
+    // $header['Floor'] = array('data' => 'Floor');
+    $header['Applicant Name'] = array('data' => 'Applicant Name');
+
+    $rows =array();
+    $output = '';
+    $serialNumber = 1;
+
+    foreach ($results as $data) { 
+        // print_r($data);die;
+        $fields = array();
+
+        $fields[] = $serialNumber;
+        // $fields[] = $data->district_name;
+        // $fields[] = $data->estate_name;
+        // $fields[] = $data->flat_type;
+        // $fields[] = $data->block_name;
+        // $fields[] = $data->flat_no;
+        // $fields[] = $data->floor;
+        $fields[] = $data->applicant_name;
+        $serialNumber++;
+
+        $rows[] = $fields;
+    }
+
+    $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped')),
+        'header' => $header,
+        'rows' => $rows,
+        'sticky' => true,
+        'empty' => t("No data found!")
+    );
+
+    if(count($rows) > 0) {
+        $build['datatable'] = array(
+            '#theme' => 'datatable',
+            '#header' => $header,
+            '#rows' => $rows,
+            '#attributes' => array(),
+        );
+
+        $variables = array(
+            'attributes' => array('class'=>array('table table-list table-striped')),
+            'header' => $header,
+            'rows' => $rows,
+        );
+        
+        $output = theme('datatable', $variables);
+    }
+    else {
+        $output = '<div>
+                        <table class="datatable_no_data_found table table-list">
+                            <tr class="tr_no_data_found">
+                                <th class="th_no_data_found"></th>
+                            </tr>
+                            <tr class="tr_no_data_found">
+                                <td class="td_no_data_found">No data found!</td>
+                            </tr>
+                        </table>
+                    </div>';
+    }
+
+    return $output;
+}

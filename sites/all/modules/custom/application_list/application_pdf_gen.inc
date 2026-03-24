@@ -12,7 +12,8 @@
 			$app_data = $app_details1->fetchObject();
 			//debolina start
 			$current_application_status_description=fetch_application_status_description($app_data->status);
-			$fetch_application_estate_preference = fetch_application_estate_preference($app_id);	
+			$fetch_application_estate_preference = fetch_application_estate_preference($app_id);
+			$fetched_existing_occupant_data = fetch_existing_flat_details($app_id);	
 
 			//debolina end
 			$output = array();
@@ -34,6 +35,7 @@
 					//debolina start
 					$output[] = $current_application_status_description;
 					$output[] = $fetch_application_estate_preference;
+					$output[] = $fetched_existing_occupant_data;
 					//print_r($output);die;
 					//debolina end
 				}
@@ -56,7 +58,7 @@
 
 			 //debolina start
 			  $preference_data=$output[5];
-			  $status_description=$output[4]; 
+			  $status_description=$output[4]->applicant_show_status;   //by dg 26-02-2026
 			 //debolina end
 			
 			if($common_data->status == 'allotted') {
@@ -75,6 +77,12 @@
 			} else if(trim($entityType) == 'CS Licence') {
 				$rhe_details_result = fetch_cs_allotment_details();
 				$rhe_details_data = $rhe_details_result->fetchObject();
+			}
+
+			if((trim($entityType) == '' || trim($entityType) != '') && !empty($app_data->status) && $app_data->status == 'existing_occupant'){
+				$new_entity_type='Existing Occupant';
+			}else{
+				$new_entity_type=$entityType;
 			}
 			
 			$page_output = '';
@@ -133,7 +141,8 @@
   					</tr>
     				<tr style="font-size:14px;">
 						<th style="border: 1px solid black; border-collapse: collapse;">Application Type</th>
-						<td style="border: 1px solid black; border-collapse: collapse;">Application for '.$entityType.'</td>
+						<td style="border: 1px solid black; border-collapse: collapse;">
+						Application for '.$new_entity_type.'</td>
 					</tr>
 					<tr style="font-size:14px;">
 						<th style="border: 1px solid black; border-collapse: collapse;">Application No.</th>
@@ -160,14 +169,14 @@
 					$headArr = array();
 	 				$valArr = array();
 					$l = 0;
-					if(count($expressions) != 0){
+					if(isset($expressions) && count($expressions) != 0){
 					foreach($expressions as $entityAlias => $columnHeadFieldSet ){
 						foreach($columnHeadFieldSet as $columnHead => $expression){
 							$headArr[$l] = $columnHead;
 							$valArr[$l] = $application_data->$expression[1];
 							$l++;
 					}}} 
-					if(count($fields) != 0){
+					if(isset($fieldsfetch_applicant_scanned_sign) && count($fields) != 0){
 					foreach($fields as $entityAlias => $columnHeadFieldSet ){
 						foreach($columnHeadFieldSet as $columnHead => $field){
 							$headArr[$l] = $columnHead;
@@ -179,14 +188,21 @@
 					$l = 0;
 					
 					if(trim($entityType) == 'New Allotment') {
-						$heading = 'Information for Allotment';
+						if(!empty($app_data->status) && $app_data->status == 'existing_occupant' ){
+							$heading = 'Possession Details';
+						}else{
+							$heading = 'Information for Allotment';
+						}
+						
 					}
 					else if(trim($entityType) == 'Vertical Shifting' || trim($entityType) == 'Category Shifting') {
 						$heading = 'Possession Details';
 					}
 					else if(trim($entityType) == 'New Licence' || trim($entityType) == 'VS Licence' || trim($entityType) == 'CS Licence' || trim($entityType) == 'Renew Licence') {
 						$heading = 'Allotment Details';	
-					}
+					}else if(trim($entityType) == '' && isset($status_short_code) && $status_short_code == 'existing_occupant'){
+				    	$heading = 'Possession Details';
+				  	}
 					
 				//permanent and present address
 					$result_permanent = particular_district_list($applicant_data->permanent_district);
@@ -357,15 +373,39 @@
 					// Done by Subham Dt.22-04-2025
 					if(trim($entityType) == 'New Allotment') 
       				{
-						$page_output .='
-						<tr style="font-size:14px;">
-							<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[0] . '</th>
-							<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->allotment_category . '</td>
-						</tr>
-						<tr style="font-size:14px;">
-							<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[1] . '</th>
-							<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->flat_type . '</td>
-						</tr>';
+      					if(!empty($app_data->status) && $app_data->status == 'existing_occupant' ){
+      						$page_output .= '<tr bgcolor="#CCCCCC">
+	  						<th colspan="2" style="text-align: center;font-size: 16px;line-height: 24px;font-weight: normal;font-family: "Dosis",Arial,Verdana,serif; border: 1px solid black; border-collapse: collapse;">Possession Details</th>
+	  						</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Possession Date</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->possession_date . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Estate Name</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->estate_name . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Block Name</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->block_name . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Flat No.</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->flat_no . '</td>
+							</tr>';
+
+      					}else{
+      						$page_output .='
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[0] . '</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->allotment_category . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[1] . '</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->flat_type . '</td>
+							</tr>';
+      					}
+						
 					} else if(trim($entityType) == 'Vertical Shifting'|| trim($entityType) == 'Category Shifting')
 					{
 						// print_r($headArr);die;
@@ -388,7 +428,28 @@
 							<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[3] . '</th>
 							<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->flat_no . '</td>
 						</tr>';
+					}else if(trim($entityType) == '' && !empty($app_data->status) && $app_data->status == 'existing_occupant' ){
+						$page_output .= '<tr bgcolor="#CCCCCC">
+	  						<th colspan="2" style="text-align: center;font-size: 16px;line-height: 24px;font-weight: normal;font-family: "Dosis",Arial,Verdana,serif; border: 1px solid black; border-collapse: collapse;">Possession Details</th>
+	  						</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Possession Date</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->possession_date . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Estate Name</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->estate_name . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Block Name</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->block_name . '</td>
+							</tr>
+							<tr style="font-size:14px;">
+								<th style="border: 1px solid black; border-collapse: collapse;">Flat No.</th>
+								<td style="border: 1px solid black; border-collapse: collapse;">' . $fetched_existing_occupant_data->flat_no . '</td>
+							</tr>';
 					}
+
 					// End
 
 				// Turned off by Subham Dt.22-04-2025
@@ -406,54 +467,53 @@
 				$page_output .='
 			  	</table>';
 			  	
-				$result_scanned_sign = fetch_applicant_scanned_sign($entityType);
+				// $result_scanned_sign = fetch_applicant_scanned_sign($entityType);  of b dg 29-08-2025
 				
-				if($result_scanned_sign->rowCount() > 0) {
-					$data_scanned_sign = $result_scanned_sign->fetchObject();
-					// print_r($data_scanned_sign);die;
-					if($data_scanned_sign->uri_scaned_sign != '') {
-						$file_path = "sites/default/files/";
-						$path = substr($data_scanned_sign->uri_scaned_sign, 9);
-					}
-				}
+				// if($result_scanned_sign->rowCount() > 0) {
+				// 	$data_scanned_sign = $result_scanned_sign->fetchObject();
+				// 	// print_r($data_scanned_sign);die;
+				// 	if($data_scanned_sign->uri_scaned_sign != '') {
+				// 		$file_path = "sites/default/files/";
+				// 		$path = substr($data_scanned_sign->uri_scaned_sign, 9);
+				// 	}
+				// }
 			  
 			if(trim($entityType) == 'New Allotment' || trim($entityType) == 'Vertical Shifting' || trim($entityType) == 'Category Shifting') {
-				$page_output .='
-				<table>
-					<tr>
-						<td>
-							<b><br><br><br><br><br><br><br><br>Recommended & forwarded by <br>Drawing and Disbursing Officer/Head <br>of Department/Head of Office with <br>official seal.<br><br>or<br><br>Digital Signature by <br>Drawing and Disbursing Officer/<br>Head of Department/Head of Office</b>
-						</td>
-					</tr>
-			  	</table>
-			  	<table align="right">
-					<tr>
-						<td align="center">
-							<br><br><br>Yours faithfully,
-							<br><br><img src="'.$file_path.$path.'" alt="Scaned Signature" width="140" height="60">
-							<br><br>Signature
-						</td>
-					</tr>
-			  	</table>';
+				// $page_output .='
+				// <table>
+				// 	<tr>
+				// 		<td>
+				// 			<b><br><br><br><br><br><br><br><br>Recommended & forwarded by <br>Drawing and Disbursing Officer/Head <br>of Department/Head of Office with <br>official seal.<br><br>or<br><br>Digital Signature by <br>Drawing and Disbursing Officer/<br>Head of Department/Head of Office</b>
+				// 		</td>
+				// 	</tr>
+			  	// </table>
+			  	// <table align="right">
+				// 	<tr>
+				// 		<td align="center">
+				// 			<br><br><br>Yours faithfully,
+				// 			<br><br><br><br><br><br>Signature
+				// 		</td>
+				// 	</tr>
+			  	// </table>';   turned of by dg 28-08-2025
 				
 			} else if(trim($entityType) == 'New Licence' || trim($entityType) == 'VS Licence' || trim($entityType) == 'CS Licence' || trim($entityType) == 'Renew Licence') {
-				$page_output .='
-				<table align="right">
-					<tr>
-						<td align="center">
-							<br><br><br><br>Yours faithfully,
-							<br><br><img src="'.$file_path.$path.'" alt="Scaned Signature" width="140" height="60">
-							<br><br>Signature
-						</td>
-					</tr>
-				</table>
-				<table>
-					<tr>
-						<td>
-							<br><br><br><br><br><b>Counter Signature of Drawing and Disbursing Officer/<br>Head of Department/Head of Office with office seal.<br><br>or<br><br>Digital Signature by <br>Drawing and Disbursing Officer/<br>Head of Department/Head of Office</b>
-						</td>
-					</tr>
-			  	</table>';
+				// $page_output .='
+				// <table align="right">
+				// 	<tr>
+				// 		<td align="center">
+				// 			<br><br><br><br>Yours faithfully,
+				// 			<br><br><img src="'.$file_path.$path.'" alt="Scaned Signature" width="140" height="60">
+				// 			<br><br>Signature
+				// 		</td>
+				// 	</tr>
+				// </table>
+				// <table>
+				// 	<tr>
+				// 		<td>
+				// 			<br><br><br><br><br><b>Counter Signature of Drawing and Disbursing Officer/<br>Head of Department/Head of Office with office seal.<br><br>or<br><br>Digital Signature by <br>Drawing and Disbursing Officer/<br>Head of Department/Head of Office</b>
+				// 		</td>
+				// 	</tr>
+			  	// </table>';   turned of by dg 28-08-2025
 				$page_output .='<pagebreak>';
 				$page_output .='
 				<div align="center">
@@ -505,19 +565,19 @@
 					<tr>
 						<td align="left"><b>Place: '.$applicant_data->permanent_city_town_village.'</b></td>
 					</tr>
-				</table>
-				<table align="right">
-					<tr>
-						<td align="center">
-							<img src="'.$file_path.$path.'" alt="Scaned Signature" width="140" height="60">
-							<br><b>
-							............................................
-							<br>
-							Signature of the Declarant</b>
-						</td>
-					</tr>
-				</table>
-				</div>';
+				</table>';
+				// <table align="right">
+				// 	<tr>
+				// 		<td align="center">
+				// 			<img src="'.$file_path.$path.'" alt="Scaned Signature" width="140" height="60">
+				// 			<br><b>
+				// 			............................................
+				// 			<br>
+				// 			Signature of the Declarant</b>
+				// 		</td>
+				// 	</tr>
+				// </table>
+				// </div>';
 				
 			}
 			

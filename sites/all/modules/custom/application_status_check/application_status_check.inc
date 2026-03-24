@@ -1,8 +1,8 @@
 <?php 
 function application_status_check_form($form,&$form_state) {
-  global $user_role;
+  global $user_role,$user;
 
-  // echo $user_role; die;
+  
 
   
  // <div class="row">
@@ -15,6 +15,11 @@ function application_status_check_form($form,&$form_state) {
     $optionList[2] = t('HRMS Id');
     $title_txt = t('Enter Application Number or HRMS Id: ');
   }
+
+   $form['user_uid'] = array(
+    '#type' => 'hidden',
+    '#value' => $user->uid, 
+    );
 
 
   $form['select_button'] = array(
@@ -51,16 +56,27 @@ function application_status_check_form($form,&$form_state) {
 
 function application_status_check_form_submit($form,&$form_state){
 
+  $user_uid = $form_state['values']['user_uid'];
+  // echo $user_uid;die;
   $select_button_status = $form_state['values']['select_button'];
  
   if($select_button_status == 1){
     $app_no = isset($form_state['values']['application_or_hrms_no']) && !empty($form_state['values']['application_or_hrms_no']) ? $form_state['values']['application_or_hrms_no'] : '';
 
     $query = db_select('housing_online_application', 'hoa');
+    $query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
+    $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
+    $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+    $query->innerJoin('housing_subdivision', 'hs', 'hs.subdiv_id = he.subdiv_id');
+    $query->innerJoin('housing_division', 'hd', 'hd.division_id = hs.division_id');
+    $query->innerJoin('users_details', 'ud', 'ud.subdiv_id = hs.subdiv_id');
     $query->fields('hoa', ['online_application_id', 'status']);
     $query->condition('hoa.application_no', $app_no);
+    $query->condition('ud.uid', $user_uid);
     $result = $query->execute();
+  // echo "<pre>"; print_r($result);die;
     $result = $result->fetchObject();
+// echo "<pre>";print_r($result);die;
     if ($result) {
       $app_id = $result->online_application_id;
       $app_status = $result->status;

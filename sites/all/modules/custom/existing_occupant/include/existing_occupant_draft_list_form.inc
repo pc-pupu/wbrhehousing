@@ -1,4 +1,5 @@
 <?php
+//~~ This function is for Division & Subdivision ~~\\
 /*Done by Subham dt.24-06-2025*/
 function existing_occupant_draft_list_form($form, &$form_state) {
     $rhe_name =  isset($form_state['values']['rhe_name']) && !empty($form_state['values']['rhe_name']) ? $form_state['values']['rhe_name'] : 0;
@@ -142,6 +143,7 @@ function display_specific_flat_list($rhe_name = 0, $flat_type = 0, $block_name =
             $query->orderBy('hb.block_name', 'ASC');
             $query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
             $query->orderBy('hf.flat_no', 'ASC');
+
             /* end */
 
             if($rhe_name != 0 && $flat_type != 0 && $block_name != 0){
@@ -299,6 +301,253 @@ function display_specific_flat_list($rhe_name = 0, $flat_type = 0, $block_name =
 
     return $output;
 }
+//~~ End ~~\\
+
+//~~ This function is for other official users except Division & Subdivision ~~\\
+// Done by Subham dt.22-08-2025
+function existing_occupant_list_wohrms_form($form, &$form_state) {
+
+    $form['flat_info'] = array(
+        '#prefix' => '<div class="row">',
+        '#suffix' => '</div>'
+    );
+
+    $form['flat_info']['updated_rhe_name'] = array(
+        '#title' => t('Name of the RHE'),
+        '#type' => 'select',
+        '#options' => rhe_list_fetch(),
+        '#attributes' => array('class' => array('form-select')),
+        '#required' => TRUE,
+        '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+        '#ajax' => array(
+            'event' => 'change',
+            'callback' => '_reload_flat_info_callback',
+            'method' => 'replace',
+        ),
+    );
+
+    $rhe_name =  isset($form_state['values']['updated_rhe_name']) && !empty($form_state['values']['updated_rhe_name']) ? $form_state['values']['updated_rhe_name'] : 0;
+     
+    $form['flat_info']['updated_flat_type'] = array(
+        '#prefix' => '<div class="col-md-4" id="flat_type_replace_updated">',
+        '#suffix' => '</div>',
+    );
+
+    $form['flat_info']['updated_block_name'] = array(
+        '#prefix' => '<div class="col-md-6" id="block_name_replace_updated"><div class="form-floating">',
+        '#suffix' => '</div></div>',
+    );
+
+    if($rhe_name != 0) {
+        $form['flat_info']['updated_flat_type'] = array(
+            '#title' => t('Flat Type'),
+            '#type' => 'select',
+            '#options' => flat_type_under_rhe($rhe_name),
+            '#required' => TRUE,
+            '#prefix' => '<div class="col-md-4" id="flat_type_replace_updated"><div class="form-floating">',
+            '#suffix' => '</div></div>',
+            '#attributes' => array('class'	=> array('form-select')), 
+            '#ajax' => array(
+                'event' => 'change',
+                'callback' => '_reload_flat_info_callback',
+                'method' => 'replace',
+            ),
+        );
+    }
+    
+    $flat_type =  isset($form_state['values']['updated_flat_type']) &&!empty($form_state['values']['updated_flat_type']) ? $form_state['values']['updated_flat_type'] : 0;
+     
+    if($rhe_name != 0 && $flat_type != 0) {
+        $form['flat_info']['updated_block_name'] = array(
+            '#title' => t('Name of the Block'),
+            '#type' => 'select',
+            '#options' => block_name_under_rhe($rhe_name, $flat_type),
+            '#required' => TRUE,
+            '#prefix' => '<div class="col-md-4" id="block_name_replace_updated"><div class="form-floating">',
+            '#suffix' => '</div></div>',
+            '#attributes' => array('class'	=> array('form-select')), 
+            '#ajax' => array(
+                'event' => 'change',
+                'callback' => '_reload_flat_info_callback',
+                'method' => 'replace',
+            ),
+        );
+    }
+
+    $block_name =  isset($form_state['values']['updated_block_name']) && !empty($form_state['values']['updated_block_name']) ? $form_state['values']['updated_block_name'] : 0;
+
+    $form['fetch_list'] = array(
+        '#prefix' => '<div class="col-md-12" id="flat_list_replace">',
+        '#suffix' => '</div>'
+    );
+    
+    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0) {
+        $form['fetch_list'] = array(
+            '#type' => 'markup',
+            '#markup' => display_flat_data($rhe_name, $flat_type, $block_name),
+            '#weight' => 50,
+            '#prefix' => '<div class="col-md-12" id="flat_list_replace">',
+            '#suffix' => '</div>'
+        );
+    }
+    return $form;
+}
+
+function _reload_flat_info_callback($form, &$form_state) {
+    $commands = array();
+    
+    $commands[] = ajax_command_replace("#flat_type_replace_updated", drupal_render($form['flat_info']['updated_flat_type']));
+    $commands[] = ajax_command_replace("#block_name_replace_updated", drupal_render($form['flat_info']['updated_block_name']));
+    $commands[] = ajax_command_replace("#flat_list_replace", drupal_render($form['fetch_list']));
+
+    return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+function display_flat_data($rhe_name = 0, $flat_type = 0, $block_name = 0) {
+
+    global $base_root, $base_path,$user, $user_role;
+    $output = '';
+    							
+    $query = db_select('housing_existing_occupant_draft', 'heod');
+    
+    $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+    $query->innerJoin('housing_block', 'hb', 'hb.block_id = hf.block_id');
+    $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
+    $query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hf.flat_type_id');
+    $query->innerJoin('housing_district', 'hd', 'he.district_code = hd.district_code');
+
+    $query->addField('heod', 'applicant_name');
+    $query->fields('he', array('estate_name', 'estate_address'));
+    $query->addField('hft', 'flat_type');
+    $query->fields('hf', array('floor', 'flat_no'));
+    $query->addField('hd', 'district_name');
+    $query->addField('hb', 'block_name');
+    $query->addField('heod', 'housing_existing_occupant_draft_id');
+
+    $query->addExpression(
+        "CASE
+            WHEN hf.flat_no ~ '^[0-9]+$' THEN CAST(hf.flat_no AS INTEGER) 
+            WHEN hf.flat_no ~ '^([0-9]+)/([0-9]+)$' THEN CAST(SPLIT_PART(hf.flat_no, '/', 1) AS INTEGER) 
+            WHEN hf.flat_no ~ '^[0-9]+' THEN CAST(SUBSTRING(hf.flat_no FROM '^[0-9]+') AS INTEGER) 
+            ELSE NULL 
+        END",
+        'flat_no_sort_key'
+    );
+
+    $query->orderBy('hb.block_name', 'ASC');
+    $query->orderBy('flat_no_sort_key', 'ASC', 'NULLS LAST');
+    $query->orderBy('hf.flat_no', 'ASC');
+
+    if($rhe_name != 0 && $flat_type != 0 && $block_name != 0){
+        $db_and = db_and();
+        $db_and->condition('hf.estate_id', $rhe_name, '=');
+        $db_and->condition('hf.flat_type_id', $flat_type, '=');
+        $db_and->condition('hf.block_id', $block_name, '=');
+        $query->condition($db_and);
+    }
+    $result =$query->execute();
+    
+    $header['Serial No.'] = array('data' => 'Serial No.');
+    $header['Applicant Name'] = array('data' => 'Applicant Name');
+    $header['District'] = array('data' => 'District');
+    $header['Estate Name'] = array('data' => 'Estate Name');
+    $header['Flat Type'] = array('data' => 'Flat Type');
+    $header['Block Name'] = array('data' => 'Block Name');
+    $header['Flat No.'] = array('data' => 'Flat No.');
+    $header['Floor'] = array('data' => 'Floor');
+    $header['Details'] = array('data' => 'Details');
+    $header['Edit'] = array('data' => 'Edit');
+    if($user_role == 8) {
+        $header['Delete'] = array('data' => 'Delete');
+    }
+    $rows =array();
+    $output = '';
+    $serialNumber = 1;
+
+    while($data = $result->fetchObject()) {
+
+        $fields = array();
+
+        $fields[] = $serialNumber;
+        $fields[] = $data->applicant_name;
+        $fields[] = $data->district_name;
+        $fields[] = $data->estate_name;
+        $fields[] = $data->flat_type;
+        $fields[] = $data->block_name;
+        $fields[] = $data->flat_no;
+        $fields[] = $data->floor;
+        // if($data->status == 0){
+        // 	$fields[] = 'Pending Approval at Division Level';
+        // }else{
+        // 	$fields[] = 'Approved by Division';
+        // }
+        $fields[] = l(
+        'View Details',
+        'existing-occupant-view-det-draft/'. encrypt_url($data->housing_existing_occupant_draft_id),
+        array(
+            'html'=>TRUE,
+            'attributes'=> array('class'=>array('btn bg-success btn-sm px-4 rounded-pill text-white fw-bolder')),
+        ));	
+
+        $fields[] = l('<i class="fa fa-edit"></i> Edit Details', 'existing-occupant-draft-edit/'. encrypt_url($data->housing_existing_occupant_draft_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+
+        if($user_role == 8) {
+            $onclick = 'Are you want to delete?';
+            /*Added by Moumita 21-05-2025  ~~~~~~ Flat id added in link by Subham dt.22-05-2025*/
+            $fields[] = l('<i class="fa fa-trash"></i> Delete', 'rhe-wise-flat-occupant-delete/draft/'.encrypt_url($data->housing_existing_occupant_draft_id).'/'.encrypt_url($data->flat_id), array('html' => true, 'attributes' => array('onclick' => 'return confirm("Are you sure you want to Delete?")', 'class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));	
+            /*end*/
+        }
+        
+        $serialNumber++;
+
+        $rows[] = $fields;
+        
+    }
+
+    $variables = array(
+        'attributes' => array('class'=>array('table table-list table-striped')),
+        'header' => $header,
+        'rows' => $rows,
+        'sticky' => true,
+        'empty' => t("No data found!")
+        );
+    //end
+
+    if(count($rows) > 0) {
+        // Render using Drupal's render API.
+        $build['datatable'] = array(
+            '#theme' => 'datatable',
+            '#header' => $header,
+            '#rows' => $rows,
+            '#attributes' => array(),
+        );
+        
+        // Or, render using a theme function.
+        $variables = array(
+            'attributes' => array('class'=>array('table table-list table-striped')),
+            'header' => $header,
+            'rows' => $rows,
+        );
+        
+        $output = theme('datatable', $variables);
+    }
+    else {
+        $output = '<div>
+                        <table class="datatable_no_data_found table table-list">
+                            <tr class="tr_no_data_found">
+                                <th class="th_no_data_found"></th>
+                            </tr>
+                            <tr class="tr_no_data_found">
+                                <td class="td_no_data_found">No data found!</td>
+                            </tr>
+                        </table>
+                    </div>';
+    }
+
+    return $output;
+}
+//~~ End ~~\\
 
 function existing_occupant_draft_edit_form($form, &$form_state, $en_row = 0){
     $row_id = decrypt_url($en_row); 
@@ -548,7 +797,7 @@ function existing_occupant_draft_edit_form($form, &$form_state, $en_row = 0){
         //for api or hrms custom table
         //'#attributes' => array('readonly' => 'readonly', 'class' => array('numeric_positive')),
         '#maxlength' => 10,
-        '#attributes' => array('class' => array('numeric_positive'),'class'=>array('form-control')),
+        '#attributes' => array('readonly' => 'readonly','class' => array('numeric_positive'),'class'=>array('form-control')),
         '#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
         '#suffix' => '</div></div>',
         //'#element_validate' => array('element_validate_hrms_id'),
@@ -824,7 +1073,7 @@ function existing_occupant_draft_edit_form($form, &$form_state, $en_row = 0){
         '#suffix' => '</div></div>',
         //'#element_validate' => array('element_validate_date', 'element_validate_age'),
     );
-    /*Added by Subham 30-06-2025*/
+    /*Added by Subham 30-06-2025*/ // added on 01-07-2025 by Moumita
     $form['license']['license_last_renewal'] = array(
         '#title' => t('Last License Renewal Date'),
         '#type' => 'textfield',
@@ -836,6 +1085,7 @@ function existing_occupant_draft_edit_form($form, &$form_state, $en_row = 0){
         //'#element_validate' => array('element_validate_date', 'element_validate_age'),
     );
     /*End*/
+
 
     $form['license']['authorised_or_not'] = array(
         '#title' => t('Occupant Status'),
@@ -938,7 +1188,7 @@ function existing_occupant_draft_edit_form_submit($form, &$form_state){
     'license_issue_date' => !empty($val['dol']) ? date('Y-m-d', strtotime($val['dol'])) : NULL,
 
     'last_license_renewal_date' => !empty($val['license_last_renewal']) ? date('Y-m-d', strtotime($val['license_last_renewal'])) : NULL, // added on 01-07-2025 by Moumita
-
+    
     'authorised_or_not' => isset($val['authorised_or_not']) ? $val['authorised_or_not'] : NULL,
 
     );

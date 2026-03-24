@@ -23,7 +23,7 @@
 		  'access arguments' => array('administer rhe allotment'),
 		); */
 		
-		return $items;
+		return $items; 
 		
 	}
 		
@@ -48,7 +48,7 @@ function get_estatewise_vacancy($allotment_type, $district_code = 0) {
 
 	// array('Ground' => 'Ground', 'First' => 'First', 'Second' => 'Second', 'Third' => 'Third','Fourth'=>'Fourth','Fifth'=>'Fifth','Sixth'=>'Sixth','Seventh'=>'Seventh','Eighth'=>'Eighth','Ninth'=>'Ninth','Tenth'=>'Tenth')
 
-	if(!empty($allotment_type)) {
+	if(!empty($allotment_type)) {   /*//added by dg 9th floor 05-08-2025*/
 		$result = db_query("SELECT t2.estate_id, t2.estate_name,
 		count(case when t1.floor = 'Ground' then t1.flat_id end) as floor_0,
 		count(case when t1.floor = 'First' then t1.flat_id end) as floor_1,
@@ -59,6 +59,7 @@ function get_estatewise_vacancy($allotment_type, $district_code = 0) {
 		count(case when t1.floor = 'Sixth' then t1.flat_id end) as floor_6,
 		count(case when t1.floor = 'Seventh' then t1.flat_id end) as floor_7,
 		count(case when t1.floor = 'Eighth' then t1.flat_id end) as floor_8,
+		count(case when t1.floor = 'Ninth' then t1.flat_id end) as floor_9,
 		count(case when t1.floor = 'Top' then t1.flat_id end) as floor_top
 
 		FROM housing_flat AS t1
@@ -68,7 +69,7 @@ function get_estatewise_vacancy($allotment_type, $district_code = 0) {
 		AND t1.flat_status_id = " . $status_id . "
 		AND t3.district_code = " . $district_code . "
 		GROUP BY t2.estate_id, t2.estate_name
-		ORDER BY t2.estate_name");
+		ORDER BY t2.estate_name"); 
 	}
 	// print_r($result);die;
 	return $result;
@@ -76,11 +77,13 @@ function get_estatewise_vacancy($allotment_type, $district_code = 0) {
 function get_no_of_applicant_vs($allotment_type, $occupation_estate) {
 	$no_of_applicant = 0;
 	// echo $allotment_type;die; 
-	
+	// inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 11-08-2025
 	if(!empty($allotment_type) && !empty($occupation_estate)) {
 		$result = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_vs_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
 					WHERE t1.status = 'housingapprover_approved_1'
+					AND t3.hrms_id is not NULL
 					AND t2.flat_type_id = " . $allotment_type . " AND t2.occupation_estate = " . $occupation_estate);
 					
 		$record = $result->fetchObject();
@@ -93,12 +96,14 @@ function get_no_of_applicant_vs($allotment_type, $occupation_estate) {
 
 function get_no_of_applicant_cs($allotment_type, $occupation_estate) {
 	$no_of_applicant = 0;
-	
+	// inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 11-08-2025
 	if(!empty($allotment_type) && !empty($occupation_estate)) {
 		$result = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_cs_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
 					WHERE t1.status = 'housingapprover_approved_1'
-				AND t2.flat_type_id = " . $allotment_type . " AND t2.occupation_estate = " . $occupation_estate);
+					AND t3.hrms_id is not NULL
+					AND t2.flat_type_id = " . $allotment_type . " AND t2.occupation_estate = " . $occupation_estate);
 				////AND t2.flat_type_id = " . $allotment_type);
 		$record = $result->fetchObject();
 		$no_of_applicant = $record -> total_applicant;
@@ -108,15 +113,18 @@ function get_no_of_applicant_cs($allotment_type, $occupation_estate) {
 }
 function get_no_of_applicant_new($allotment_type = '') {
 	$no_of_applicant = 0;
-	
+	// inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 26-06-2025
 	if(!empty($allotment_type)) {
 		$result = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_new_allotment_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id  
 					WHERE t1.status = 'housingapprover_approved_1'
+					AND t3.hrms_id is not NULL
 					AND t2.flat_type_id = " . $allotment_type);
 
 		$record = $result->fetchObject();
 		$no_of_applicant = $record -> total_applicant;
+		// echo $no_of_applicant;die;
 	}	
 	//housing_sup_approved_1 to housingapprover_approved_1 by debaleena 04-09-2024
 	return $no_of_applicant;	
@@ -131,9 +139,12 @@ function get_applicant_total_count($allotment_type = ''){
 	
 	if(!empty($allotment_type)) {
 		//housing_sup_approved_1 to housingapprover_approved_1 by debaleena 04-09-2024
+		// inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 11-08-2025
 		$result_new = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_new_allotment_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
 					WHERE t1.status = 'housingapprover_approved_1'
+					AND t3.hrms_id is not NULL
 					AND t2.flat_type_id = " . $allotment_type);
 
 		$record_new = $result_new->fetchObject();
@@ -142,15 +153,19 @@ function get_applicant_total_count($allotment_type = ''){
 
 		$result_cs = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_cs_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
 					WHERE t1.status = 'housingapprover_approved_1'
-				AND t2.flat_type_id = " . $allotment_type);
+					AND t3.hrms_id is not NULL
+					AND t2.flat_type_id = " . $allotment_type);
 				////AND t2.flat_type_id = " . $allotment_type);
 		$record_cs = $result_cs->fetchObject();
 		$no_of_applicant_cs = $record_cs -> total_applicant;
 
 		$result_vs = db_query("SELECT count(*) as total_applicant FROM housing_online_application as t1
 					INNER JOIN housing_vs_application as t2 ON t1.online_application_id = t2.online_application_id
+					INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
 					WHERE t1.status = 'housingapprover_approved_1'
+					AND t3.hrms_id is not NULL
 					AND t2.flat_type_id = " . $allotment_type);
 					
 		$record_vs = $result_vs->fetchObject();
@@ -175,7 +190,7 @@ function get_vacancy_details($allotment_type, $estate_id, $application_type, $di
 	$vacancy_details = array(); $condition = "";
 	// $floor['vs'] = "('F','S')";
 	// $floor['cs'] = "('G', 'T')";
-	$floor['vs'] = "('First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth')";
+	$floor['vs'] = "('First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth','Ninth')";  //add ninth by dg 12-08-2025
 	$floor['cs'] = "('Ground', 'Top')";
 
 	if(isset($estate_id) && !empty($estate_id)) {

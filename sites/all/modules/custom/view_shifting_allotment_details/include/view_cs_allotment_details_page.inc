@@ -4,11 +4,21 @@
 		global $base_root, $base_path, $user;
 		
 		$output = '';
+
+		// ~~~~~~~ Query added by subham dt.26-11-2025 for fetching and pass online application id as a parameter to below funcn. ~~~~~~~~//
+		$query = db_select('housing_applicant_official_detail', 'haod');
+		$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->condition('haod.uid', $user->uid, '=');
+		$query->condition('haod.is_active','1','=');
+
+		$query->addField('hoa', 'online_application_id');
+		$rslt = $query->execute()->fetchAssoc();
+		
 		$result = fetch_cs_allotment_details();
 
 		/////added by dg 23-12-2024////
 
-		$fetchDoc = get_applicant_upload_docs();
+		$fetchDoc = get_applicant_upload_docs($rslt['online_application_id']);
 		// print_r($fetchDoc->fetchAll());echo $fetchDoc->rowCount(); die;
 		
 		if($fetchDoc->rowCount() >0){
@@ -60,7 +70,7 @@
 			$fields[] = implode('/', array_reverse(explode('-', $data->allotment_date)));
 			$fields[] = $data->district_name;
 			$fields[] = $data->flat_type;
-			$fields[] =	$data->estate_name.',<br>'.$data->estate_address;
+			$fields[] =	$data->status == 'allotted' ? '---' : $data->estate_name.',<br>'.$data->estate_address;
 			//$fields[] =	$data->estate_address;
 			//$fields[] = $data->flat_no;
 			if($data->accept_reject_status == '') {

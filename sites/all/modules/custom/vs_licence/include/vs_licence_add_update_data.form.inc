@@ -14,7 +14,7 @@
 		//$vs_license_app_arr['allotment_flat']  =   trim($form['allotment_info']['allotment_flat']['#value']);
 		
 		$vs_licence_app_arr['allotment_flat_id']  =   trim($form['allotment_info']['allotment_flat_id']['#value']);		
-		
+		/* // Turned off by Subham 24-07-2025
 		if($form_state['values']['file'] != 0){
 			// file exists
 			$file = file_load($form_state['values']['file']);
@@ -29,9 +29,9 @@
 			}
 			
 		}
-		else {
+		else {*/ // Turned off by Subham 24-07-2025
 			$vs_licence_app_arr['document']  =  NULL;
-		}
+		// }
 		
 		if($online_application_id != 0) {
 			db_insert('housing_license_application')
@@ -45,7 +45,7 @@
 		global $user;
 		
 		$vs_licence_app_arr = array();
-
+		/* // Turned off by Subham 24-07-2025
         // deleted	
 		if($form_state['values']['file'] == 0 ){	
 			$file =  file_load($form_state['values']['file']) ;
@@ -83,7 +83,7 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
-					
+					/* // Turned off by Subham 24-07-2025
 					$file1 = file_load($data->file_id);
 					file_usage_delete($file1, 'vs_licence', 'Payslip Document', $user->uid);
     				file_delete($file1);
@@ -95,7 +95,7 @@
 				/*$path_parts = pathinfo($file->filename);
 				$file->filename = 'payslip_doc_'.$user->uid.'_'.time().'.'.$path_parts['extension'];*/
 			//code end
-				
+				/* // Turned off by Subham 24-07-2025
 				$file->status = FILE_STATUS_PERMANENT;
 				
 				file_save($file);
@@ -109,7 +109,7 @@
   	  			->execute();	
 			}
 		}
-		else {
+		else {*/ // Turned off by Subham 24-07-2025
 			$vs_licence_app_arr['document']  =  NULL;
 			
 			if($online_application_id != 0) {
@@ -118,7 +118,7 @@
 				->condition('online_application_id', $online_application_id, '=')
 				->execute();
 			}
-		}
+		// }
 		
 		/*db_update('housing_license_application')
   	  	->fields($new_license_app_arr)

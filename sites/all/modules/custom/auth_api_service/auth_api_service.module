@@ -28,7 +28,7 @@ function auth_api_service_resource() {
                             'optional' => true,
                         ),
                         array(
-                            'encdata' => 'encdata',
+                            'encData' => 'encData',
                             'type' => 'string',
                             'description' => 'Enc Data.',
                             'source' => 'data',
@@ -54,7 +54,7 @@ function auth_api_service_resource() {
                     'access arguments'  => array('access content'), 
                     'args' => array(
                         array(
-                            'encdata' => 'encdata',
+                            'encData' => 'encdata',
                             'type' => 'string',
                             'description' => 'Enc Data.',
                             'source' => 'data',
@@ -100,181 +100,296 @@ function decrypt($data){
 function applicant_login($data){
     global $base_root, $base_path;
     // echo 'debolina';die;
+    // echo '<pre>'; print_r($data); die;
    
+   if($_SERVER['REQUEST_METHOD']==='POST'){
+        if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('uat_hrms_url','')){
 
-    // $decrypted_data=decrypt($data);
-    // echo '<pre>'; print_r($decrypted_data);
-    //ob_start();
-    //$bufferedOutput = ob_get_contents();
-    //file_put_contents('debug_output.txt', $bufferedOutput);
-    //print_r($bufferedOutput);
-    //ob_end_clean();
-    //die();
-        
-    set_time_limit(10); // Limit execution to 10 seconds
+            $encdata = $data['encdata'];
+            $cs =  $data['cs']; 
 
-    // Send timeout response if script takes too long
-    if (time() - $_SERVER['REQUEST_TIME'] > 10) {
-        drupal_json_output(array('status'  => 'error','message' => 'Request timed out. Please try again.', 'status_code' => 408));
-        // drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
-        drupal_exit();
-    }
-
-    $data['encdata'] = 'qPulk+Qm812USMSsU3kPpVvEknTzyV5qTXxYc\/hoPn2jmCkSdv6Y4nx3uaet61IwjVBn3Om3PlMBygmEzadNG5DuYRddbN9r+QTNbC\/t+TuJ1vWqhSbSWGXhPpZSkk9rj298U3y6agBE1VjU+awHan8h9rs84KUqGodkUtYZ6pL0XNlOF5C\/xqX8ZHz8YF3fmDoefhn6G6mIQtdO\/SKPVO9Zdx06NVnxN\/c6mhzNFT5A7ErVC0TSNPyvHGEAcMP\/8kNglqE0ERL9XECAAwDAa+myCB1g1KEbtdD+bTbzOsbLrGXZ8XIJgztvAaJpUKsQ';
-
-    $data['cs'] = '51ef2d8ca4a9e62e7c8db805368a7c8d986d2cacb377bf2943524d70ce769e65';
-    
-    $encdata = $data['encdata'];
-    $cs =  $data['cs']; 
-
-    $decrypted_data = decrypt($encdata); echo $decrypted_data; 
-    $dataObj = json_decode($decrypted_data);
-
-    echo $cksm = checksum_validation($decrypted_data);
-die;
-
-    if($cs == $cksm){
-        
-        if(empty($dataObj->hrmsid)){
-            // drupal_json_output(array('error' => 'Missing required data'), 400);
-            drupal_json_output(array('status'  => 'error','message' => 'Missing required data.', 'status_code' => 400));
-            drupal_exit();
-        }else{
+            $decrypted_data=decrypt($encdata);
+            $dataObj = json_decode($decrypted_data);
             
-            //*by dg 07-01-2025 */
+
+            //added on 05-07-2025 start. This is to prevent replay attack.
+            
+            $reqTime = DateTime::createFromFormat("d/m/Y H:i:s", $dataObj->sysTimeStamp); 
+                        
+            if ($reqTime === false) {
+            	drupal_json_output(array('error' => 'Invalid timestamp format'), 400);
+                drupal_exit();
+        	}
+        	
+        	$reqUnixTime = $reqTime->getTimestamp(); 
+           
+
+        	$currentUnixTime = time();
+
+            // echo "Requested Unix Time: " . $reqUnixTime . "\n";
+            // echo "Current Unix Time: " . $currentUnixTime . "\n";
+            // echo "Difference: " . abs($currentUnixTime - $reqUnixTime) . " seconds\n";die();
+
+
+
+        	//this is to be turned on in production and clock should be 24h clock not 12 h
+        	if (abs($currentUnixTime - $reqUnixTime) > 120) {
+            	drupal_json_output(array('error' => 'Expired Request'), 400);
+                drupal_exit();
+        	}
+        	// open on 07-08-20256 By Moumita
+            // off due to direfrence in server time by Moumita 29-07-2025
+
+            //05-07-2025 end
+
+            
+            set_time_limit(10); // Limit execution to 10 seconds
+
+            // Send timeout response if script takes too long
+            if (time() - $_SERVER['REQUEST_TIME'] > 10) {
+                drupal_json_output(array('status'  => 'error','message' => 'Request timed out. Please try again.', 'status_code' => 408));
+                // drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
+                drupal_exit();
+            }
+
+
+            $hrms_json_log2 = array();
+            $hrms_json_log2['hrms_id'] = $dataObj->hrmsid;
+            $hrms_json_log2['json_encrypted_data'] = $encdata;
+            $hrms_json_log2['json_decrypted_data'] = $decrypted_data;
+            $hrms_json_log2['created_at'] = date('Y-m-d H:i:s');
+            db_insert('housing_hrms_applicant_login_log')
+            ->fields($hrms_json_log2)
+            ->execute();
+
+            $cksm = checksum_validation($decrypted_data); 
+            if($cs == $cksm){
+                
+                if(empty($dataObj->hrmsid)){
+                    // drupal_json_output(array('error' => 'Missing required data'), 400);
+                    drupal_json_output(array('status'  => 'error','message' => 'Missing required data.', 'status_code' => 400));
+                    drupal_exit();
+                }else{
+                    
+
+                    /*turned off 05-07-2025 
+                    $url = $base_root . $base_path. '/dashboard';
+                    drupal_add_http_header('redirect_url',$url);
+                    drupal_goto('/user/sso/' . base64_encode($dataObj->hrmsid));
+                    */
+
+                    /** addded 05-07-2025 start**/
+                    /** a redirect_url is sent with a token having timestamp. This url having the token will be sent by the client browser in the subsequent request and if token gets validated user session will be created at drupal end. This is added cz our earlier approach had a flaw. The earlier redirection url if hijacked and pasted on browser would open the dashboard**/
+
+                    $account = user_load_by_name($dataObj->hrmsid);
+                    if (empty($account)) {
+                        $mail = isset($dataObj->email) ? trim($dataObj->email) : $dataObj->hrmsid.'@gmail.com';
+                        $appUserData = array(
+                                'name' => trim($dataObj->hrmsid) ,
+                                'pass' => trim($dataObj->hrmsid) , // note: do not md5 the password
+                                'mail' => $mail,
+                                'access' => REQUEST_TIME,
+                                'login' => REQUEST_TIME,
+                                'status' => 1,
+                                //'init' => trim($userData['email']),
+                                'roles' => array(
+                                    DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                                    4 => 'Applicant'
+                                )
+                            );
+                        $userDetails = user_save(Null, $appUserData);
+                    }
+
+                    $hrmscode=encrypt_url($dataObj->hrmsid); 
+                    $timestamp = time();
+                    $message = $hrmscode . "|" . $timestamp;
+                    $hmac = hash_hmac("sha256", $message, variable_get('hmac_secret_me',''));
+                    $token = base64_encode($message . "|" . $hmac);
+                    $redirect_url=$base_root.$base_path.'user/sso/'.urlencode($token);
+                    // return $redirect_url;
+
+                    drupal_json_output(array('status'  => 'success','redirect_url' => $redirect_url, 'message' => 'Redirection URL sent', 'status_code' => 200));
+                    drupal_exit();
+
+                    /** 05-07-2025 end**/
+
+                }
+            }else{
+                // drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
+                drupal_json_output(array('status'  => 'error','message' => 'Error: Checksum mismatch', 'status_code' => 400));
+                drupal_exit();
+            }
+        }else{
+        	drupal_json_output(array('status'  => 'error','message' => 'Error: Invalid Origin or Missing Origin', 'status_code' => 400));
+        	drupal_access_denied(); 
+                drupal_exit();
+        }
+    }
+}
+
+function ddo_login($data){
+    global $user,$base_path,$base_root;
+    // print_r($data);die; 
+
+    if($_SERVER['REQUEST_METHOD']==='POST'){
+        if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('uat_hrms_url','')){
+
+            $encdata = $data['encdata'];
+            $cs =  $data['cs']; 
+
+            $decrypted_data = decrypt($encdata);
+            $dataObj = json_decode($decrypted_data);
+
+            //added on 05-07-2025 start. This is to prevent replay attack.
+            $reqTime = DateTime::createFromFormat("d/m/Y H:i:s", $dataObj->sysTimeStamp);
+            if ($reqTime === false) {
+                drupal_json_output(array('error' => 'Invalid timestamp format'), 400);
+                drupal_exit();
+            }
+            
+            $reqUnixTime = $reqTime->getTimestamp();
+            $currentUnixTime = time();
+
+
+            //this is to be turned on in production and clock should be 24h clock not 12 h
+            if (abs($currentUnixTime - $reqUnixTime) > 120) {
+                drupal_json_output(array('error' => 'Expired Request'), 400);
+                drupal_exit();
+            }
+            // open on 07-08-20256 By Moumita
+            // off due to direfrence in server time by Moumita 29-07-2025
+
+            // echo '<pre>';print($currentUnixTime);die;
+            //05-07-2025 end
+
+
+
+
+            set_time_limit(10); // Limit execution to 10 seconds
+
+            // Send timeout response if script takes too long
+            if (time() - $_SERVER['REQUEST_TIME'] > 10) {
+                // drupal_json_output(array('status'  => 'error','message' => 'Request timed out.',));
+                drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
+                drupal_exit();
+            }
+            //*by Moumita 03-07-2025 */
             $hrms_json_log = array();
-            $hrms_json_log['hrms_id'] = $dataObj->hrmsid;
+            $hrms_json_log['hrms_id'] = $dataObj->hrmsid; 
+            $hrms_json_log['ddo_code'] = $dataObj->ddo_code; 
             $hrms_json_log['json_encrypted_data'] = $encdata;
             $hrms_json_log['json_decrypted_data'] = $decrypted_data;
             $hrms_json_log['created_at'] = date('Y-m-d H:i:s');
-            db_insert('housing_hrms_applicant_login_log')
+            db_insert('housing_hrms_ddo_login_log')
             ->fields($hrms_json_log)
             ->execute();
 
             //*end *//
 
-            $url = $base_root . $base_path. '/dashboard';
-            drupal_add_http_header('redirect_url',$url);
-            drupal_goto('/user/sso/' . base64_encode($dataObj->hrmsid));
+            $cksm = checksum_validation($decrypted_data);
+            if($cs == $cksm){
+                if(empty($dataObj->ddo_code)){
+                    drupal_json_output(array('error' => 'Missing required data'), 400);
+                    drupal_exit();
+                }else{
+                    // echo $dataObj->ddo_code; die;
+                    // check before insert 
+                    $result = db_query("select ddo_code, hrms_id, is_active from  housing_ddo_hrms_mapping where  ddo_code=:ddo_code and hrms_id=:hrms_id and is_active = 'Y' ", array(':ddo_code'=> $dataObj->ddo_code, ':hrms_id' => $dataObj->hrmsid));
+                    
+                    if($result->rowCount() == 0){
+                        // update previous DDO entry by is_active = N
+                        $update = db_update('housing_ddo_hrms_mapping')->fields(array('is_active'=>'N'))->condition('ddo_code',$dataObj->ddo_code, '=')->execute();
 
-            
-            //** new code written for api not providing redirect_url in header but it is turned off cz it might be solved by whitelisting **//
-            // Generate redirect URL (absolute URL is best here)
-            /*$url = 'http://172.25.142.221/user/sso/' . base64_encode($dataObj->hrmsid);
 
-            // Debug log
-            //access_log("Redirect URL: $url");
+                        // insert into housing_ddo_hrms_mapping
 
-            // Check for output before headers
-            if (headers_sent($file, $line)) {
-                error_log("Headers already sent at $file:$line — cannot redirect.");
-            } else {
-                // Clean all output buffers
-                while (ob_get_level()) {
-                    ob_end_clean();
+                        $insarr = array(
+                            'ddo_code' => $dataObj->ddo_code,
+                            'hrms_id' => $dataObj->hrmsid,
+                            'created_datetime' => date('Y-m-d H:i:s'),
+                            'is_active'=>'Y'
+                        );
+                        $ex = db_insert('housing_ddo_hrms_mapping')->fields($insarr)->execute();
+
+                        $appUserData = array(
+                            'name' => trim($dataObj->ddo_code) ,
+                            'pass' => trim($dataObj->ddo_code) , // note: do not md5 the password
+                            'mail' => $dataObj->email,
+                            'access' => REQUEST_TIME,
+                            'login' => REQUEST_TIME,
+                            'status' => 1,
+                            //'init' => trim($userData['email']),
+                            'roles' => array(
+                                DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                                11 => 'DDO'
+                            )
+                        ); 
+
+                        // The first parameter is sent blank so a new user is created.
+                        // chccking for duplicate 03-07-2025 by Moumita
+                        $account = user_load_by_name($dataObj->ddo_code);
+                        if (empty($account)) {
+                            $userDetails = user_save(Null, $appUserData);
+                        }
+
+                        /*turned off 05-07-2025 
+                        $user = user_load_by_name($dataObj->ddo_code);
+                        $user_id = $user->uid;  
+                        drupal_session_regenerate();
+                        drupal_goto('dashboard');**/
+
+                        /** addded 05-07-2025 start**/
+                        /** a redirect_url is sent with a token having timestamp. This url having the token will be sent by the client browser in the subsequent request and if token gets validated user session will be created at drupal end. This is added cz our earlier approach had a flaw. The earlier redirection url if hijacked and pasted on browser would open the dashboard**/
+                        
+
+                        $ddocode=encrypt_url($dataObj->ddo_code); 
+                        $timestamp = time();
+                        $message = $ddocode . "|" . $timestamp;
+                        $hmac = hash_hmac("sha256", $message, variable_get('hmac_secret_me',''));
+                        $token = base64_encode($message . "|" . $hmac);
+                        $redirect_url=$base_root.$base_path.'sso/ddo/'.urlencode($token);
+                        // return $redirect_url;
+
+                        drupal_json_output(array('status'  => 'success','redirect_url' => $redirect_url, 'message' => 'Redirection URL sent', 'status_code' => 200));
+                        drupal_exit();
+
+                        /** 05-07-2025 end**/
+
+                    }else{
+                        
+                        /*turned off 05-07-2025
+                        
+                        drupal_goto('sso/ddo/'.base64_encode($dataObj->ddo_code));*/
+
+                        /** addded 05-07-2025 start**/
+                        /** a redirect_url is sent with a token having timestamp. This url having the token will be sent by the client browser in the subsequent request and if token gets validated user session will be created at drupal end. This is added cz our earlier approach had a flaw. The earlier redirection url if hijacked and pasted on browser would open the dashboard**/
+                        $ddocode=encrypt_url($dataObj->ddo_code); 
+                        $timestamp = time();
+                        $message = $ddocode . "|" . $timestamp;
+                        $hmac = hash_hmac("sha256", $message, variable_get('hmac_secret_me',''));
+                        $token = base64_encode($message . "|" . $hmac);
+                        $redirect_url=$base_root.$base_path.'sso/ddo/'.urlencode($token);
+                        // return $redirect_url;
+
+                        drupal_json_output(array('status'  => 'success','redirect_url' => $redirect_url, 'message' => 'Redirection URL sent', 'status_code' => 200));
+                        drupal_exit();
+
+                        /** 05-07-2025 end**/
+
+                    }
                 }
-
-                // Send the redirect
-                header('Location: ' . $url, true, 302);
-                exit;
-            }*/
-            
-
-        }
-    }else{
-        // drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
-        drupal_json_output(array('status'  => 'error','message' => 'Error: Checksum mismatch', 'status_code' => 400));
-        drupal_exit();
-    }
-}
-
-function ddo_login($data){
-    global $user;
-    //print_r($data); die;
-
-    $encdata = $data['encdata'];
-    $cs =  $data['cs']; 
-
-    $decrypted_data = decrypt($encdata);
-    $dataObj = json_decode($decrypted_data);
-
-    // echo '<pre>'; print_r($dataObj); die;
-
-    set_time_limit(10); // Limit execution to 10 seconds
-
-    // Send timeout response if script takes too long
-    if (time() - $_SERVER['REQUEST_TIME'] > 10) {
-        // drupal_json_output(array('status'  => 'error','message' => 'Request timed out.',));
-        drupal_json_output(array('error' => 'Request timed out. Please try again.'), 408);
-        drupal_exit();
-    }
-
-    $cksm = checksum_validation($decrypted_data);
-    if($cs == $cksm){
-        if(empty($dataObj->ddo_code)){
-            drupal_json_output(array('error' => 'Missing required data'), 400);
-            drupal_exit();
-        }else{
-            
-            // check before insert 
-            $result = db_query("select ddo_code, hrms_id, is_active from  housing_ddo_hrms_mapping where  ddo_code=:ddo_code and hrms_id=:hrms_id and is_active = 'Y' ", array(':ddo_code'=> $dataObj->ddo_code, ':hrms_id' => $dataObj->hrmsid));
-            
-            if($result->rowCount() == 0){
-                // update previous DDO entry by is_active = N
-                $update = db_update('housing_ddo_hrms_mapping')->fields(array('is_active'=>'N'))->condition('ddo_code',$dataObj->ddo_code, '=')->execute();
-
-
-                // insert into housing_ddo_hrms_mapping
-
-                $insarr = array(
-                    'ddo_code' => $dataObj->ddo_code,
-                    'hrms_id' => $dataObj->hrmsid,
-                    'created_datetime' => date('Y-m-d H:i:s'),
-                    'is_active'=>'Y'
-                );
-                $ex = db_insert('housing_ddo_hrms_mapping')->fields($insarr)->execute();
-
-                $appUserData = array(
-                    'name' => trim($dataObj->ddo_code) ,
-                    'pass' => trim($dataObj->ddo_code) , // note: do not md5 the password
-                    'mail' => $dataObj->email,
-                    'access' => REQUEST_TIME,
-                    'login' => REQUEST_TIME,
-                    'status' => 1,
-                    //'init' => trim($userData['email']),
-                    'roles' => array(
-                        DRUPAL_AUTHENTICATED_RID => 'authenticated user',
-                        11 => 'DDO'
-                    )
-                );
-
-                // The first parameter is sent blank so a new user is created.
-                $userDetails = user_save(Null, $appUserData); 
-                $user = user_load_by_name($dataObj->ddo_code);
-                $user_id = $user->uid;  
-                drupal_session_regenerate();
-                drupal_goto('dashboard');
-
             }else{
-
-                //*by dg 07-01-2025 */
-                $hrms_json_log = array();
-                $hrms_json_log['hrms_id'] = $dataObj->hrmsid;
-                $hrms_json_log['ddo_code'] = $dataObj->ddo_code;
-                $hrms_json_log['json_encrypted_data'] = $encdata;
-                $hrms_json_log['json_decrypted_data'] = $decrypted_data;
-                $hrms_json_log['created_at'] = date('Y-m-d H:i:s');
-                db_insert('housing_hrms_ddo_login_log')
-                ->fields($hrms_json_log)
-                ->execute();
-
-                //*end *//
-                drupal_goto('sso/ddo/'.base64_encode($dataObj->ddo_code));
+                drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
             }
+
         }
-    }else{
-        drupal_json_output(array('error' => 'Error: Checksum mismatch'), 400);
+        else{
+        	drupal_json_output(array('error' => 'Error: Invalid Origin or Missing Origin'), 400);
+            drupal_access_denied();
+            drupal_exit();
+        }
     }
+   
 }
 
 function validate_token($given_token){

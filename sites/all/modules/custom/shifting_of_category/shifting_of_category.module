@@ -281,6 +281,7 @@
 			'#required' => TRUE,
 			'#process' => array('shifting_of_category_element_process'),
 		);
+		/* Turned off by Subham 24-07-2025
         ///added by dg 20-12-2024///
 		$form['current_occupation_cs']['cs_scanned_sign'] = array(
 			'#title' => t('Upload Scanned Signature'),
@@ -297,10 +298,8 @@
 			'#upload_location' => 'public://doc/',
 			'#required' => TRUE,
 			'#process' => array('shifting_of_category_element_process'),
-		);
-
-
-		
+		);*/ // Turned off by Subham 24-07-2025
+	
 													 
 		fetch_cs_data($form);
 		

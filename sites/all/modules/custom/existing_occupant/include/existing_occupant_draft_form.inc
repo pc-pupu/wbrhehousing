@@ -416,6 +416,51 @@
 				//'#attributes' => array('id' => 'edit-app-designation', 'oncopy' => "return false", 'onpaste' => "return false"),
 			);
 
+			// /* by dg 28-07-2025 */
+			// $form['official_info']['pay_band_type'] = array(
+			// 	'#title' => t('Pay Band Type'),
+			// 	'#type' => 'radios',
+			// 	'#options' => array('old' => 'Old', 'new' => 'New'),
+			// 	'#default_value' => isset($form_state['values']['pay_band_type']) ? $form_state['values']['pay_band_type'] : 'new',
+			// 	'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+			// 	'#suffix' => '</div></div></div>',
+			// 	'#ajax' => array(
+			// 		'callback' => 'update_pay_band_callback',
+			// 		'wrapper' => 'pay-band-wrapper',
+			// 		'event' => 'change',
+			// 	),
+			// );
+
+			// $form['official_info']['pay_band_wrapper'] = array(
+			// 	'#type' => 'container',
+			// 	'#attributes' => array('id' => 'pay-band-wrapper'),
+			// );
+
+			// // Get selected value or default
+			// $selected_type = isset($form_state['values']['pay_band_type']) ? $form_state['values']['pay_band_type'] : 'new';
+
+			// $form['official_info']['pay_band_wrapper']['pay_band'] = array(
+			// 	'#title' => t('Basic Pay Range'),
+			// 	'#type' => 'select',
+			// 	'#options' => pay_band_list_eo_pa($selected_type), 
+			// 	'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
+			// 	'#suffix' => '</div></div>',
+			// 	'#validated' => TRUE,
+			// 	'#attributes' => array('class'=>array('form-control')),
+			// );
+
+			// $form['official_info']['pay_band_wrapper']['pay_in'] = array(
+			//  	'#title' => t('Basic Pay'),
+			// 	'#type' => 'textfield',
+			//  	'#required' => TRUE,
+			//  	//'#element_validate' => array('element_validate_numeric_positive'), 
+			//  	'#prefix' => '<div class="col-md-6"><div class="form-floating">',
+			//  	'#suffix' => '</div></div></div>',
+			//  	'#attributes' => array('class' => array('numeric_positive'),'class'=>array('form-control')),
+			// );
+			// /* by dg end 28-07-2025 */
+
+
 			$form['official_info']['pay_band'] = array(
 				'#title' => t('Basic Pay Range'),
 				'#type' => 'select',
@@ -435,7 +480,7 @@
 			 	'#prefix' => '<div class="col-md-6"><div class="form-floating">',
 			 	'#suffix' => '</div></div></div>',
 			 	'#attributes' => array('class' => array('numeric_positive'),'class'=>array('form-control')),
-			);
+			 );
 		
 			
 			$form['official_info']['occupant_posting_place'] = array(

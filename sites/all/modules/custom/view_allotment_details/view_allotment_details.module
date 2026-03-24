@@ -33,8 +33,8 @@
 		  'access callback' => TRUE,
 		);
 
-		$items['download-and-upload'] = array(
-			'title' => 'Documents Download',
+		$items['download-and-upload/%'] = array(
+			'title' => 'Declaration',
 			'page callback' => 'drupal_get_form',
 			'page arguments' => array('download_and_upload',1),
 			'file' => 'include/download_and_upload.inc',
@@ -57,9 +57,9 @@
 			'file' => 'include/allotment_detail_pdf_gen.inc',
 			'access arguments' => array('access content'),
 		);
-
-
 		
+		//End
+
 		return $items;
 	}
 	
@@ -103,6 +103,7 @@
 		'hb.block_id = hf.block_id');    //debaleena 29-07-2024
 		$query->fields('ha', array());
 		$query->addField('hoa', 'online_application_id');
+		$query->addField('hoa', 'application_no');
 		$query->addField('hoa', 'status');
 		$query->addField('hfo', 'allotment_no');
 		$query->addField('hfo', 'allotment_date');
@@ -118,8 +119,8 @@
 		$query->addField('hf', 'floor');  //debaleena 29-07-2024
 		
 		// allowed application to view
-		$status_arr = array('housing_official_approved','allotted','applicant_acceptance','applicant_reject','ddo_verified_2','ddo_reject_2','housing_sup_approved_2','housing_sup_reject_2','license_generate','offer_letter_extended');
-
+		$status_arr = array('housing_official_approved','allotted','applicant_acceptance','applicant_reject','ddo_verified_2','ddo_reject_2','housing_sup_approved_2','housing_sup_reject_2','license_generate','offer_letter_extended','flat_possession_taken','housingapprover_approved_2','housing_approver_reject_2','offer_letter_cancel'); //add flat_possession_taken by dg 22-07-2025, last 3 status added by dg 07-12-2025
+		// echo $online_application_id;die;
 
 		if($online_application_id == ''){
 			$db_and = db_and();
@@ -145,7 +146,7 @@
 		$query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
 		$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
 		//$query->innerJoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id');
-		$query->innerJoin('housing_district', 'hd', 'ha.permanent_district = hd.district_code');
+		$query->leftJoin('housing_district', 'hd', 'ha.permanent_district = hd.district_code');
 	
 		$query->fields('ha', array());
 		$query->fields('haod', array());
@@ -219,12 +220,14 @@
 	// added by moumita
 	function get_applicant_upload_docs($app_id = ''){
 		global $user;
+		// echo $app_id;die;
 		// echo $user->uid;die;
-		$query = db_select('housing_online_application_upload_doc', 'haupdoc');
+		// $query = db_select('housing_online_application_upload_doc', 'haupdoc');
+		$query = db_select('housing_new_allotment_application', 'haupdoc');
 		$query->fields('haupdoc', array());
 		if($app_id!=''){
 			$query->condition('haupdoc.online_application_id', $app_id, '=');
-		}else{
+		} else{
 			$query->condition('haupdoc.uid', $user->uid, '=');
 		}
 		return $query->execute();

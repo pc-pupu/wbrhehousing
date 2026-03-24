@@ -62,7 +62,7 @@ function rhe_allotment_form_submit($form, &$form_state) {
 			drupal_set_message('Allotment Process Completed Successfully');
 		}else{
 			drupal_set_message('No Application Available for Allotment','error');
-		}
+		} 
 		
 
 		
@@ -76,6 +76,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 	$allvacancy = "";
 	$allvacancy = get_estatewise_vacancy($allotment_type, $district_code );
 
+	//Floor 9 added 27-08-2025 SD
 	$report_table = '<table class="allotment table table-list">
 		<tr>
 			<th rowspan="2">Housing</th>
@@ -92,6 +93,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 			<th>Floor-6</th>
 			<th>Floor-7</th>
 			<th>Floor-8</th>
+			<th>Floor-9</th>
 			<th>Floor-Top</th>
 			<th>Floor shifting</th>
 			<th>Category shifting</th>
@@ -114,6 +116,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 				$applicant_total = $applicant_vs + $applicant_cs + $applicant_new;				
 				// echo $applicant_total;die;
 				if($counter == 1) {
+					//Floor 9 added 27-08-2025 SD
 					$report_table .= '<tr>
 						<td>' . $record -> estate_name . '</td>
 						<td>' . $record -> floor_0 . '</td>
@@ -125,6 +128,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 						<td>' . $record -> floor_6 . '</td>
 						<td>' . $record -> floor_7 . '</td>
 						<td>' . $record -> floor_8 . '</td>
+						<td>' . $record -> floor_9 . '</td>
 						
 						<td>' . $record -> floor_top . '</td>
 						<td>' . $applicant_vs . '</td>
@@ -132,6 +136,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 						<td rowspan = "' . $rowspan . '">' . $applicant_new . '</td>
 					</tr>';
 				} else {
+					//Floor 9 added 27-08-2025 SD
 					$report_table .= '<tr>
 						<td>' . $record -> estate_name . '</td>
 						<td>' . $record -> floor_0 . '</td>
@@ -143,7 +148,7 @@ function get_vacancy_applicant($allotment_type, $district_code = 0) {
 						<td>' . $record -> floor_6 . '</td>
 						<td>' . $record -> floor_7 . '</td>
 						<td>' . $record -> floor_8 . '</td>
-						
+						<td>' . $record -> floor_9 . '</td>
 						<td>' . $record -> floor_top . '</td>
 						<td>' . $applicant_vs . '</td>
 						<td>' . $applicant_cs . '</td>

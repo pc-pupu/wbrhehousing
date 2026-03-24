@@ -47,6 +47,49 @@
 			'access arguments' => array('administer Transfer DDO List Details'),
 		);
 		// End
+
+		/*Added by Subham dt.10-07-2025*/
+		$items['unauthorized-occupant-list-whrms'] = array(
+			'title' => 'Unauthorised Occupant List (with HRMS ID)',
+			'page callback'=>'drupal_get_form',
+			'page arguments'=> array('view_unauthorised_occupants_list_form'),
+			'file' => 'include/view_unauthorised_occupants_list_form.inc',
+			'access arguments' => array('administer Unauthorised Occupant List')
+		);
+
+		$items['unauthorized-occupant-list-wohrms'] = array(
+			'title' => 'Unauthorised Occupant List (without HRMS ID)',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('unauthorized_occupant_draft_list_form'),
+			'file' => 'include/view_unauthorised_occupants_list_form.inc',
+			'access arguments' => array('administer Unauthorised Occupant List'),
+		);
+
+		$items['mark-as-unauthorised/%'] = array(
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array('mark_as_unauthorised_save', 1),
+			'file' => 'include/view_unauthorised_occupants_list_form.inc',
+			'access arguments' => array('administer Unauthorised Occupant List')
+		);
+		/*End 10-07-2025*/
+
+		/* Added by Subham 19-12-2025 */
+		$items['unauthorized-occupant-list-whrms-pdf/%/%/%'] = array(
+			'title' => 'Unauthorised Occupant List PDF (with HRMS ID)',
+			'page callback' => 'unauthorised_occupant_list_whrms_pdf_gen',
+			'page arguments' => array(1,2,3),
+			'file' => 'include/unauthorised_occupant_list_pdf.inc',
+			'access arguments' => array('administer Unauthorised Occupant List')
+		);
+		
+		$items['unauthorized-occupant-list-wohrms-pdf/%/%/%'] = array(
+			'title' => 'Unauthorised Occupant List PDF (without HRMS ID)',
+			'page callback' => 'unauthorised_occupant_list_wohrms_pdf_gen',
+			'page arguments' => array(1,2,3),
+			'file' => 'include/unauthorised_occupant_list_pdf.inc',
+			'access arguments' => array('administer Unauthorised Occupant List')
+		);
+		/* End */
 		
 		return $items;
 		

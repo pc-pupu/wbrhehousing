@@ -90,7 +90,7 @@
 			$form['allotment_process_type'] = array(
 				'#title' => t('Allotment Process Type'),
 				'#type' => 'select',
-				'#options' => array('' => 'Select Allotment Process Type', 'NAL' => 'New Allotment', 'VSAL' => 'Floor Shifting', 'CSAL' => 'Category Shifting'),
+				'#options' => array('' => 'Select Allotment Process Type', 'NAL' => 'New Allotment', 'VSAL' => 'Floor Shifting', 'CSAL' => 'Category Shifting','MSR' => 'Manual Special Recomandation'),// added by g on 14-11-2025),
 				'#required' => TRUE,
 				//'#attributes' => array('class' => array('dropdown3')),//sd 24-06-2024 turned off
 				'#ajax' => array(
@@ -526,23 +526,27 @@
 		//$rows = array(); //sd 24-06-2024 turned off
 		
 		$header[] = array('data' => 'Sl. No.');
-		if($allotment_process_type == 'NAL') {
+		if($allotment_process_type == 'NAL' || $allotment_process_type == 'MSR') {  // MSR added by dg 14-11-2025
 			$header[] = array('data' => 'Name and Designation');
 			$header[] = array('data' => '1. Application No.<br>2. Place of Posting<br>3. Date of Application');
 			$header[] = array('data' => 'Flat Allotted');
 			$header[] = array('data' => 'Floor');
 			$header[] = array('data' => 'Name of R.H.E.');
+			$header[] = array('data' => 'Name of Block');   //added by dg 14-11-2025
 			$header[] = array('data' => 'Date of Retirement');
 		} else if($allotment_process_type == 'VSAL' || $allotment_process_type == 'CSAL') {
 			$header[] = array('data' => 'Name');
 			$header[] = array('data' => '1. Date of Possession<br>2. Date of Application<br>3. Date of Retirement');
-			$header[] = array('data' => 'Allotted Flat No.');
+			$header[] = array('data' => 'Name of R.H.E');  //added by dg 21-11-2025
+			$header[] = array('data' => 'From Flat(Block/Flat No)');
+			$header[] = array('data' => 'To Flat(Block/Flat No)');
 			$header[] = array('data' => 'Type of Flat');
-			$header[] = array('data' => 'Floor');
-			$header[] = array('data' => 'From Flat No.');
-			$header[] = array('data' => 'To Flat No.');		
+			$header[] = array('data' => 'Floor');	
 		}
-		$header[] = array('data' => 'Remarks');
+		if($allotment_process_type != 'MSR'){    //added by dg on 14-11-2025 because for manual allotment there will be no remarks (no roaster maintain)
+			$header[] = array('data' => 'Remarks');
+		}
+		
 		$header[] = array('data' => 'Allotment Approval Status');// sd 11-09-2024
 		$header[] = array('data' => 'Application Status');// dg 06-12-2024
 		
@@ -627,6 +631,7 @@
 						$fields[] = $data->flat_no;
 						$fields[] = $floor;
 						$fields[] = $data->estate_name;
+						$fields[] = $data->block_name;   //added by dg 14-11-2025
 						$fields[] = implode('/', array_reverse(explode('-', $data->date_of_retirement)));
 						$fields[] = $remarks;
 						$fields[] = $allotment_status; //sd 11-09-2024
@@ -666,7 +671,7 @@
 			
 			$i = 1;
 			while($data = $result->fetchObject()) {
-				//print_r($data);die;
+				
 				$fields = array();
 				$allotment_status=fetchAllotmentStatus($data->online_application_id);// 11-09-2024 sd
 				
@@ -694,23 +699,26 @@
 				$fields[] = $i;
 				$fields[] = $data->applicant_name;
 				$fields[] = '1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement)));
-				$fields[] = $data->flat_no;
+				$fields[] = $data->estate_name;   //aded by dg 21-11-2025
+				$fields[] = $data->block_name_vs.'/'.$data->occupied_flat_vs;
+				$fields[] = $data->block_name.'/'.$data->flat_no;
 				$fields[] = $data->flat_type;
 				$fields[] = $floor;
-				$fields[] = $data->occupied_flat_vs;
-				$fields[] = $data->flat_no;
 				$fields[] = 'Floor Shifting';
 				$fields[] = $allotment_status; //sd 11-09-2024
-				$fields[] = $application_status; //dg 06-12-2024
+				// $fields[] = $application_status; //dg 06-12-2024
+				$fields[] = $data->status_description; // by Moumita 29-01-2026
 				
 				$i++;
 				$rows[] = $fields;
 			}
 		} else if($allotment_process_type == 'CSAL') {
+
 			$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type);
 			
 			$i = 1;
 			while($data = $result->fetchObject()) {
+				// print_r($data);die;
 				$fields = array();
 				$allotment_status=fetchAllotmentStatus($data->online_application_id);// 11-09-2024 sd
 				
@@ -738,19 +746,64 @@
 				$fields[] = $i;
 				$fields[] = $data->applicant_name;
 				$fields[] = '1. '.implode('/', array_reverse(explode('-', $data->possession_date))).'<br>'.'2. '.implode('/', array_reverse(explode('-', $data->date_of_application))).'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_retirement)));
-				$fields[] = $data->flat_no;
+				$fields[] = $data->estate_name;   //aded by dg 21-11-2025
+				$fields[] = $data->block_name_cs.'/'.$data->occupied_flat_cs;
+				$fields[] = $data->block_name.'/'.$data->flat_no;
 				$fields[] = $data->flat_type;
 				$fields[] = $floor;
-				$fields[] = $data->occupied_flat_cs;
-				$fields[] = $data->flat_no;
 				$fields[] = 'Category Shifting';
 				$fields[] = $allotment_status; //sd 11-09-2024
-				$fields[] = $application_status; //dg 06-12-2024
+				// $fields[] = $application_status; //dg 06-12-2024
+				$fields[] = $data->status_description; // by Moumita 29-01-2026
 				
 				$i++;
 				$rows[] = $fields;
 			}
-		}
+		} else if($allotment_process_type == 'MSR') {   //added by dg 14-11-2025
+			$result = fetch_all_allottee_details($allotment_process_date, $allotment_process_no, $allotment_process_type);
+			
+			$i = 1;
+			while($data = $result->fetchObject()) {
+				$fields = array();
+				$allotment_status=fetchAllotmentStatus($data->online_application_id);
+				
+				/*if(trim($data->floor) == 'F') {
+					$floor = '1st';	
+				} else if(trim($data->floor) == 'S') {
+					$floor = '2nd';	
+				} else {
+					$floor = $data->floor;	
+				}*/
+
+				$floor = $data->floor;
+
+				////////////added by dg 06-12-2024//////
+				if($data->status == 'offer_letter_cancel'){
+					$application_status = 'Offer Letter Cancel';
+				}else if($data->status == 'license_cancel'){
+					$application_status = 'License Cancel';
+				}else{
+					$application_status = 'N/A';
+				}
+				///////end////////////
+				
+				
+				$fields[] = $i;
+				$fields[] = $data->applicant_name.'<br>'.$data->applicant_designation;
+				$fields[] = '1. '.$data->application_no.'<br>'.'2. '.$data->applicant_posting_place.'<br>'.'3. '.implode('/', array_reverse(explode('-', $data->date_of_application)));
+				$fields[] = $data->flat_no;
+				$fields[] = $floor;
+				$fields[] = $data->estate_name;
+				$fields[] = $data->block_name;
+				$fields[] = implode('/', array_reverse(explode('-', $data->date_of_retirement)));
+				$fields[] = $allotment_status; 
+				//$fields[] = $application_status; 
+				$fields[] = $data->status_description; 
+				
+				$i++;
+				$rows[] = $fields;
+			}
+		} 
 
 		// print_r($header);
 			
@@ -827,7 +880,13 @@
 			$html = '';
 			$html = '<br><div style="padding-right:20px;">'.l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'allotment_list').'/images/pdf_icon.png" title="Download Allottee List" alt="PDF Icon">Download Allottees List', 'allottee_list_pdf/'.encrypt_url($allotment_process_date).'/'.encrypt_url($allotment_process_no).'/'.encrypt_url($allotment_process_type).'/'.$allotment_process_type.'_allottees_list_'.time(), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'</div><br>';
 			
-			$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat Type - '.$data1->flat_type.' (New Allotment)</u></b></font><br>';		
+
+			if($allotment_process_type == 'MSR'){
+				$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat (Manual Allotment)</u></b></font><br>';	
+			}else if($allotment_process_type == 'NAL'){
+				$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat Type - '.$data1->flat_type.' (New Allotment)</u></b></font><br>';	
+			}
+				
 	
 			if($result->rowCount() > 0) {
 				return $html.$output;
@@ -835,7 +894,7 @@
 			else {
 				return $output;
 			}
-		}  else if($allotment_process_type == 'VSAL') {
+		} else if($allotment_process_type == 'VSAL') {
 			if($result->rowCount() > 0) {
 				// Render using Drupal's render API.
 				$build['datatable'] = array(
@@ -926,6 +985,68 @@
 			else {
 				return $output;
 			}	
+		} else if($allotment_process_type == 'MSR') {		//MSR added by dg 24-11-2025	
+			if($result->rowCount() > 0) {
+				// Render using Drupal's render API.
+				$build['datatable'] = array(
+				  '#theme' => 'datatable',
+				  '#header' => $header,
+				  '#rows' => $rows,
+				  '#attributes' => array(),
+				);
+			
+				// Or, render using a theme function.
+				$variables = array(
+				  //'attributes' => array(), //sd 24-06-2024 turned off
+				  'header' => $header,
+				  'rows' => $rows,
+				  'attributes' => array('class'=>array('table table-list')),//sd 24-06-2024
+				);
+				
+				$output = '<br>'.theme('datatable', $variables);
+			}
+			else {
+				$output = '<br><div>
+								<table class="datatable_no_data_found table table-list">
+									<tr class="tr_no_data_found">
+										<th class="th_no_data_found"></th>
+									</tr>
+									<tr class="tr_no_data_found">
+										<td class="td_no_data_found">No data found!</td>
+									</tr>
+								</table>
+							</div>';
+			}
+			
+			
+			$html = '';
+			$html = '<br><div style="padding-right:20px;">'.l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'allotment_list').'/images/pdf_icon.png" title="Download Allottee List" alt="PDF Icon">Download Allottees List by Date & Process No.', 'allottee_list_pdf/'.encrypt_url($allotment_process_date).'/'.encrypt_url($allotment_process_no).'/'.encrypt_url($allotment_process_type).'/'.$allotment_process_type.'_allottees_list_'.time(), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'</div><br>';
+
+			$html1 = '<br><div style="padding-right:20px;">'.l('<img height="18" width="18" src="'.$base_path.drupal_get_path('module', 'allotment_list').'/images/pdf_icon.png" title="Download Allottee List" alt="PDF Icon">All Allottees List – Date-wise Download', 'allottee_list_by_date_pdf/'.encrypt_url($allotment_process_date).'/'.encrypt_url($allotment_process_type).'/'.$allotment_process_type.'_allottees_list_'.time(), array('html'=>TRUE, 'attributes' => array('target' => '_blank', 'style' => 'color: #0090C7;font-weight: 400;text-decoration: none; font-size:14px'))).'</div><br>';
+			
+
+			if($allotment_process_type == 'MSR'){
+				$html .= '<font style=" font-size: 20px; color: #0090C7;"><b><u>List of Allottees at Different R.H.E. of Flat (Manual Allotment)</u></b></font><br>';	
+			}
+				
+	
+			if ($result->rowCount() > 0) {
+
+			    $returnHtml = '
+			    <div style="display:flex; gap:20px; align-items:flex-start;">
+			        <div style="width:50%;">' . $html . '</div>
+			        <div style="width:50%;">' . $html1 . '</div>
+			    </div>
+
+			    <div style="margin-top:20px;">
+			        ' . $output . '
+			    </div>';
+
+			    return $returnHtml;
+			}
+			else {
+			    return $output;
+			}
 		}
 	}
 

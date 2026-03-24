@@ -7,7 +7,8 @@
 		
 		if(is_numeric($flat_type)) {
 			if($flat_type == 5) {
-				$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
+				
+				/*$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
 									allotment_category, computer_serial_no, grade_pay 
 									from {housing_applicant} ha
 									inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
@@ -23,9 +24,60 @@
 									//debaleena start//
 									//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));	
 									array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));  //debaleena 04-09-2024
-									//end//	
+									//end//	*/ // turned off 19-09-2025
+
+				//added 19-09-2025					
+				$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, 	
+							flat_type, computer_serial_no, allotment_category, grade_pay
+							from {housing_applicant} ha
+							inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
+							inner join {housing_online_application} hoa 
+							on hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+							inner join {housing_new_allotment_application} hnaa 
+							on hnaa.online_application_id = hoa.online_application_id
+							inner join {housing_flat_type} hft on hnaa.flat_type_id = hft.flat_type_id
+							where status = :status and hft.flat_type_id = :flat_type_id 
+							ORDER BY 
+			                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
+			                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC", 
+							//array(':status' => 'verified', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));
+							//debaleena start//
+							//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type_id, ':app_no' => 'NA'));	
+							array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type));  //debaleena 04-09-2024
+							//end//
 			} else {
-				$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
+
+				//added 19-09-2025
+				$sql = "SELECT applicant_name, hoa.online_application_id, status, application_no, 	
+		               flat_type, computer_serial_no, hnaa.allotment_category, grade_pay
+		        FROM {housing_applicant} ha
+		        INNER JOIN {housing_applicant_official_detail} haod 
+		            ON haod.housing_applicant_id = ha.housing_applicant_id
+		        INNER JOIN {housing_online_application} hoa 
+		            ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id ";
+
+				
+				
+				$sql .= "INNER JOIN {housing_new_allotment_application} hnaa 
+				        ON hnaa.online_application_id = hoa.online_application_id ";
+				$sql .= "INNER JOIN {housing_flat_type} hft 
+				        ON hnaa.flat_type_id = hft.flat_type_id ";
+				$sql .= "WHERE hoa.status = :status 
+				          AND hft.flat_type_id = :flat_type_id 
+				          ORDER BY 
+                regexp_replace(hoa.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
+                regexp_replace(hoa.computer_serial_no, '[0-9]', '', 'g') ASC";
+
+				/* by dg 24-07-2025 */
+				$codn_arr = array(
+				    ':status' => 'housingapprover_approved_1',
+				    ':flat_type_id' => $flat_type,
+				);
+
+
+				// Execute query
+				$result = db_query($sql, $codn_arr); //print_r($result->fetchObject);die;
+				/*$result = db_query("select applicant_name, hoa.online_application_id, status, application_no, flat_type, 	
 									allotment_category, computer_serial_no, grade_pay 
 									from {housing_applicant} ha
 									inner join {housing_applicant_official_detail} haod on haod.uid = ha.uid
@@ -41,7 +93,7 @@
 									//debaleena start//
 									//array(':status' => 'housing_sup_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));	
 									array(':status' => 'housingapprover_approved_1', ':flat_type_id' => $flat_type, ':app_no' => 'NA'));   //debaleena 04-09-2024
-									//end//
+									//end//*/ // turned of 19-09-2025
 			}
 		//$data1 = $result->fetchObject();					
 		

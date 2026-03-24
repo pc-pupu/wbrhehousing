@@ -22,11 +22,23 @@ function cms_content_edit_form($form, &$form_state, $housing_cms_id_enc = '') {
                 'about_us' => t('About Us'),
                 'contact_us' => t('Contact Us'),
                 'what_is_new' => t('What\'s New'),
+                'notice' => t('Notice'),
             ),
             '#default_value' => $result['content_type'],
             '#required' => TRUE,
-            '#prefix' => '<div class="col-md-2"><div class="form-floating">',
+            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
             '#suffix' => '</div></div>'
+        );
+
+        $form['cms_info']['edited_link_title'] = array(
+            '#title' => t('Link Title'),
+            '#type' => 'textfield',
+            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+            '#suffix' => '</div></div>',
+            '#default_value' => '',
+            '#attributes' => array('class'=>array('form-control')),
+            // '#required' => TRUE,
+            '#default_value' => $result['link_title']
         );
 
         $form['cms_info']['edited_content_title'] = array(
@@ -40,22 +52,20 @@ function cms_content_edit_form($form, &$form_state, $housing_cms_id_enc = '') {
             '#default_value' => $result['content_title']
         );
 
-        $form['cms_info']['edited_link_title'] = array(
-            '#title' => t('Link Title'),
-            '#type' => 'textfield',
-            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
+        $form['cms_info']['edited_content_description'] = array(
+            '#title' => t('Content Description'),
+            '#type' => 'textarea',
+            '#prefix' => '<div class="col-md-12"><div class="form-floating">',
             '#suffix' => '</div></div>',
-            '#default_value' => '',
-            '#attributes' => array('class'=>array('form-control')),
             '#required' => TRUE,
-            '#default_value' => $result['link_title']
+            '#default_value' => $result['content_description']
         );
 
         $form['cms_info']['edited_order_no'] = array(
             '#title' => t('Order No.'),
             '#type' => 'textfield',
             '#element_validate' => array('element_validate_numeric_positive'),
-            '#prefix' => '<div class="col-md-2"><div class="form-floating">',
+            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
             '#suffix' => '</div></div>',
             '#attributes' => array('class' => array('numeric_positive','form-control')),
             '#disabled' => TRUE,
@@ -86,16 +96,6 @@ function cms_content_edit_form($form, &$form_state, $housing_cms_id_enc = '') {
             '#suffix' => '</div></div>',
             '#element_validate' => array('element_validate_date'),
             '#default_value' => $formatted_date
-        );
-
-        $form['cms_info']['edited_content_description'] = array(
-            '#title' => t('Content Description'),
-            '#type' => 'textfield',
-            '#prefix' => '<div class="col-md-4"><div class="form-floating">',
-            '#suffix' => '</div></div>',
-            '#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
-            '#required' => TRUE,
-            '#default_value' => $result['content_description']
         );
 
         $form['edited_meta_desc_text'] = array(
@@ -171,7 +171,7 @@ function cms_content_edit_submit($from, &$form_state) {
     $form_data['order_no']                  =  trim($values['edited_order_no']);
     $form_data['meta_keyword']              =  trim($values['edited_meta_keyword_text_box']);
     $form_data['meta_description']          =  trim($values['edited_meta_desc_text']);
-    $form_data['date_of_notification']      =  trim($values['edited_don']);
+    $form_data['date_of_notification']      =  trim(implode('-', array_reverse(explode('/', $values['edited_don']))));
     $form_data['created_date']              =  date('Y-m-d H:i:s');
     $form_data['content_description']       =  trim($values['edited_content_description']);
     $form_data['is_active']                 =  trim($values['edited_is_active_radio']);
@@ -208,9 +208,9 @@ function cms_content_edit_submit($from, &$form_state) {
     }
 
     db_update('housing_cms')
-    ->fields($form_data)
-    ->condition('housing_cms_id', $values['hidden_textbx_cms_id'])
-    ->execute();
+        ->fields($form_data)
+        ->condition('housing_cms_id', $values['hidden_textbx_cms_id'])
+        ->execute();
     drupal_set_message(t('Content edited successfully.'));
     drupal_goto('cms-content-list');
 }

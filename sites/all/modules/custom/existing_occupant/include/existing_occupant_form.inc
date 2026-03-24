@@ -358,7 +358,7 @@
 			'#required' => TRUE,
 			'#prefix' => '<div class="row"><div class="col-md-6"><div class="form-floating">',
 			'#suffix' => '</div></div>',
-			'#element_validate' => array('element_validate_mobile'),
+			'#element_validate' => array('element_validate_mobile','mobile_no_validate_existing_occupant'), //mobile_no_validate_existing_occupant add by dg 24-07-2025
 			'#attributes' => array('id' => 'mobile_no','class'=>array('form-control')),
 		);
 		
@@ -1144,8 +1144,6 @@
 			$allotment_ins_arr['flat_id']  = trim($form_state['values']['flat_id']);
 			$allotment_ins_arr['allotment_date']  =  NULL;
 			
-			//$allotment_ins_arr['allotment_no'] = 'NAL-'.$data2->oid.'-'.date("dmY");
-			//$allotment_ins_arr['allotment_process_no'] = ;
 		
 			db_insert('housing_flat_occupant')
 			->fields($allotment_ins_arr)

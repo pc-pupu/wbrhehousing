@@ -64,6 +64,22 @@ function application_status_check_menu() {
     'access arguments' => array('common_allotment_view'),
   );
   // End
+
+  // Done By Moumita on 27-01-2026
+    $items['license-extension-list'] = array(
+        'title' => 'License Extension List',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('license_extension_list'),
+        'access arguments' => array('common_allotment_view'),
+    );
+
+    $items['license-extension-status/%/%'] = array(
+        'title' => 'License Extension Approve or Reject',
+        'page callback' => 'license_extension_status',
+        'page arguments' => array(1,2),
+        'access arguments' => array('common_allotment_view'),
+    );
+
   return $items;
 }
 
@@ -116,21 +132,25 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
     $result = $query->execute();
     // $data = $result->fetchAll();
     
-   
+    $header['sl_no'] = array('data' => 'Sl. No.');
     $header['applicant_name'] = array('data' => 'Name');
     $header['application_no'] = array('data' => 'Application Number');
     $header['Status'] = array('data' => 'Status');
-    $header['action'] = array('data' => 'Action', 'width'=>'40%');
+    $header['action'] = array('data' => 'Action');
    
 		$rows =array();
 		$output = '';
+    $i = 1;
 		
 		while($data = $result->fetchObject()) {
      // echo "<pre>";print_r($data);die;
 			$fields = array();
+      $fields[] = $i++;
 			$fields[] = $data->applicant_name;
 			$fields[] = $data->application_no;
       $fields[] = $data->status_description;
+
+      // echo '<pre>';print_r($data);die;
 
       if($user_role == 7){
         // print_r($data);die;
@@ -193,8 +213,9 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                                   ->condition('hac.cancellation_type', 'offer-letter')
                                   ->countQuery();
             $count = $query->execute()->fetchField();
-            //echo $count;die;
-            if($count < 2){
+            // echo $count;die;
+            // if($count < 2){ // Turned off by Subham dt.18-12-2025
+            if($count >= 1){ // Added by Subham dt.18-12-2025 (if data is visible in 'housing_auto_cancellation' table then only 'if' condition will execute)
               $fields[] = l(
                 ' View',
                 'common-application-view-det/'. $app_id.'/'.$app_status,
@@ -202,15 +223,16 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                     'html'=>TRUE,
                     'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                 )
-                ).' '.
-               l(
-                ' Extend Offer Letter',
-                'request-for-offer-letter-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id).'/'. encrypt_url($data->date_of_verified), //
-                array(
-                    'html'=>TRUE,
-                    'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
-                )
-              );
+                );
+              //   .' '.
+              //  l(
+              //   ' Extend Offer Letter',
+              //   'request-for-offer-letter-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id).'/'. encrypt_url($data->date_of_verified), //
+              //   array(
+              //       'html'=>TRUE,
+              //       'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+              //   )
+              // );
             }else{
               $fields[] = l(
                 'View',
@@ -230,7 +252,8 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                                   ->countQuery();
             $count = $query->execute()->fetchField();
             //echo $count;die;
-            if($count < 2){
+            // if($count < 2){ // Turned off by Subham dt.18-12-2025
+            if($count == 1){ // Added by Subham dt.18-12-2025 (if data is visible in 'housing_auto_cancellation' table then only 'if' condition will execute)
               $fields[] = l(
                 'View',
                 'common-application-view-det/'. $app_id.'/'.$app_status,
@@ -238,7 +261,7 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                     'html'=>TRUE,
                     'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                 )
-                ).' '.
+                ) /*.' '.   off by dg 24-07-2025
                l(
                 ' Extend License',
                 'request-for-license-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id), //
@@ -246,7 +269,7 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                     'html'=>TRUE,
                     'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                 )
-              );
+              ) */ ;
             }else{
               $fields[] = l(
                 'View',
@@ -276,10 +299,35 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                 'html'=>TRUE,
                 'attributes'=> array('class'=>array('btn bg-success btn-sm px-4 fa fa-plus rounded-pill text-white fw-bolder')),
             )
-            );
+            ).' '.
+            l(
+                ' Extend License',
+                'request-for-license-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id), //
+                array(
+                    'html'=>TRUE,
+                    'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                )
+              );
 
+        }else if(strpos($data->application_no, 'EO') === 0){   //added by dg 23-03-2026
+          $fields[] = l(
+            'View',
+            'common-application-view-det/'. $app_id.'/'.$app_status,
+            array(
+                'html'=>TRUE,
+                'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+            )
+          ).' '.
+          l(
+            'Add Release Date',
+            'add-release-date/'. $app_id.'/'.$app_status,
+            array(
+                'html'=>TRUE,
+                'attributes'=> array('class'=>array('btn fa fa-plus bg-secondary btn-sm px-4 rounded-pill text-white fw-bolder')),
+            )
+          );
+          
         }else{
-          // echo 'hiii';die;
           $fields[] = l(
             'View',
             'common-application-view-det/'. $app_id.'/'.$app_status, //
@@ -290,19 +338,101 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
             );
         }
       }else if($user_role == 6 || $user_role == 10 || $user_role == 13){
-        $fields[] = l(
+        if($user_role == 6 || $user_role == 10){
+          $fields[] = l(
           'View',
           'common-application-view-det/'. $app_id.'/'.$app_status, //
           array(
               'html'=>TRUE,
               'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
           )
+          ).
+          l(' Allow To Apply New Application','allow-new-application/'. $app_id, array(
+                    'html'=>TRUE,
+                    'attributes'=> array('class'=>array('btn fa fa-check bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                )
           );
 
-      }
-        
+        }else if($user_role == 13){ 
+          $offer_letter_extension_link = '';
+          $query1 = db_select('housing_auto_cancellation', 'hac')
+                                  ->fields('hac', array())
+                                  ->condition('hac.online_application_id', $data->online_application_id, '=')
+                                  ->condition('hac.cancellation_type', 'offer-letter')
+                                  ->countQuery();
+          $count1 = $query1->execute()->fetchField();
+          if($count1 >= 1){ // Added by Moumita on 27-02-2026
+            $offer_letter_extension_link = l(
+                ' Extend Offer Letter',
+                'request-for-offer-letter-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id).'/'. encrypt_url($data->date_of_verified), //
+                array(
+                    'html'=>TRUE,
+                    'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                )
+            );
+          }
 
-      
+           // added this role condition by dg 24-07-2025
+            if($data->license_no != ''){
+              $query = db_select('housing_license_application', 'hla');
+              $query->innerJoin('housing_occupant_license', 'hol', 'hla.license_application_id = hol.license_application_id');
+              $query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hla.online_application_id');
+              $query->innerJoin('housing_applicant_official_detail', 'haod', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+              $query->fields('hol', array('license_issue_date','license_no','possession_date'));
+              $query->fields('haod', array('uid','applicant_official_detail_id'));
+
+              $query->condition('hla.online_application_id',$enc_app_id,'=');
+              $db_or = db_or();
+              $db_or->condition('hoa.status', 'license_generate', '=');
+              $db_or->condition('hoa.status', 'license_extended', '='); 
+              $query->condition($db_or);
+              $result = $query->execute();
+
+              $data = $result->fetchObject();
+
+              // echo '<pre>';print_r($data);die;
+             
+                if($data->possession_date == ''){
+                  $fields[] = l(
+                    'View',
+                    'common-application-view-det/'. $app_id.'/'.$app_status, //
+                    array(
+                        'html'=>TRUE,
+                        'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                    )
+                    ). $offer_letter_extension_link ;
+                    /*.' '.
+                    l(
+                      ' Extend License',
+                      'request-for-license-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id), 
+                      array(
+                          'html'=>TRUE,
+                          'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                      )
+                    );*/
+
+                }else if($data->possession_date != ''){
+                  $fields[] = l(
+                    'View',
+                    'common-application-view-det/'. $app_id.'/'.$app_status, //
+                    array(
+                        'html'=>TRUE,
+                        'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                    )
+                    ). $offer_letter_extension_link;
+                }
+            }else{ // added by Moumita 17-12-2025
+              $fields[] = l(
+                'View',
+                'common-application-view-det/'. $app_id.'/'.$app_status, //
+                array(
+                    'html'=>TRUE,
+                    'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                )
+                ). $offer_letter_extension_link ;
+            }
+        }
+      }
       
 			$rows[] = $fields;
 		}
@@ -353,10 +483,6 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
   }
 }
 
-
-
-
-
 ///////end//////
 
 function common_applicant_data_fetch($app_id = '', $app_status = '') {
@@ -372,8 +498,8 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
               FROM 
               housing_online_application hoa
               INNER JOIN housing_applicant_official_detail haod ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id
-              INNER JOIN housing_ddo hd ON hd.ddo_id = haod.ddo_id
-              INNER JOIN housing_district hds ON hds.district_code = hd.district_code
+              LEFT JOIN housing_ddo hd ON hd.ddo_id = haod.ddo_id
+              LEFT JOIN housing_district hds ON hds.district_code = hd.district_code
               INNER JOIN housing_pay_band_categories hpb ON hpb.pay_band_id = haod.pay_band_id
               INNER JOIN housing_applicant ha ON ha.uid = haod.uid
               INNER JOIN users u ON u.uid = haod.uid
@@ -414,6 +540,40 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
         }
     }
 
+    /* for address null error resolve by dg 30-07-2025 */
+    $present_address_parts = array_filter([
+      $output['present_street'] ?? '',
+      $output['present_city_town_village'] ?? '',
+      $output['present_post_office'] ? 'P.O- ' . $output['present_post_office'] : '',
+      $output['present_district_name'] ?? '',
+      $output['present_pincode'] ? 'Pin-' . $output['present_pincode'] : '',
+    ]);
+
+    $present_address = !empty($present_address_parts) ? implode(', ', $present_address_parts) : 'Not Available';
+
+    $permanent_address_parts = array_filter([
+      $output['permanent_street'] ?? '',
+      $output['permanent_city_town_village'] ?? '',
+      $output['permanent_post_office'] ? 'P.O- ' . $output['permanent_post_office'] : '',
+      $output['permanent_district_name'] ?? '',
+      $output['permanent_pincode'] ? 'Pin-' . $output['permanent_pincode'] : '',
+    ]);
+    
+    $permanent_address = !empty($permanent_address_parts) ? implode(', ', $permanent_address_parts) : 'Not Available';
+    
+    $office_address_parts = array_filter([
+      $output['office_street'] ?? '',
+      $output['office_city_town_village'] ?? '',
+      $output['office_post_office'] ? 'P.O- ' . $output['office_post_office'] : '',
+      $output['office_district_name'] ?? '',
+      $output['office_pin_code'] ? 'Pin-' . $output['office_pin_code'] : '',
+    ]);
+    
+    $office_address = !empty($office_address_parts) ? implode(', ', $office_address_parts) : 'Not Available';
+
+    /* end */
+
+
     $output['application_type'] = $display_app_type;
     $output['gender'] = $display_gender;
 
@@ -431,7 +591,7 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
 
     
 
-    if ($enc_app_status == 'allotted' || $enc_app_status == 'housing_official_approved' || $enc_app_status == 'housing_official_reject' || $enc_app_status == 'offer_letter_generate' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'applicant_reject' || $enc_app_status == 'ddo_verified_2' || $enc_app_status == 'ddo_rejected_2' || $enc_app_status == 'housing_sup_approved_2' || $enc_app_status == 'housing_sup_reject_2' || $enc_app_status == 'license_generate' || $enc_app_status == 'existing_occupant' || $enc_app_status == 'applied' || $enc_app_status == 'offer_letter_cancel' || $enc_app_status == 'license_cancel' || $enc_app_status == 'applicant_acceptance') {
+    if ($enc_app_status == 'allotted' || $enc_app_status == 'housing_official_approved' || $enc_app_status == 'housing_official_reject' || $enc_app_status == 'offer_letter_generate' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'applicant_reject' || $enc_app_status == 'ddo_verified_2' || $enc_app_status == 'ddo_rejected_2' || $enc_app_status == 'housing_sup_approved_2' || $enc_app_status == 'housing_sup_reject_2' || $enc_app_status == 'license_generate' || $enc_app_status == 'existing_occupant' || $enc_app_status == 'applied' || $enc_app_status == 'offer_letter_cancel' || $enc_app_status == 'license_cancel' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'housingapprover_approved_2' || $enc_app_status == 'housing_approver_reject_2') {  //added by dg last two housing_approver status 07-12-2025
 
       $query_get = db_select('housing_occupant_license', 'hol');
       $query_get->innerjoin('housing_license_application','hla','hla.license_application_id = hol.license_application_id');
@@ -492,9 +652,24 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
     }else{
       $output = $output;
     }
+
+    // get document info
+		$fetchDoc = get_applicant_upload_docs($enc_app_id);
+		// echo '<pre>'; print_r($fetchDoc); die($app_id);
+    $extra_doc_link = '';
+    if(!empty($fetchDoc->fetchAssoc())){
+      $doc_data = $fetchDoc->fetchObject();
+      if($doc_data->extra_doc_path != '' ){ 
+        $doc_path = file_create_url($doc_data->extra_doc_path);
+          $extra_doc_link = l(' Download Supporting Document', $doc_path, array('attributes' => array('target' => '_blank', 'class' => array('btn bg-primary px-6 rounded-pill text-white fw-bolder mb-2 fa fa-download')), 'html' => TRUE)).'<br/>';
+      }else{
+        $extra_doc_link = '<span color="red">Supporting Document Not Uploaded<br/></span>';
+      }
+    }
+
     
     // print_r($extra_query);die;
-    $display_output = '
+    $display_output = $extra_doc_link. '
       <div class="table-bottom">
         <table class="table table-list">
           <tr>
@@ -529,15 +704,15 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
           </tr>
           <tr>
             <th style="background-color:#00000000">Permanent Address:</th>
-            <td>'.$output['permanent_street'].', '.$output['permanent_city_town_village'].', P.O - '.$output['permanent_post_office'].', '.$output['permanent_city_town_village'].'- '.$output['permanent_pincode'].'</td>
+            <td>'.$permanent_address.'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Present Address:</th>
-            <td>'.$output['present_street'].', '.$output['present_city_town_village'].', P.O - '.$output['present_post_office'].', '.$output['present_city_town_village'].'- '.$output['present_pincode'].'</td>
+            <td>'.$present_address.'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Gender:</th>
-            <td>'.$output['gender'].'</td>
+            <td>'.(isset($output['gender']) ? $output['gender'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Date of Birth:</th>
@@ -545,30 +720,30 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
           </tr>
           <tr>
             <th style="background-color:#00000000">Mobile Number:</th>
-            <td>'.$output['office_phone_no'].'</td>
+            <td>'.(isset($output['office_phone_no']) ? $output['office_phone_no'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Email ID:</th>
-            <td>'.$output['mail'].'</td>
+            <td>'.(isset($output['mail']) ? $output['mail'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant Official Information</th>
           </tr>
           <tr>
             <th style="background-color:#00000000">Employee HRMS ID:</th>
-            <td>'.$output['hrms_id'].'</td>
+            <td>'.(isset($output['hrms_id']) ? $output['hrms_id'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Designation:</th>
-            <td>'.$output['applicant_designation'].'</td>
+            <td>'.(isset($output['applicant_designation']) ? $output['applicant_designation'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Office Headquarter:</th>
-            <td>'.$output['applicant_headquarter'].'</td>
+            <td>'.(isset($output['applicant_headquarter']) ? $output['applicant_headquarter'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Place of Posting:</th>
-            <td>'.$output['applicant_posting_place'].'</td>
+            <td>'.(isset($output['applicant_posting_place']) ? $output['applicant_posting_place'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Pay Band:</th>
@@ -576,7 +751,7 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
           </tr>
           <tr>
             <th style="background-color:#00000000">Basic Pay:</th>
-            <td>'.$output['pay_in_the_pay_band'].'</td>
+            <td>'.(isset($output['pay_in_the_pay_band']) ? $output['pay_in_the_pay_band'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Date of Joining:</th>
@@ -591,30 +766,30 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
           </tr>
           <tr>
             <th style="background-color:#00000000">Name of the office:</th>
-            <td>'.$output['office_name'].'</td>
+            <td>'.(isset($output['office_name']) ? $output['office_name'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Office Address:</th>
-            <td>'.$output['office_street'].', '.$output['office_city_town_village'].', '.$output['office_post_office'].'- '.$output['office_pin_code'].'</td>
+            <td>'.$office_address.'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">Office Phone Number:</th>
-            <td>'.$output['office_phone_no'].'</td>
+            <td>'.(isset($output['office_phone_no']) ? $output['office_phone_no'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant DDO Information</th>
           </tr>
           <tr>
             <th style="background-color:#00000000">DDO District:</th>
-            <td>'.$output['district_name'].'</td>
+            <td>'.(isset($output['district_name']) ? $output['district_name'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">DDO Designation:</th>
-            <td>'.$output['ddo_designation'].'</td>
+            <td>'.(isset($output['ddo_designation']) ? $output['ddo_designation'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th style="background-color:#00000000">DDO Address:</th>
-            <td>'.$output['ddo_address'].'</td>
+            <td>'.(isset($output['ddo_address']) ? $output['ddo_address'] : 'Not Avalaible').'</td>
           </tr>
           <tr>
             <th colspan="2" style="background: none repeat scroll 0 0 #473a39;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Applicant\'s Housing Estate Preference</th>
@@ -670,5 +845,164 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
       </div>';
       
       return $display_output;
+    }
 }
+
+function license_extension_list($form, &$form_state) {
+    global $user, $user_role;
+
+    // $userrole_arr = array(7,8);
+    $userrole_arr = array(8); // added by Moumita on 19-03-2026
+
+    if(in_array($user_role, $userrole_arr, '===' )){
+      $header_str = '<th>Action</th>';
+    }else{
+      $header_str = '';
+    }
+  
+    // get license_generate and license_extended application list
+
+    $sql = db_select('housing_license_offer_letter_extension', 'hlole');
+    $sql->fields('hlole', array());
+    $sql->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hlole.online_application_id');
+    $sql->fields('hoa', array('status','application_no','online_application_id'));
+    $sql->innerJoin('housing_applicant_official_detail', 'haod', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+    $sql->fields('haod',array('hrms_id','applicant_official_detail_id'));
+    $sql->innerJoin('housing_applicant', 'ha', 'ha.housing_applicant_id = haod.housing_applicant_id');
+    $sql->fields('ha', array('applicant_name'));
+    $sql->addField('hlole','status','request_status');
+    $sql->condition('hlole.status', array('license_extention_request','license_extended'), 'IN');
+    $excute = $sql->execute();
+
+    // echo '<pre>'; print_r($excute->fetchAll()); die;
+
+    if($excute->rowCount() > 0){
+        $output = '<table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Applicant Name</th>
+                        <th>Application No.</th>
+                        <th>HRMS ID</th>
+                        <th>Reason for Extension</th>
+                        <th>Supporting Document</th>
+                        <th>Extended Upto</th>
+                        <th>Status</th>
+                        '.$header_str.'
+                    </tr>
+                    </thead>
+                    <tbody>';
+        foreach($excute->fetchAll() as $record){
+            $existing_reason = ucwords(str_replace('_',' ',$record->reason_for_extension));
+            $existing_other_reason = $record->reason_for_extension_other;
+            $existing_doc_fid = $record->doc_fid;
+            $existing_extended_upto = date('d/m/Y',strtotime($record->extended_upto));
+            $status = ucwords(str_replace('_',' ',$record->request_status));
+
+            // Load file details
+            $file = file_load($existing_doc_fid);
+            // Condition added by Subham dt.23-03-2026
+            if (!empty($existing_doc_fid) && ($file = file_load($existing_doc_fid))) {
+              $file_url = file_create_url($file->uri);
+              $file_link = l('<i class="fa fa-file-pdf-o"></i> View', $file_url, array('attributes' => array('target' => '_blank', 'class' => 'btn btn-sm btn-info'), 'html' => TRUE));
+            } else {
+              $file_link = '<span style="font-size: 0.8em; color: #666;">File not available to download</span>';
+            }
+            
+            $onclickapp="return confirm('Are you sure you want to approve?')";
+
+            $approve_link = l('<span class="fa fa-check"></span> Approve', 'license-extension-status/'.encrypt_url($record->online_application_id).'/approve', array('html'=>TRUE, 'attributes' => array('onclick' => $onclickapp, 'class' => array('btn btn-sm btn-success rounded'))));
+            
+            $onclickrej="return confirm('Are you sure you want to reject?')";
+
+            $reject_link = l('<span class="fa fa-close"></span> Reject', 'license-extension-status/'.encrypt_url($record->online_application_id).'/reject', array('html'=>TRUE, 'attributes' => array('onclick' => $onclickrej, 'class' => array('btn btn-sm btn-danger rounded'))));
+
+            if($record->request_status == 'license_extention_request'){
+                if(in_array($user_role, $userrole_arr, '===' )){
+                $row_str = '<td>' . $approve_link .'<br>'. $reject_link .'</td>';
+              }else{
+                $row_str = '<td></td>';
+              }
+            }else{
+              $row_str = '<td></td>';
+            }
+
+            $output .= '<tr>
+                            <td>' . check_plain($record->applicant_name) . '</td>
+                            <td>' . check_plain($record->application_no) . '</td>
+                            <td>' . check_plain($record->hrms_id) . '</td>
+                            <td>' . check_plain($existing_reason) .'<br>'. check_plain($existing_other_reason) . ' </td>
+                            <td>' . $file_link . '</td>
+                            <td>' . check_plain($existing_extended_upto) . '</td>
+                            <td>' . $status . ' </td>
+                            '.$row_str.'
+                        </tr>';
+            }
+            $output .= '</tbody></table>';
+
+        }else{
+          $output = '<div>
+                          <table class="datatable_no_data_found table table-list">
+                              <tr class="tr_no_data_found">
+                                  <th class="th_no_data_found"> No approval request has been raised </th>
+                              </tr>
+                          </table>
+                      </div>';
+        }
+
+    $form['list_data'] = array(
+    '#type' => 'markup',
+    '#markup' => $output,
+    );
+
+    return $form;
+}
+
+function license_extension_status($online_application_id = '', $action = '') {
+    global $base_root, $base_path, $user; 
+
+    // echo $online_application_id.'<br>'.$action;die;
+    
+    $online_application_id = decrypt_url($online_application_id);
+    $action = $action;
+
+    if($online_application_id !=''){
+        if($action == 'approve'){
+            $update = array('status' => 'license_extended');
+            $msg = 'License Extension Request Approved Successfully.';
+        }else{
+            $update = array('status' => 'license_cancel');
+            $msg = 'License Extension Request Rejected Successfully.';
+        }
+
+        $update_ex = db_update('housing_license_offer_letter_extension')
+        ->fields($update)
+        ->condition('online_application_id', $online_application_id, '=')
+        ->execute();
+        // update housing_online_application status as well
+        $update_online_app = db_update('housing_online_application')
+                        ->fields(array('status' => $update['status']))
+                        ->condition('online_application_id', $online_application_id, '=')
+                        ->execute();
+        
+        $status_id = get_status_id($update['status']);
+
+        // housing_process flow insert
+        $insert = array(
+            'online_application_id' => $online_application_id,
+            'status_id' => $status_id,
+            'uid' => $user->uid,
+            'short_code' => $update['status'],
+            'created_at' => date("Y-m-d H:i:s")
+        );
+
+        db_insert('housing_process_flow')
+            ->fields($insert)
+            ->execute();
+
+        drupal_set_message($msg);
+        drupal_goto('license-extension-list');
+    }else{
+        drupal_set_message('Invalid Request.','error');
+        drupal_goto('license-extension-list');
+    }
 }

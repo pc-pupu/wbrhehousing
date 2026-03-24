@@ -27,7 +27,10 @@ function redir( $checkingUrl = '', $Entity = '', $db_and = '', $online_applicati
  function pay_band_list() {
 	
 	$pay_band_options = array(''=>'- Select -');
-	$query = db_select('housing_pay_band_categories', 'hpb')->fields('hpb')->orderBy('pay_band_id', 'ASC');
+	$query = db_select('housing_pay_band_categories', 'hpb')
+							->fields('hpb')
+							->condition('hpb.flag','new')  // add by dg 25-07-2025
+							->orderBy('pay_band_id', 'ASC');
 	$result = $query->execute();
 	foreach($result as $val) {
 
@@ -44,14 +47,50 @@ function redir( $checkingUrl = '', $Entity = '', $db_and = '', $online_applicati
 	
 	return $pay_band_options;
 }
+
+/* this function only for existing occupant and physical application form by dg 28-07-2025 */
+ function pay_band_list_eo_pa($pay_band_type = ''){
+	if($pay_band_type == 'old'){
+		$query = db_select('housing_pay_band_categories', 'hpb')
+				->fields('hpb')
+				->condition('flag', 'old') 
+				->orderBy('pay_band_id', 'ASC');
+
+	}else if($pay_band_type == 'new'){
+		$query = db_select('housing_pay_band_categories', 'hpb')
+				->fields('hpb')
+				->condition('flag', 'new') 
+				->orderBy('pay_band_id', 'ASC');
+	}
+
+	$result = $query->execute();
+	foreach($result as $val) {
+
+		if($val->scale_from == 0 && $val->scale_to != 0) {
+			$str = '(Up to Rs'.$val->scale_to.'/-)';
+		}else if($val->scale_from != 0 && $val->scale_to != 0)
+		{
+			$str = '(Rs.'.$val->scale_from.'/ Up to Rs. '.$val->scale_to.'/-)';
+		}else{
+			$str = '(Rs '.$val->scale_from.'/- and above)';
+		}
+		$pay_band_options[$val->pay_band_id] = $str;
+	}
+	
+	return $pay_band_options;
+	
+ }
+ /* end */
+
 /* fetch rhe flat_type corresponding to payband*/
   function rhe_flat_type_rst_pay_band_id($pay_band_id) {
 
-	$query = db_select('housing_pay_band', 'hpb');
+	//$query = db_select('housing_pay_band', 'hpb');   offby dg 20-06-2025
+	$query = db_select('housing_pay_band_categories', 'hpbc');  //added by dg 20-06-2025
 	$query->innerJoin('housing_flat_type', 'hft',
-	'hft.flat_type_id = hpb.flat_type_id');
+	'hft.flat_type_id = hpbc.flat_type_id');
 	$query->addField('hft', 'flat_type');
-	$query->condition('hpb.pay_band_id', $pay_band_id, '=');
+	$query->condition('hpbc.pay_band_id', $pay_band_id, '=');
 	$result = $query->execute();
 	$str = '';
 	if($result->rowcount() > 0){
