@@ -8,41 +8,45 @@ function employeeSubmit(){
     
         // $hmac_secret="8392512033044595";
         $hmac_secret= "1Po/Rx7oUnNzy9QZ7NZJjA==";
-        // $hmac_secret= "DDThkqkxlOYQzpZUbqnfEGir5mWHV5mY";
 
-        // $req2 = array(
-        //     'src'=>'HRMS',
-        //     'hrmsid'=>'1995002970', //'19921209876',
-        //     'email'=>'test@example.com',
-        //     'mobile'=>'9999999999',
-        //     'name'=>'John Doe',
-        //     'designation'=>'Scientific Officer/Engineer-SB',
-        //     'status'=>'authenticated',
-        //     'sysTimeStamp'=>date('d/m/Y H:i:s')
-        // );
-        // $jsonData2 =json_encode($req2); //print($jsonData2);
+        $req = array(
+            'src'=>'HRMS',
+            'hrmsid'=>'1995002970', //'19921209876',
+            'email'=>'test@example.com',
+            'mobile'=>'9999999999',
+            'name'=>'John Doe',
+            'designation'=>'Scientific Officer/Engineer-SB',
+            'status'=>'authenticated',
+            'sysTimeStamp'=>date('d/m/Y H:i:s')
+        );
+        $jsonData =json_encode($req); //dd($jsonData);
 
-        $jsonData = '{"src": "NIC","hrmsid": "2000007780","email": "JEETENDRAGUPTA@gmail.com","mobile": "7797660379","name": "JEETENDRA GUPTA","designation": "Additional District & Sessions Judge","status": "authenticated","sysTimeStamp": "12/06/2025 04:11:00"}';
+
+        // given json data
+
+        // $jsonData = '{"src": "HRMS","hrmsid": "2000007780", "email": "JEETENDRAGUPTA@gmail.com","mobile": "7797660379","name": "JEETENDRA GUPTA","designation": "Additional District & Sessions Judge","status": "authenticated","sysTimeStamp": "12/06/2025 04:11:00"}';
+
+
 
 
         $encryptedData = encrypt($jsonData);
 
-        $checksum=hash_hmac('sha256', mb_convert_encoding($jsonData, "UTF-8"),$hmac_secret); 
+        $checksum=hash_hmac('sha256', mb_convert_encoding($jsonData, "UTF-8"),$hmac_secret, true);
 
         $payload = array(
             'encdata' => $encryptedData,
             'cs' => $checksum, // Send IV so the recipient can decrypt
         );
 
-        $payloadJson = json_encode($payload);   print($payloadJson); die;
+        $payloadJson = json_encode($payload);   // print($payloadJson); die;
         
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
           //CURLOPT_URL => 'http://10.173.42.87:8080/rhewbhousing/rhe-wbhousing-v2/auth/login-hrms',
 	      //CURLOPT_URL => 'http://172.25.142.221/rhewbhousing/auth/login-hrms',
-          CURLOPT_URL => 'https://rhe.wb.gov.in/auth/login-hrms',
-        //   CURLOPT_URL => 'http://localhost/housing/auth/login-hrms',
+        //   CURLOPT_URL => 'https://rhe.wb.gov.in/auth/login-hrms',
+          CURLOPT_URL => 'http://localhost/housing/auth/login-hrms',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -63,12 +67,12 @@ function employeeSubmit(){
         $response = curl_exec($curl);  //dd($response);
         // Get the response headers
         $header = curl_getinfo($curl);
-        // echo '<pre>';
-        // echo '$response -- '.$response;
-        // echo '$Header -- ';
-        // print_r($header);
-        // echo '$URL -- ';
-        // echo $header['redirect_url'];die;
+        echo '<pre>';
+        echo '$response -- '.$response;
+        echo '$Header -- ';
+        print_r($header);
+        echo '$URL -- ';
+        echo $header['redirect_url'];die;
 
         // Check if a redirect is being issued
         // if (isset($header['redirect_url']) && $header['redirect_url']) {
@@ -81,7 +85,6 @@ function employeeSubmit(){
         curl_close($curl);
         //echo $response;
         //dd();
-        echo $header['redirect_url'];die;
         if (isset($header['redirect_url']) && $header['redirect_url']) {
             //return redirect($header['redirect_url']);
              header("Location: " . $header['redirect_url']);

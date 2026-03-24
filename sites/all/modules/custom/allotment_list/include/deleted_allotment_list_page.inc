@@ -2,6 +2,11 @@
 
 function fetch_deleted_allotment_list($allotment_process_no = '', $allotment_process_type = ''){
 	global $base_root, $base_path;
+<<<<<<< HEAD
+=======
+	$allotment_process_no = decrypt_url($allotment_process_no);
+	$allotment_process_type = decrypt_url($allotment_process_type);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	$output = '';
 		$query = db_select('housing_allotment_rejection_log', 'harl');
 		$query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = harl.online_application_id');
@@ -19,8 +24,13 @@ function fetch_deleted_allotment_list($allotment_process_no = '', $allotment_pro
 		$query->fields('he',array('estate_name'));
 		$query->fields('hft',array('flat_type'));
 		
+<<<<<<< HEAD
 		//$query->condition('harl.allotment_process_no',$allotment_process_no);
 		//$query->condition('harl.allotment_process_type',$allotment_process_type);
+=======
+		$query->condition('harl.allotment_process_no',$allotment_process_no);
+		$query->condition('harl.allotment_process_type',$allotment_process_type);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	
 
@@ -31,7 +41,11 @@ function fetch_deleted_allotment_list($allotment_process_no = '', $allotment_pro
 		// echo "<pre>";print_r($data);die;
 
 		///////////////////debaleena 23-09-2024////////////////////////
+<<<<<<< HEAD
 		$header['sl_no'] = array('data' => 'Name');
+=======
+		// $header['sl_no'] = array('data' => 'Name');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$header['applicant_name'] = array('data' => 'Applicant Name');
 		$header['application_no'] = array('data' => 'Application No.');
 		$header['computer_serial_no'] = array('data' => 'Computer Serial No');
@@ -75,6 +89,7 @@ function fetch_deleted_allotment_list($allotment_process_no = '', $allotment_pro
 			
 
 			$variables = array(
+<<<<<<< HEAD
 				'attributes' => array('class'=>array('table table-list table-striped')),
 				'header' => $header,
 				'rows' => $rows,
@@ -114,6 +129,48 @@ function fetch_deleted_allotment_list($allotment_process_no = '', $allotment_pro
 			}
 		
 		return $output;
+=======
+			'attributes' => array('class'=>array('table table-list table-striped')),
+			'header' => $header,
+			'rows' => $rows,
+			'sticky' => true,
+			'empty' => t("No data found!") // The message to be displayed if table is empty
+		  );
+  		//end
+		//sd turned off 21-06-2024
+		if(count($rows) > 0) {
+			// Render using Drupal's render API.
+			$build['datatable'] = array(
+			  '#theme' => 'datatable',
+			  '#header' => $header,
+			  '#rows' => $rows,
+			  '#attributes' => array(),
+			);
+			
+			// Or, render using a theme function.
+			$variables = array(
+			  'attributes' => array('class'=>array('table table-list table-striped')),
+			  'header' => $header,
+			  'rows' => $rows,
+			);
+			
+			$output = theme('datatable', $variables);
+		}
+		else {
+			$output = '<div>
+							<table class="datatable_no_data_found table table-list">
+								<tr class="tr_no_data_found">
+									<th class="th_no_data_found"></th>
+								</tr>
+								<tr class="tr_no_data_found">
+									<td class="td_no_data_found">No data found!</td>
+								</tr>
+							</table>
+						</div>';
+		}
+	
+	return $output;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			
 	
 }

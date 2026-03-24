@@ -1156,13 +1156,21 @@
 			$result4 = $query4->execute();
 			$data4 = $result4->fetchObject();
 			
+<<<<<<< HEAD
 			$license_issue_date = !empty($form_state['values']['dol']) ? trim(implode('-', array_reverse(explode('/', $form_state['values']['dol'])))) : null; //added by dg04-08-2025
+=======
+			$license_issue_date = trim( implode('-', array_reverse(explode('/', $form_state['values']['dol']))));
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$licence_expiry_date = date('Y-m-d', strtotime($license_issue_date.'+3 years -1 day'));
 
 			$license_details_arr = array();
 			$license_details_arr['flat_occupant_id'] =  trim($data4->id);
 			$license_details_arr['license_issue_date'] = $license_issue_date;
+<<<<<<< HEAD
 			$license_details_arr['license_expiry_date'] = !empty($licence_expiry_date) ? trim(implode('-', array_reverse(explode('/', $licence_expiry_date)))) : null;  //added by dg04-08-2025
+=======
+			$license_details_arr['license_expiry_date'] = $licence_expiry_date;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$license_details_arr['existing_occupant_license_no'] = trim($form_state['values']['license_no']);
 			$license_details_arr['authorised_or_not'] = trim($form_state['values']['authorised_or_not']);
 

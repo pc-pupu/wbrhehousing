@@ -101,20 +101,30 @@
 				<table width="100%" align="center">
 					<tr>
 						<td style="font-size:15px;" align="center" width="35%">
+<<<<<<< HEAD
 							<b>Competent Authority &<br>
 							Senior Special Secretary<br>
 							Housing Department</b>
 						</td>
 						<td width="25%"></td>
+=======
+							<b>Competent Authority<br>
+							Housing Department</b>
+						</td>
+						<td width="45%"></td>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						<td style="font-size:15px;" align="center" width="40%">
 							<b>Principal Secretary<br>
 							Housing Department</b>
 						</td>
+<<<<<<< HEAD
 						<td width="25%"></td>
 						<td style="font-size:15px;" align="center" width="40%">
 							<b>Hon\'ble Minister-in-Charge<br>
 							Housing Department</b>
 						</td>
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 					</tr>
 				</table>
 				</div>';

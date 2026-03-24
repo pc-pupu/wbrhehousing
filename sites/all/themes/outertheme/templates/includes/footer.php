@@ -49,8 +49,13 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
+<<<<<<< HEAD
                         Copyright © <?= date('Y') ?> Housing Department - All right reserved - Last Updated: <span
                             class="date"><?= date('d/m/Y') ?></span>
+=======
+                        Copyright © 2024 Housing Department - All right reserved - Last Updated: <span
+                            class="date">24/12/2024</span>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     </div>
                     <div class="col-md-6 text-end">Designed and developed by <a href="https://www.nic.in/"
                             target="_blank"><img src="<?= $base_root.$base_path ?>sites/all/themes/outertheme/images/nic-logo.png" alt="NIC" title="NIC" width="90"></a>

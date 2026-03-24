@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 <?php global $base_root, $base_path; 
 $actual_path = drupal_get_path_alias($_GET['q']);?>
+=======
+<?php global $base_root, $base_path; ?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
     <!-- Top header section start -->
     <section class="top-header">
         <div class="container">
             <div class="row">
+<<<<<<< HEAD
                 <div class="col-md-10">
                     <div class="contact-info"> <!-- Added by Subham 08-12-2025 -->
                         <span class="contact-note">
@@ -28,6 +33,10 @@ $actual_path = drupal_get_path_alias($_GET['q']);?>
                         </a>
                     </div> <!-- End -->
                 </div>
+=======
+                <div class="col-md-6"></div>
+                <div class="col-md-6 text-end"><a href="#" target="_self">Skip to main content</a></div>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             </div>
         </div>
     </section>
@@ -36,11 +45,19 @@ $actual_path = drupal_get_path_alias($_GET['q']);?>
     <section class="top-header-logo-bg">
         <div class="container">
             <div class="row">
+<<<<<<< HEAD
                 <div class="col-md-6"><a href="<?= $base_root.$base_path ?>"><img src="<?= $base_root.$base_path ?>sites/all/themes/outertheme/images/e-allotment-rhe-logo2.jpg" alt="Housing Department"
                         title="Housing Department"></a></div>
                 <div class="col-md-6 text-end mt-5">
                     <a href="<?= $base_root.$base_path.'user/login'?>" target="_self" class="btn-admin-login mx-2">Official Login</a>
                     <!-- <a href="<?= $base_root.$base_path.'hrms-login'?>" target="_self" class="btn-admin-login">Applicant Login</a> -->
+=======
+                <div class="col-md-6"><img src="<?= $base_root.$base_path ?>sites/all/themes/outertheme/images/e-allotment-rhe-logo2.jpg" alt="Housing Department"
+                        title="Housing Department"></div>
+                <div class="col-md-6 text-end mt-5">
+                    <a href="<?= $base_root.$base_path.'user/login'?>" target="_self" class="btn-admin-login mx-2">Official Login</a>
+                    <a href="<?= $base_root.$base_path.'hrms-login'?>" target="_self" class="btn-admin-login">Applicant Login</a>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 </div>
             </div>
         </div>
@@ -59,6 +76,7 @@ $actual_path = drupal_get_path_alias($_GET['q']);?>
                         <div class="collapse navbar-collapse" id="collapsibleNavbar">
                             <ul class="navbar-nav ">
                                 <li class="nav-item">
+<<<<<<< HEAD
                                     <a class="nav-link" href="<?= $base_root.$base_path ?>">Home</a>
                                 </li>
                                 <li class="nav-item">
@@ -76,6 +94,40 @@ $actual_path = drupal_get_path_alias($_GET['q']);?>
                                 <li class="nav-item">
                                     <a class="nav-link <?= ($actual_path == 'user-manual') ? 'active' : '' ?>" href="<?= $base_root . $base_path . 'user-manual' ?>">User Manual / SOP</a>
                                 </li>
+=======
+                                    <a class="nav-link" href="#">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">About Housing</a>
+                                </li>
+                                <!-- <li class="nav-item">
+                                    <a class="nav-link" href="#">Housing Estate</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Scheme</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">RTI</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">FAQ</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Publication</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Act & Rules</a>
+                                </li> -->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">Contact Us</a>
+                                </li>
+                                <!-- <li class="nav-item">
+                                    <a href="#" target="_self" class="btn-admin-login ">Department Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" target="_self" class="btn-admin-login">Applicant Login</a>
+                                </li> -->
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                             </ul>
                         </div>
                     </nav>

@@ -2,25 +2,61 @@
 function request_for_offer_letter_extension_form($form,&$form_state, $app_id = '', $app_status = '', $uid = '', $off_detail_id = '', $dov = '') {
   global $user, $user_role;
   
+<<<<<<< HEAD
 
   $enc_app_id = decrypt_url($app_id);
+=======
+  $enc_app_id = decrypt_url($app_id);
+  // echo $enc_app_id;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $enc_app_status = decrypt_url($app_status);
   
   $enc_uid = decrypt_url($uid);
   $enc_off_detail_id = decrypt_url($off_detail_id);
   $enc_dov = decrypt_url($dov);
   //print_r($enc_dov);die;
+<<<<<<< HEAD
   $date_only = date('Y-m-d', strtotime($enc_dov));
   //echo $date_only;die;
 
   drupal_add_js(array('application_status_check' => array('date_only' => $date_only)), 'setting');
+=======
+
+  $query = db_select('housing_online_application', 'hoa');
+  $query->innerJoin('housing_process_flow', 'hpf', 'hoa.online_application_id = hpf.online_application_id');
+  $query->condition('hoa.online_application_id', $enc_app_id,'=');
+  $query->condition('hpf.short_code', 'housing_official_approved');
+  $query->addField('hpf', 'created_at');
+
+  $result = $query->execute()->fetchField();
+  $approved_date = $result;
+  $current_date = date('Y-m-d');
+  $extension_upto_date = '';
+
+  if (!empty($approved_date)) {
+    $approved_dt = strtotime($approved_date);
+    $extension_upto_date = date('Y-m-d', strtotime('+40 days', $approved_dt));
+  }
+  
+  drupal_add_js(array(
+    'application_status_check' => array(
+      'current_date' => $current_date,
+      'extension_upto_date' => $extension_upto_date,
+    )
+  ), 'setting');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
   $form['offer_letter_extension_reason_dropdown'] = array(
     '#title' => t('Reason for Offer Letter Extension'),
     '#type' => 'select',
     '#options' => array(
+<<<<<<< HEAD
                 'Reason_1' => t('Reason-1'),
                 'Reason_2' => t('Reason-2')
+=======
+                'medical_purpose' => t('Medical Purpose'),
+                'headquarter_leave' => t('Headquarter Leave')
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     ),
     '#required' => TRUE,
     '#prefix' => '<div class="row"><div class="col-md-4"><div class="form-floating">',
@@ -154,8 +190,14 @@ function request_for_offer_letter_extension_form_submit($form, &$form_state){
   ->execute();
 
   if ($app_status == 'offer_letter_cancel') {
+<<<<<<< HEAD
       $display_type_of_extension = 'Offer Letter';
   }
+=======
+    $display_type_of_extension = 'Offer Letter';
+  }
+  
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $insert_housing_license_offer_letter_extension = array(
                   'uid' => $uid,
                   'online_application_id' => $app_id,
@@ -167,6 +209,14 @@ function request_for_offer_letter_extension_form_submit($form, &$form_state){
                   'doc_fid' => $fid,
                   'departmental_uid' => $user->uid
   );
+<<<<<<< HEAD
+=======
+
+  if($offer_letter_extension_reason === 'other'){
+    $insert_housing_license_offer_letter_extension['reason_for_extension_other'] = $form_state['values']['other_offer_letter_extension_reason'];
+  }
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   db_insert('housing_license_offer_letter_extension')
   ->fields($insert_housing_license_offer_letter_extension)
   ->execute();

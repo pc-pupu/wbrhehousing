@@ -34,7 +34,11 @@
 			</div>
 			<br>
 			<div align="right">
+<<<<<<< HEAD
 				<font size="3"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
+=======
+				<font size="4"><b>Date : </b>'.date('l d-m-Y h:i:s A').'</font>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			</div>
 			<br>
 			

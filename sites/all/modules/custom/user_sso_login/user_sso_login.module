@@ -192,9 +192,16 @@ function customJsonValidator($data) {
 
 function getHRMSUserData($hrmsID= NULL)
 {
+<<<<<<< HEAD
 	$userDataArr = array(); 
 	if (!empty($hrmsID)) { 
 		$userDataJson = fetchHRMSUserAPIData($hrmsID); // echo $hrmsID; echo $userDataJson; die('Under Maintenance222');
+=======
+	$userDataArr = array();
+	if (!empty($hrmsID)) { 
+		$userDataJson = fetchHRMSUserAPIData($hrmsID); 
+		// print_r(json_decode($userDataJson,true)); die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		if(!empty($userDataJson) && customJsonValidator($userDataJson)){
 			$userDataArrTemp = json_decode($userDataJson,true); 
 			if (isset($userDataArrTemp['resp']['status']) && !empty($userDataArrTemp['resp']['status']) && strtolower($userDataArrTemp['resp']['status']) == 's') {
@@ -205,7 +212,11 @@ function getHRMSUserData($hrmsID= NULL)
 				$userDataArr = $userDataArrTemp['resp']['data'];
 				$userDataArr = json_decode(decrypt($userDataArr),true); 
 				$userDataArr = $userDataArr[0];
+<<<<<<< HEAD
 				// print_r($userDataArr);die('Under Maintenance');
+=======
+				// print_r($userDataArr);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			}else{
 				exit('User data Fetch error.');
 			}
@@ -216,21 +227,32 @@ function getHRMSUserData($hrmsID= NULL)
 #1999002754,1995002970,1981000029
 function fetchHRMSUserAPIData($hrmsID= NULL)
 {
+<<<<<<< HEAD
 	// echo "Under Maintenance";die;
 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	if (!empty($hrmsID)) {
 		$ch = curl_init();
 		// $url="http://172.17.2.53/hrms-External/housing/fetchEmployeeDetails";
 		// $url = 'https://uat.wbifms.gov.in/hrms-External/housing/fetchEmployeeDetails';
+<<<<<<< HEAD
 		// $url = 'https://wbifms.gov.in/hrms-External/housing/fetchEmployeeDetails';
 		// $url="https://www.google.co.in";
 
+=======
+		// $url="https://www.google.co.in";
+		// echo 'hitting curl url';die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		// using VIP at live server
 		$url = 'https://172.17.2.45/hrms-External/housing/fetchEmployeeDetails';
 
+<<<<<<< HEAD
 		// echo 'hitting curl url';die;
 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$data = array("req" => array ("hrmsId" => $hrmsID));
 		$postdata = json_encode($data);
 		
@@ -241,14 +263,24 @@ function fetchHRMSUserAPIData($hrmsID= NULL)
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+<<<<<<< HEAD
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,0); // uncommant this on live server
 		if (curl_errno($ch)) {
 			echo 'Curl error: ' . curl_error($ch);die;
+=======
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,0);
+		if (curl_errno($ch)) {
+			// echo 'Curl error: ' . curl_error($ch);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			return false;
 		}
 		else {
 			$curl_output =curl_exec($ch);
+<<<<<<< HEAD
 			// echo 'curl returns' . $curl_output;die;
+=======
+			//echo 'curl returns' . $curl_output;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		}
 		curl_close($ch);
 		//save_sms_data($item,$curl_output);
@@ -274,6 +306,17 @@ function get_test_info($param = '', $param2 = '') {
 
 	$userdata = getHRMSUserData($hrsmId);
 
+<<<<<<< HEAD
 	echo '<pre>'; print_r($userdata); echo '</pre>'; die;
 
+=======
+	// echo '<pre>'; print_r($userdata); echo '</pre>'; die;
+
+	// $encData = 'NqXWaTRcbK851dot+OCfOP0z0uOL+jlGurEsfrbPEQu2cMmPyNJ04c78SGnj5vb/MT2jQU1lu9OObhNS8UIaoPxNGftx2BgaUY6PkETM+Kvs/eqmfalAgsmpvIPAzi+8lXzjA59A/QsAHhl6bxn7NtiLEM1b2XUYRwfBfQpmmPNxD5I19QhevnRzD904uafAHkXO1AHB7Tzg95/7dV7UnTkHJ6vn7jmmipd3nithAKGNFwZtdfKwEGCJpEONc3POq7qqV+neiZCO3Nhk8w1CudMZPkDhlXWUKuTshG9a0cwy7OHB4HphUJEloIYEOgaytp2tJ3GGYx1A+gcL+TfReMSxMxRHkMwYIg9muBFcvTJUzT0vnO5e6d/KxYxJVUXPd1KSCprcYYa2iCEOHwAyH4VOiWdHfTZHeB4ICbOxHgPyJO+mC6wcfsL/6bSOLbS17ak0I4z/AdxPVoCcSr2HWCtGoR7/Sz2nUjrV89Cvx/zdoSIZldTsANzNLrLizA4HCd1n6Auhf4bG3z/PJoj5CBVG3wg2zEyzMkAxiYaaaBaG0q8ehqxOE1KUabTCvOlYOk6/QYmaDATTD2QYm8eXiAc7woVy5Z4g0OWTnqCynkp4Owa19V/gqxgoW804SMs+6V7Vatqwpexvt3hs+Z0NdzAS5JZaT/f9yKATiNCp7qE1XSxqd8HkfYDtCnWjJMV/8B+3BUUqMmM4Eec+21bX1RReRYiLzVGy1KP4nOjUzpGfphkB5O/erMDRijXosUytDtjswX0hbPm7ode8RslWBFHX1FGM7G4X8kZrlA31gOcjDnOOd60WOlD7/ZGpEA0re6tajLB/BIzBJUpAonNDrAA03E97wgP5br74VBAWoogBUxAm7mGif0k3bG/NsyJLqsQa+xVAlrrtKmUD2uLpEKN15dhVIs01S1GWqJJRNTH9r3oDWp1DIkrVnp7SvdFgzjnl4WTIQ4WY4tcYbnYRLYudgy4QEu8OO+Hy3VbNck+n/IgPTNNiboBesHIK5CEp+XgRLaDbuo9E0Egbv8L8daxWfGpGcqOvifCkjxgUvw0IFX6yJcfxOKLLUZPZHZxEC5cCLE2Y8ZwTx4kfNssYL125lnQWZUpeT0+FTKtVza/jeBEomdLc1pMezcAdBiASwC2dtgCDpb4ntMeO13B1srVaakHk6HYYAThq21CGPm4=';
+
+	// $dataArr = decrypt($encData);
+
+	// echo $dataArr;
+	print_r($dataArr); die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 }

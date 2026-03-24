@@ -34,6 +34,7 @@
             <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
             <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div> -->
+<<<<<<< HEAD
         
         <div class="carousel-inner important-info-carousel-inner">
             <!-- dynamic content loop for what's new section start  --> <!-- done by Subham dt.17-07-2025 -->
@@ -53,6 +54,42 @@
 
 
 
+=======
+        <div class="carousel-inner important-info-carousel-inner">
+            <div class="carousel-item active info" data-bs-interval="10000">
+                <!-- <img src="..." class="d-block w-100" alt="..."> -->
+
+                <!-- Instead of image, div with style and min-height -->
+                 <!-- <div class="info"> -->
+                    <div class="carousel-caption1 d-block">
+                        <h5 class="important-info-heading">Important Announcements</h5>
+                        <p class="important-info-text">Some representative placeholder content for the first slide.</p>
+                    </div>
+                <!-- </div> -->
+                <!-- end of div style min-height: 140px; -->
+            </div>
+            <div class="carousel-item" data-bs-interval="2000">
+                <!-- Instead of image, div with style and min-height -->
+                 <!-- <div class="info"> -->
+                    <div class="carousel-caption1 d-block">
+                        <h5 class="important-info-heading">Important Announcements</h5>
+                        <p class="important-info-text">Some representative placeholder content for the second slide.</p>
+                    </div>
+                <!-- </div> -->
+                <!-- end of div style min-height: 140px; -->
+            </div>
+            <div class="carousel-item">
+                <!-- Instead of image, div with style and min-height -->
+                 <!-- <div class="info"> -->
+                    <div class="carousel-caption1 d-block">
+                        <h5 class="important-info-heading">Important Announcements</h5>
+                        <p class="important-info-text">Some representative placeholder content for the third slide.</p>
+                    </div>
+                <!-- </div> -->
+                <!-- end of div style min-height: 140px; -->
+            </div>
+        </div>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden"></span>

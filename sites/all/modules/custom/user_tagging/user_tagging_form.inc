@@ -298,7 +298,11 @@ function user_tagging_submit($form, &$form_state) {
     global $user;
     $form_data = array();
 
+<<<<<<< HEAD
 
+=======
+    // echo '<pre>'; print_r($form_state);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     if($form_state['values']['physical_application_vs_cs'] == 'yes' && ($form_state['values']['physical_application_no'] == '' || $form_state['values']['application_type'] == '')){
         // echo "k";die;
         if($form_state['values']['physical_application_no'] == ''){
@@ -350,8 +354,13 @@ function user_tagging_submit($form, &$form_state) {
             drupal_set_message(t('Your data has been submitted for departmental approval. Please wait until the approval process is complete.'));
         }
     }
+<<<<<<< HEAD
 
     
+=======
+    
+  
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 }
 
 function _reload_rhewise_flat_info_callback($form, &$form_state) {
@@ -365,3 +374,7 @@ function _reload_rhewise_flat_info_callback($form, &$form_state) {
     return array('#type' => 'ajax', '#commands' => $commands);
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

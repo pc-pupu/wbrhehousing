@@ -23,7 +23,11 @@
 		  'access arguments' => array('administer rhe allotment'),
 		); */
 		
+<<<<<<< HEAD
 		return $items;
+=======
+		return $items; 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 	}
 		

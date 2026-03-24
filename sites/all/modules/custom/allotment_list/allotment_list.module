@@ -56,11 +56,19 @@
 			'access arguments' => array('administer Allotment List for Hold'),
 		);
 		/* end */
+<<<<<<< HEAD
 
 		$items['allotment-deleted-info'] = array(
 			'title' => 'List of Deleted Allottees',
 			'page callback' => 'fetch_deleted_allotment_list',
 			//'page arguments' => array('allotment_list_hold_form'),
+=======
+		//added by dg 25-02-2026
+		$items['allotment-deleted-info/%/%'] = array(
+			'title' => 'List of Deleted Allottees',
+			'page callback' => 'fetch_deleted_allotment_list',
+			'page arguments' => array(1,2),
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			'file' => 'include/deleted_allotment_list_page.inc',
 			'access arguments' => array('administer Allotment List'),
 		);

@@ -286,6 +286,7 @@ jQuery(document).ready(function(){
 
 
 /* added by dg because of getting error for previous code */ 
+<<<<<<< HEAD
 jQuery(document).ready(function () {
   // Ensure the Drupal settings object exists and contains the expected date
   if (Drupal.settings && Drupal.settings.application_status_check && Drupal.settings.application_status_check.date_only) {
@@ -315,6 +316,35 @@ jQuery(document).ready(function () {
 //   else {
 //     console.error("Required Drupal setting 'application_status_check.date_only' is missing.");
 //   }
+=======
+jQuery(document).ready(function ($) {
+  if (
+    typeof Drupal !== "undefined" &&
+    Drupal.settings.application_status_check &&
+    Drupal.settings.application_status_check.current_date &&
+    Drupal.settings.application_status_check.extension_upto_date
+  ) {
+
+    // Min date (date_only)
+    var minDateStr = Drupal.settings.application_status_check.current_date;
+    var minParts = minDateStr.split('-');
+    var minDateObj = new Date(minParts[0], minParts[1] - 1, minParts[2]);
+
+    // Max date (extension_upto_date)
+    var maxDateStr = Drupal.settings.application_status_check.extension_upto_date;
+    var maxParts = maxDateStr.split('-');
+    var maxDateObj = new Date(maxParts[0], maxParts[1] - 1, maxParts[2]);
+
+    $("#edit-extension").datepicker({
+      dateFormat: "dd/mm/yy",
+      changeMonth: true,
+      changeYear: true,
+      minDate: minDateObj,
+      maxDate: maxDateObj,
+      autoSize: true
+    });
+  }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 });
 /* end */
 
@@ -342,7 +372,12 @@ jQuery(document).ready(function(){  //by dg 07-12-2025
 	changeMonth: true,
 	changeYear: true,
 	yearRange: "-0:+70",
+<<<<<<< HEAD
 	autoSize: true
+=======
+	autoSize: true,
+	minDate: +1, // Set minDate to tomorrow
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 });	
 });
 

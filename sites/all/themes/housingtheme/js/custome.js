@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function(){
     }) // forEach
   }); 
 
+<<<<<<< HEAD
 (function ($) {
   // Unique behavior name for setting the cookie
   Drupal.behaviors.setCookieOnClick = {
@@ -44,6 +45,16 @@ document.addEventListener("DOMContentLoaded", function(){
     attach: function (context, settings) {
       $('#my-logout', context).once('unset-cookie-on-logout').click(function () {
         document.cookie = "user_type=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+=======
+  (function ($) {
+  Drupal.behaviors.setCookieAlert = {
+    attach: function (context, settings) {
+      $('#my-button', context).once('set-cookie-alert').click(function () {
+        // Set cookie (simple way)
+        document.cookie = "user_type=new; max-age=30;"; 
+        // Show alert
+        // alert('Cookie has been set!');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
       });
     }
   };

@@ -60,12 +60,19 @@ function application_status_form($form,&$form_state) {
 		// $result = application_detail_fetch($online_application_id, trim($application_no)); // turned off by debaleena
 
 		//debaleena start 11-06-2024
+<<<<<<< HEAD
 		$result = fetch_full_application_status(trim($application_no));
+=======
+		// $result = fetch_full_application_status(trim($application_no));
+		$result = fetch_full_application_status_updated(trim($application_no));   //added by dg 26-02-2026
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		//end
 		$rows =array();
 		$header = array();
 		$fields = array();
+<<<<<<< HEAD
 		//$header[] = array('data' => 'Application Type');
 		//$header[] = array('data' => 'Application No.', 'class' => array('text-align-c'));
 		//$header[] = array('data' => 'Date of Application', 'class' => array('text-align-c'));
@@ -74,10 +81,16 @@ function application_status_form($form,&$form_state) {
 		//$header[] = array('data' => 'Computer Serial No', 'class' => array('text-align-r'));
 		//$header[] = array('data' => 'Combined Waiting No', 'class' => array('text-align-r'));
 		//$header[] = array('data' => 'View Details');
+=======
+
+		$header[] = array('data' => 'Status', 'class' => array('text-align-c'));
+		$header[] = array('data' => 'Verification Date', 'class' => array('text-align-c'), 'width'=>'40%');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 		//$flat_type_id = 0;
 		
 		 while($data = $result->fetchObject()) {
+<<<<<<< HEAD
 			//print_r($data->status_description);die;
 			$fields[] = array('data' => $data->status_description, 'class' => array('text-align-c'));
 			$fields[] = array('data' => $data->created_at, 'class' => array('text-align-c'));
@@ -135,6 +148,13 @@ function application_status_form($form,&$form_state) {
 			 ));*/
 			 //end
 			$rows[] = $fields;
+=======
+			// print_r($data);die;
+			$fields[] = array('data' => $data->applicant_show_status, 'class' => array('text-align-c'));
+			$fields[] = array('data' => date('d/m/Y',strtotime($data->created_at)), 'class' => array('text-align-c'));
+			$rows[] = $fields;
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			// Remove data from array 
 			unset($fields); 
 		}

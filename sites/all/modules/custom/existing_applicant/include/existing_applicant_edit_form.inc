@@ -116,7 +116,11 @@
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 		);
 		
+<<<<<<< HEAD
 	//Permanent Address
+=======
+		//Permanent Address
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$form['prrsonal_info']['permanent_address'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('Permanent Address'),
@@ -165,7 +169,11 @@
 			// 	'width' => '500',
 			// 	//'placeholder' => '- Select -',
 			// 	'allowClear' => TRUE
+<<<<<<< HEAD
    //      	)
+=======
+   		//      	)
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		);
 		$form['prrsonal_info']['permanent_address']['permanent_pincode'] = array(
 			'#title' => t('Pincode'),
@@ -178,7 +186,11 @@
 			'#suffix' => '</div></div></div>',
 			'#attributes' => array('class' => array('numeric_positive'), 'class'=>array('form-control')),
 		);
+<<<<<<< HEAD
 	//end
+=======
+		//end
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 		// Turned off checkbox 23-04-2025	
 
@@ -299,7 +311,11 @@
 				'#suffix' => '</div>',
 			);*/
 		// }
+<<<<<<< HEAD
 	//end
+=======
+		//end
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 		$form['prrsonal_info']['mobile'] = array(
 			'#title' => t('Mobile no'),
@@ -996,6 +1012,23 @@
 		$computer_serial_no = trim($form_state['values']['computer_serial_no']);
 		$confirm_computer_serial_no = trim($form_state['values']['confirm_computer_serial_no']);
 
+<<<<<<< HEAD
+=======
+		// Sanitize integer-like input fields by removing any non-digit characters.
+		//added by jyoti on 11-12-2025 start
+		$raw = isset($form_state['values']) ? $form_state['values'] : array();
+		$mobile_clean = isset($raw['mobile']) ? preg_replace('/\D+/', '', $raw['mobile']) : '';
+		$hrms_id_clean = isset($raw['hrms_id']) ? preg_replace('/\D+/', '', $raw['hrms_id']) : '';
+		$pay_band_clean = isset($raw['pay_band']) ? preg_replace('/\D+/', '', $raw['pay_band']) : '';
+		$pay_in_clean = isset($raw['pay_in']) ? preg_replace('/[^0-9\-]/', '', $raw['pay_in']) : ''; // allow minus only if needed
+		$present_pincode_clean = isset($raw['present_pincode']) ? preg_replace('/\D+/', '', $raw['present_pincode']) : '';
+		$permanent_pincode_clean = isset($raw['permanent_pincode']) ? preg_replace('/\D+/', '', $raw['permanent_pincode']) : '';
+		$office_pincode_clean = isset($raw['office_pincode']) ? preg_replace('/\D+/', '', $raw['office_pincode']) : '';
+		$office_phone_no_clean = isset($raw['office_phone_no']) ? trim($raw['office_phone_no']) : '';
+			//added by jyoti on 11-12-2025 end
+
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		if($computer_serial_no == $confirm_computer_serial_no)
 		{
 			$word_c = str_word_count(trim($form_state['values']['applicant_name']));
@@ -1080,8 +1113,21 @@
 				$applicant_personal_detail_arr['permanent_post_office']  =  strtoupper(trim($form_state['values']['permanent_post_office']));
 			if($form_state['values']['permanent_district'] != '')
 				$applicant_personal_detail_arr['permanent_district']  =  trim($form_state['values']['permanent_district']);
+<<<<<<< HEAD
 			if($form_state['values']['permanent_pincode'] != '')
 				$applicant_personal_detail_arr['permanent_pincode']  =  trim($form_state['values']['permanent_pincode']);
+=======
+
+			// if($form_state['values']['permanent_pincode'] != '')
+			// 	$applicant_personal_detail_arr['permanent_pincode']  =  trim($form_state['values']['permanent_pincode']);
+
+			// added by jyoti on 11-12-2025
+			if($mobile_clean != '')
+				$applicant_personal_detail_arr['mobile_no'] 			=  $mobile_clean;
+			if($permanent_pincode_clean != '')
+				$applicant_personal_detail_arr['permanent_pincode']  =  $permanent_pincode_clean;
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			
 			if(($form_state['values']['permanent_street'] != '') && ($form_state['values']['permanent_city_town_village'] != '') && ($form_state['values']['permanent_post_office'] != '') && ($form_state['values']['permanent_district'] != '') && ($form_state['values']['permanent_pincode'] != ''))
 				// $applicant_personal_detail_arr['permanent_present_same']  =  trim($form_state['values']['chk_permanent_address']);
@@ -1096,8 +1142,18 @@
 				$applicant_personal_detail_arr['present_post_office']  =  strtoupper(trim($form_state['values']['present_post_office']));
 			if($form_state['values']['present_district'] != '')
 				$applicant_personal_detail_arr['present_district']  =  trim($form_state['values']['present_district']);
+<<<<<<< HEAD
 			if($form_state['values']['present_pincode'] != '')
 				$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
+=======
+
+			// if($form_state['values']['present_pincode'] != '')
+			// 	$applicant_personal_detail_arr['present_pincode']  =  trim($form_state['values']['present_pincode']);
+
+			// added by jyoti on 11-12-2025
+			if($present_pincode_clean != '')
+				$applicant_personal_detail_arr['present_pincode']  =  $present_pincode_clean;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			
 			
 			db_update('housing_applicant')
@@ -1109,12 +1165,32 @@
 			/*update applicant_official_detail  data*/
 			$app_off_detail_arr = array();
 			$app_off_detail_arr['uid']  =  $hidden_users_uid;
+<<<<<<< HEAD
 			if($form_state['values']['hrms_id'] != '')
 				$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
 			
 			$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
 			$app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
 			$app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
+=======
+
+			// if($form_state['values']['hrms_id'] != '')
+			// 	$app_off_detail_arr['hrms_id']  =  trim($form_state['values']['hrms_id']);
+
+			// added by jyoti on 11-12-2025
+			if($hrms_id_clean != '')
+				$app_off_detail_arr['hrms_id']  =  $hrms_id_clean;
+			
+			$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
+
+			// $app_off_detail_arr['pay_band_id']  =  trim($form_state['values']['pay_band']);
+			// $app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
+
+			// Ensure pay band and pay_in are integers (or numeric strings) before storing.
+			$app_off_detail_arr['pay_band_id']  =  ($pay_band_clean !== '') ? (int) $pay_band_clean : NULL; // added by jyoti on 11-12-2025
+			$app_off_detail_arr['pay_in_the_pay_band']  =  ($pay_in_clean !== '') ? $pay_in_clean : NULL; // added by jyoti on 11-12-2025
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$app_off_detail_arr['applicant_posting_place']  =  strtoupper(trim($form_state['values']['app_posting_place']));
 			if($form_state['values']['app_headquarter'] != '')
 				$app_off_detail_arr['applicant_headquarter']  =  strtoupper(trim($form_state['values']['app_headquarter']));
@@ -1130,7 +1206,14 @@
 				$app_off_detail_arr['office_post_office']  =  strtoupper(trim($form_state['values']['office_post_office']));
 			
 			$app_off_detail_arr['office_district']  =  trim($form_state['values']['office_district']);
+<<<<<<< HEAD
 			$app_off_detail_arr['office_pin_code']  =  trim($form_state['values']['office_pincode']);
+=======
+			// $app_off_detail_arr['office_pin_code']  =  trim($form_state['values']['office_pincode']);
+
+			$app_off_detail_arr['office_pin_code']  =  ($office_pincode_clean !== '') ? $office_pincode_clean : NULL; // added by jyoti on 11-12-2025
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			if($form_state['values']['office_phone_no'] != '')
 				$app_off_detail_arr['office_phone_no']  =  trim($form_state['values']['office_phone_no']);
 			

@@ -103,14 +103,19 @@ function applicant_login($data){
     // echo '<pre>'; print_r($data); die;
    
    if($_SERVER['REQUEST_METHOD']==='POST'){
+<<<<<<< HEAD
         // if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url','')){
         if((!empty($_SERVER['HTTP_REFERER'])) && ( ($_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url','')) || ($_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url_without',''))) ){
+=======
+        if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('uat_hrms_url','')){
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
             $encdata = $data['encdata'];
             $cs =  $data['cs']; 
 
             $decrypted_data=decrypt($encdata);
             $dataObj = json_decode($decrypted_data);
+<<<<<<< HEAD
             // echo '<pre>'; print_r($decrypted_data);
             //ob_start();
             //$bufferedOutput = ob_get_contents();
@@ -121,22 +126,49 @@ function applicant_login($data){
 
             //added on 05-07-2025 start. This is to prevent replay attack.
             $reqTime = DateTime::createFromFormat("d/m/Y H:i:s", $dataObj->sysTimeStamp);
+=======
+            
+
+            //added on 05-07-2025 start. This is to prevent replay attack.
+            
+            $reqTime = DateTime::createFromFormat("d/m/Y H:i:s", $dataObj->sysTimeStamp); 
+                        
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             if ($reqTime === false) {
             	drupal_json_output(array('error' => 'Invalid timestamp format'), 400);
                 drupal_exit();
         	}
         	
+<<<<<<< HEAD
         	$reqUnixTime = $reqTime->getTimestamp();
         	$currentUnixTime = time();
 
+=======
+        	$reqUnixTime = $reqTime->getTimestamp(); 
+           
+
+        	$currentUnixTime = time();
+
+            // echo "Requested Unix Time: " . $reqUnixTime . "\n";
+            // echo "Current Unix Time: " . $currentUnixTime . "\n";
+            // echo "Difference: " . abs($currentUnixTime - $reqUnixTime) . " seconds\n";die();
+
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
         	//this is to be turned on in production and clock should be 24h clock not 12 h
         	if (abs($currentUnixTime - $reqUnixTime) > 120) {
             	drupal_json_output(array('error' => 'Expired Request'), 400);
                 drupal_exit();
         	}
+<<<<<<< HEAD
         	//echo '<pre>';print_r($currentUnixTime);
             
+=======
+        	// open on 07-08-20256 By Moumita
+            // off due to direfrence in server time by Moumita 29-07-2025
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             //05-07-2025 end
 
             
@@ -149,6 +181,7 @@ function applicant_login($data){
                 drupal_exit();
             }
 
+<<<<<<< HEAD
             
             // static data by TCS
             // $encdata = "7MZdJdN/wLmRPs/AvTHJ1s/IBThJH3uvb69maLznWeQ8ooMEZer1cKeiCuS39GUj9sqWGj21rciUYw8tURrUbXpk/TV4WmUTnABbS4QHoSwRAyKMaMYZGqKAd0hWCfMaFuApsOKduww9Uu/CFjF/fE4lva6B2ILhUaPcby0WrnzgZI9q7oGNcpU2X0muyi0Mi/xa57/GyNJAbz7DG95s1dGNduYEOSYV5jYqf7veInMKUxgpOsv+n5YzodprkUzcxSvtZBVASx4xfrh3lUBABv0PELUMR6FpEGyTyUMAS4RBTdupbGOFln9Kpp5MugT/";
@@ -171,6 +204,8 @@ function applicant_login($data){
             echo 'Our CS : '. $cksm;
             
             die;*/
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
             $hrms_json_log2 = array();
             $hrms_json_log2['hrms_id'] = $dataObj->hrmsid;
@@ -251,8 +286,12 @@ function ddo_login($data){
     // print_r($data);die; 
 
     if($_SERVER['REQUEST_METHOD']==='POST'){
+<<<<<<< HEAD
         // if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url','')){
         if((!empty($_SERVER['HTTP_REFERER'])) && ( ($_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url','')) || ($_SERVER['HTTP_REFERER']==variable_get('prod_hrms_url_without',''))) ){
+=======
+        if(!empty($_SERVER['HTTP_REFERER'])&& $_SERVER['HTTP_REFERER']==variable_get('uat_hrms_url','')){
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
             $encdata = $data['encdata'];
             $cs =  $data['cs']; 
@@ -276,6 +315,12 @@ function ddo_login($data){
                 drupal_json_output(array('error' => 'Expired Request'), 400);
                 drupal_exit();
             }
+<<<<<<< HEAD
+=======
+            // open on 07-08-20256 By Moumita
+            // off due to direfrence in server time by Moumita 29-07-2025
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             // echo '<pre>';print($currentUnixTime);die;
             //05-07-2025 end
 

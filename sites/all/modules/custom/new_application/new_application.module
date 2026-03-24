@@ -1,18 +1,46 @@
 <?php
 function new_application_init()
 {
+<<<<<<< HEAD
     global $custom_url; //comment off for live
     
     if ($_SERVER['REQUEST_URI'] == $custom_url . '/new-apply')
     { //delete $custom_url. for live
         $result = fetch_new_app_status(array('draft'));
+=======
+    global $custom_url, $user; //comment off for live
+
+    if ($_SERVER['REQUEST_URI'] == $custom_url . '/new-apply')
+    { //delete $custom_url. for live
+        $result = fetch_new_app_status(array('draft','allow_new_application'));
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         $row_count = $result->rowCount();
         if ($row_count > 0)
         {
             $data = $result->fetchObject();
             // print_r($data);die;
+<<<<<<< HEAD
 			///////////debaleena 27-11-2024////////
 			if(isset($data->status) && ($data->status == 'offer_letter_cancel' || $data->status == 'license_cancel' || $data->status == 'ddo_rejected_1' || $data->status == 'housing_sup_reject_1' || $data->status == 'housing_approver_reject_1' || $data->status == 'housing_official_reject' || $data->status == 'applicant_reject' || $data->status == 'ddo_rejected_2' || $data->status == 'housing_sup_reject_2' || $data->status == 'housing_approver_reject_2' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $data->status == 'license_cancel')){
+=======
+
+            // check for allow new online application for Existing CS/VS Application
+            $sql = "select hoa.online_application_id , status
+                    from housing_online_application hoa 
+                    inner join housing_applicant_official_detail haod on haod.applicant_official_detail_id = hoa.applicant_official_detail_id 
+                    where status = 'allow_new_application' and haod.hrms_id = ".$user->name;
+            $checkAlow = db_query($sql);
+            $row_count_new = $checkAlow->rowCount();
+            if($row_count_new > 0){
+                $vscs_data = $checkAlow->fetchObject();
+                $allow_status = $vscs_data->status;
+            }else{
+                $allow_status = '';
+            }
+
+			///////////debaleena 27-11-2024////////
+			if(isset($data->status) && ($data->status == 'offer_letter_cancel' || $data->status == 'license_cancel' || $data->status == 'ddo_rejected_1' || $data->status == 'housing_sup_reject_1' || $data->status == 'housing_approver_reject_1' || $data->status == 'housing_official_reject' || $data->status == 'applicant_reject' || $data->status == 'ddo_rejected_2' || $data->status == 'housing_sup_reject_2' || $data->status == 'housing_approver_reject_2' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $data->status == 'license_cancel' || $allow_status =='allow_new_application')){ 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 				drupal_goto('new-apply/');
 			}else{
 				drupal_goto('view-application/'.encrypt_url($data->online_application_id));
@@ -44,6 +72,18 @@ function new_application_menu()
       'access arguments' => array('access content')
     );
 
+<<<<<<< HEAD
+=======
+    // Allow New Application for Existing CS/VS Application By Moumita on 18-02-2026
+    $items['allow-new-application/%'] = array(
+      'title' => 'Allow New Application for Existing CS/VS Application',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('allow_new_application',1),
+      'file' => 'allow_new_application.inc',
+      'access arguments' => array('access content')
+    );
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     return $items;
 }
 
@@ -59,16 +99,28 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
     /*API Call to get HRMS API Data*/
     #sample HRMS ID
     #1999002754,1995002970,1981000029
+<<<<<<< HEAD
     // $userHRMSID = '1981000029';
     $userHRMSID = $user->name;
     $userData = getHRMSUserData($userHRMSID); 
     $ddo_data_all = get_ddo_all_data($userData['ddoId']);
     // echo "<pre>"; print_r($userData); die;
+=======
+    // $userHRMSID = '1981000029'; 
+    $userHRMSID = $user->name;
+    $userData = getHRMSUserData($userHRMSID); 
+    $ddo_data_all = get_ddo_all_data($userData['ddoId']);
+    // echo '123<pre>'; print_r($userData); die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     
     
 
     if (!empty($userData)){   
+<<<<<<< HEAD
         //print_r($userData);die; 
+=======
+        // print_r($userData);die; 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
        
         $form['ddo']['district']['#default_value'] = isset($ddo_data_all['district_code']) ? $ddo_data_all['district_code'] : '';
         $form['ddo']['district']['#disabled'] = true;
@@ -269,6 +321,7 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
         }
 
         $query->condition('t1.flag', 'new', '=');
+<<<<<<< HEAD
         
 
         $result = $query->execute(); // echo '<pre>'; print_r($result); die;
@@ -276,6 +329,13 @@ function new_application_form_application_form_alter(&$form, &$form_state, $form
         $pay_band_id = $record->pay_band_id;
         $flat_type = $record->flat_type;
 			
+=======
+		
+		$result = $query->execute();
+		$record = $result->fetchObject();
+		$pay_band_id = $record->pay_band_id;
+		$flat_type = $record->flat_type;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         $form['official_info']['pay_band']['#default_value'] = $pay_band_id;
         $form['official_info']['pay_band']['#disabled'] = true;
         $form['allotment_reason']['rhe_flat_type']['#default_value'] = $flat_type; 

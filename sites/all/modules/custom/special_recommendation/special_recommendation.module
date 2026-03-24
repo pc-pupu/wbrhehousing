@@ -18,10 +18,18 @@ function special_recommendation_menu() {
     'page arguments' => array(1),
     'access arguments' => array('access content')
   );
+<<<<<<< HEAD
 
   $items['convrt-to-gen-cat/%'] = array(	
     'page callback' => 'convert_from_recommended_to_general_category',
     'page arguments' => array(1),
+=======
+  
+  // modified by Moumita on 13-01-2026
+  $items['convrt-to-gen-cat'] = array(	
+    'page callback' => 'convert_from_recommended_to_general_category',
+    'page arguments' => array(1,2),
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     'access arguments' => array('administer convert from recommended to general category')
   );
   //end
@@ -298,7 +306,10 @@ function housing_approver_list($form, &$form_state){
     '3'=> 'C',
     '4'=> 'D',
   );
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
  /* Added by Subham 21-11-2025 */
   $form['flat_type'] = array(
     '#type' => 'select',
@@ -354,7 +365,11 @@ $query->condition('hnaa.allotment_category',$form_state['values']['type_of_categ
 $query->condition('hnaa.flat_type_id', $form_state['values']['flat_type']); /* Added by Subham 21-11-2025 */
 
 $result = $query->execute();
+<<<<<<< HEAD
 
+=======
+echo $query; echo $form_state['values']['type_of_category']; echo $form_state['values']['flat_type']; die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 ///////////////////debaleena 23-09-2024////////////////////////
 $header['applicant_name'] = array('data' => 'Name');
@@ -380,6 +395,10 @@ $fields[] = $data->allotment_category;
 $fields[] = $data->flat_type;
 $fields[] = date('d/m/Y', strtotime($data->date_of_verified));
       
+<<<<<<< HEAD
+=======
+      
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 $query1 = db_select('housing_special_recommended', 'hsr');
 $query1->addField('hsr', 'special_recommend_id');
@@ -405,7 +424,11 @@ $action_buttons = ''; //added dt.13-10-2025
             array('html'=>TRUE)).'<br><br>'.l('View Details', 'view-app-det/'.encrypt_url($data->online_application_id), array('html'=>TRUE,'attributes'=> array('target' => '_blank', 'class' => array('btn bg-primary btn-sm px-4.5 rounded-pill text-white fw-bolder')))
           );
           $action_buttons .= '<br><br>';
+<<<<<<< HEAD
           if($data->allotment_category == 'Recommended'){ //added dt.13-10-2025
+=======
+          if($data->allotment_category == 'Recommended'){ // added dt.13-10-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             $action_buttons .= l(
               '<span class="btn bg-success btn-sm fa fa-hourglass-1 text-white rounded" style="font-size:12px" title="Convert to General Category with same waiting list"> Convert to General</span>' , 'convrt-to-gen-cat/'.encrypt_url($data->online_application_id), array('html'=>TRUE));
           }
@@ -502,6 +525,10 @@ $action_buttons = ''; //added dt.13-10-2025
       $header['flat_type'] = array('data' => 'Flat Type', 'width' => '8%');
       $header['date_of_verified'] = array('data' => 'Approval/Rejection Date', 'width' => '10%');
       $header['action'] = array('data' => 'Action'); //added dt.13-10-2025
+<<<<<<< HEAD
+=======
+      
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
       
       $rows =array();
@@ -1145,6 +1172,7 @@ function spl_recommendation_view_details($online_application_id = '') {
   return $output;
 }
 
+<<<<<<< HEAD
 // added dt.13-10-2025
 function convert_from_recommended_to_general_category($online_application_id = '') {
   global $base_root, $base_path;
@@ -1154,6 +1182,17 @@ function convert_from_recommended_to_general_category($online_application_id = '
     $update_allotment_category = array(
                                       'allotment_category' => 'General',
                                     );
+=======
+// added dt.13-10-2025 // modified by Moumita on 13-01-2026
+function convert_from_recommended_to_general_category($online_application_id = '', $old_category = 'Recommended') {
+  global $base_root, $base_path, $user_role;
+
+  $dec_online_application_id = decrypt_url($online_application_id);
+  $old_category = decrypt_url($old_category);
+
+  if (db_table_exists('housing_new_allotment_application')) {
+    $update_allotment_category = array('allotment_category' => 'General',);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
     db_update('housing_new_allotment_application')
           ->fields($update_allotment_category)
@@ -1165,18 +1204,34 @@ function convert_from_recommended_to_general_category($online_application_id = '
                                   'housing_online_application_id' => $dec_online_application_id,
                                   'priority_order' => 0,
                                   'flag' => 'convert_to_general',
+<<<<<<< HEAD
                                   'old_category' => 'Recommended',
+=======
+                                  'old_category' => $old_category,
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                                   'new_category' => 'General',
                                   'created_at' => date('Y-m-d H:i:s')
     );
     db_insert('housing_special_recommended_log')->fields($status_conversion_log)->execute();
     
     drupal_set_message('Applicant converted to General category with same waiting list'); 
+<<<<<<< HEAD
     drupal_goto('housing-approver-list'); 
   } else{
     $error_message = 'Something went wrong.';
     drupal_set_message(t($error_message), 'error');
     drupal_goto('housing-approver-list');
+=======
+    if($user_role == 13){
+      drupal_goto('housing-approver-list');
+    }else{
+      drupal_goto('dashboard');
+    }     
+  } else{
+    $error_message = 'Something went wrong.';
+    drupal_set_message(t($error_message), 'error');
+    
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   }
 }
 

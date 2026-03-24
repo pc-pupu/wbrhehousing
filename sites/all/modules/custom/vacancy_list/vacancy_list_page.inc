@@ -22,25 +22,45 @@ function vacancy_list_page($district_id = 0, $flat_type_id = 0) {
 	$header['flat_list'] = array('data' => 'Flat No.', 'width' => '20%');
 	$header['no_of_vacant_flat'] = array('data' => 'No. of vacant Flat(s)', 'width' => '15%');
 	//$header['flat_status'] = array('data' => 'Flat Status');
+<<<<<<< HEAD
 	
 	$i = 1;
 	 while($data = $result->fetchObject()) {
+=======
+
+	$rows = array();
+	$i = 1;
+	 while($data = $result->fetchObject()) {
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		 $fields = array();
 		 $fields['slno'] = $i;
 		 $fields['district_name'] = $data->district_name;
 		 $fields['estate_name'] = $data->estate_name;
 		 $fields['estate_address'] = $data->estate_address;
 		 $out = rhe_flat_allotment_list_rst_estate($flat_type_id, $flat_status_id, $data->estate_id);
+<<<<<<< HEAD
+=======
+		 // echo "<pre>";print_r($out);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		 $fields['flat_list'] = $out[1];
 		 $fields['no_of_vacant_flat'] = $out[0];
 		 //$fields['flat_status'] = $data1->flat_status;
 		 
+<<<<<<< HEAD
+=======
+		 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		 $rows[] = $fields;
 		 $i++;
 		 $total_no_flat = $total_no_flat + $out[0];
 	 }
 	 
+<<<<<<< HEAD
 	 if ($result->rowCount() == 0 || empty($rows)) {  //changed if empty showing no data found by dg 15-10-2025
+=======
+	if ($result->rowCount() == 0 || empty($rows)) {  //changed if empty showing no data found by dg 15-10-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		  
 	  return '
 	   <div class="text-center my-5">
@@ -147,4 +167,7 @@ function show_vacancy_list($rhe_name = '', $flat_type_id = '') {
 	) . '<div class="mb-5 pb-3">' . $output . '</div>';
 }
 /* End */
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

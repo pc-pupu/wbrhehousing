@@ -17,7 +17,12 @@ if($isVal){
 
   //debolina start
   $preference_data=$output[5];
+<<<<<<< HEAD
   $status_description=$output[4]->status_description;   //by dg 2025
+=======
+  $status_description=$output[4]->applicant_show_status;   //by dg 26-02-2026
+    
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $status_short_code = $output[4]->short_code;  //by dg 28-08-2025
   $fetched_existing_occupant_data = $output[6];  //by dg 28-08-2025
    // echo "<pre>";print_r($output);die;
@@ -34,9 +39,14 @@ if($isVal){
 
 ?>
 </div>
+<<<<<<< HEAD
 <?php
 
 //start added by dg 07-12-2025 //
+=======
+<?php 
+ //start added by dg 07-12-2025 //
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
  $result = db_query("SELECT status_id FROM {housing_allotment_status_master} WHERE short_code = :short_code", [':short_code' => $common_data->status,]);
 
  $status_id = $result->fetchField();
@@ -47,8 +57,13 @@ if($isVal){
 if ($supporting_document != ''  && $application_data->allotment_category != 'General' && $status_id <= 8 && !in_array($application_no_prifix, array('VS', 'CS'))
 ) {
 ?>
+<<<<<<< HEAD
 <div class = "col-md-4"><?= l(' Download Supporting Document',$supporting_document,array('html'=>TRUE,'attributes' => array('target' => '_blank','class' => 'btn bg-primary px-6 rounded-pill text-white fw-bolder mb-2 fa fa-download','role'=>'button'))) ?></div>
 <?php
+=======
+  <div class = "col-md-4"><?= l(' Download Supporting Document',$supporting_document,array('html'=>TRUE,'attributes' => array('target' => '_blank','class' => 'btn bg-primary px-6 rounded-pill text-white fw-bolder mb-2 fa fa-download','role'=>'button'))) ?></div>
+  <?php
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 }
 ?>
 

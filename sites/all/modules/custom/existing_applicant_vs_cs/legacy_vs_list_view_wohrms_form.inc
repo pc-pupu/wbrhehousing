@@ -78,6 +78,183 @@ function _reload_vs_wohrms_list_view($form, &$form_state) {
     return array('#type' => 'ajax', '#commands' => $commands);
 }
 
+<<<<<<< HEAD
+=======
+// function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
+//     global $base_root, $base_path, $user, $user_role;
+//     $output = '';
+//     // echo "<pre>";print_r($flat_type);die;                
+
+//     $query_dtls = db_select('users_details', 'ud'); 
+//     $query_dtls->fields('ud');
+//     $query_dtls->condition('uid',$user->uid,'=');
+//     $rsult = $query_dtls->execute();
+//     $data_fetch = $rsult->fetchObject();
+
+//     if($data_fetch->division_id != '' && $data_fetch->subdiv_id != '') { 
+//         if($data_fetch->subdiv_id != 0) {
+// 			$query = db_select('housing_existing_occupant_draft', 'heod');
+// 			$query->innerJoin('housing_vs_application', 'hva', 'hva.occupation_flat = heod.flat_id');
+// 			$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+// 			$query->innerJoin('housing_estate', 'he', 'he.estate_id = hva.occupation_estate');
+// 			$query->innerJoin('housing_block', 'hb', 'hb.block_id = hva.occupation_block');
+// 			$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hva.flat_type_id');
+// 			$query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hva.online_application_id');
+// 			$query->innerJoin('housing_applicant_official_detail', 'haod', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+// 			$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+// 			$query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+
+//             $query->condition('hoa.application_no', 'VS%', 'LIKE');
+//             $query->condition('hoa.is_backlog_applicant', '1', '=');
+//             // $query->isNull('heod.hrms_id');
+
+// 			$query->fields('ha', array('applicant_name', 'gender', 'mobile_no'));
+//             $query->fields('hoa', array('application_no', 'date_of_application', 'online_application_id'));
+            
+//             $query->addField('he', 'estate_name');
+//             $query->addField('hb', 'block_name');
+//             $query->addField('hft', 'flat_type');
+//             $query->fields('hf', array('flat_no', 'flat_id'));
+            
+//             $db_and = db_and();														
+//             $db_and->condition('he.division_id', $data_fetch->division_id, '=');	
+//             $db_and->condition('he.subdiv_id', $data_fetch->subdiv_id, '=');		
+//             $query->condition($db_and);												
+
+//             if($rhe_name != 0 && $flat_type != 0){
+//                 $db_and = db_and();
+//                 $db_and->condition('hf.estate_id', $rhe_name, '=');
+//                 $db_and->condition('hf.flat_type_id', $flat_type, '=');
+
+//                 $query->condition($db_and);
+//             }
+//             $query->orderBy('hoa.date_of_application', 'DESC');
+//             $result = $query->execute();
+//         } else{
+//             $query = db_select('housing_existing_occupant_draft', 'heod');
+// 			$query->innerJoin('housing_vs_application', 'hva', 'hva.occupation_flat = heod.flat_id');
+// 			$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = heod.flat_id');
+// 			$query->innerJoin('housing_estate', 'he', 'he.estate_id = hva.occupation_estate');
+// 			$query->innerJoin('housing_block', 'hb', 'hb.block_id = hva.occupation_block');
+// 			$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hva.flat_type_id');
+// 			$query->innerJoin('housing_online_application', 'hoa', 'hoa.online_application_id = hva.online_application_id');
+// 			$query->innerJoin('housing_applicant_official_detail', 'haod', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+// 			$query->innerJoin('users', 'u', 'u.uid = haod.uid');
+// 			$query->innerJoin('housing_applicant', 'ha', 'ha.uid = haod.uid');
+
+//             $query->condition('hoa.application_no', 'VS%', 'LIKE');
+//             $query->condition('hoa.is_backlog_applicant', '1', '=');
+//             // $query->isNull('heod.hrms_id');
+
+//             $query->fields('ha', array());
+
+//             $query->fields('hoa', array('application_no', 'date_of_application'));
+//             $query->addField('hoa', 'online_application_id');
+            
+//             $query->addField('he', 'estate_name');
+//             $query->addField('hb', 'block_name');
+//             $query->addField('hft', 'flat_type');
+//             $query->fields('hf', array('flat_no', 'flat_id'));
+            
+//             $db_and = db_and();														
+//             $db_and->condition('he.division_id', $data_fetch->division_id, '=');			
+//             $query->condition($db_and);												
+
+//             if($rhe_name != 0 && $flat_type != 0){
+//                 $db_and = db_and();
+//                 $db_and->condition('hf.estate_id', $rhe_name, '=');
+//                 $db_and->condition('hf.flat_type_id', $flat_type, '=');
+
+//                 $query->condition($db_and);
+//             }
+// 			$query->orderBy('hoa.date_of_application', 'DESC');
+//             $result = $query->execute();
+//         }
+//     }
+
+//     $flat_type_name = '';
+//     if ($flat_type != 0) {
+//         $query_flat_type = db_select('housing_flat_type', 'hft')
+//             ->fields('hft', array('flat_type'))
+//             ->condition('flat_type_id', $flat_type, '=')
+//             ->execute();
+        
+//         if ($result_ft = $query_flat_type->fetchObject()) {
+//             $flat_type_name = $result_ft->flat_type;
+//         }
+//     }
+    
+//     $header['sl_no'] = array('data' => 'Sl. No.');
+//     $header['application_no'] = array('data' => 'Application No');
+//     $header['applicant_name'] = array('data' => 'Applicant Name');
+//     $header['date_of_application'] = array('data' => 'Date of Application');
+//     $header['mobile_no'] = array('data' => 'Mobile No.');
+//     $header['gender'] = array('data' => 'Gender');
+//     $header['current_occupancy_details'] = array('data' => 'Current Occupancy Details');
+//     $header['flat_type_applied_for'] = array('data' => 'Flat Type Applied For');
+//     $header['action'] = array('data' => 'Action');
+    
+//     $rows =array();
+//     $output = '';
+//     $c= 1;
+
+//     while($data = $result->fetchObject()) {
+//       $fields = array();
+
+//       $fields[] = $c;		
+//       $fields[] = $data->application_no;
+//       $fields[] = $data->applicant_name;
+//       $fields[] = date('d/m/Y', strtotime($data->date_of_application));
+//       $fields[] = isset($data->mobile_no) ? $data->mobile_no : 'Data Not Found';
+//       $fields[] = isset($data->gender) ? $data->gender : 'Data Not Found';
+//       $fields[] = '<b>RHE Name:</b> ' . $data->estate_name . '<br> <b>Block Name:</b> ' . $data->block_name . '<br> <b>Flat No.:</b> ' . $data->flat_no . '<br> <b>Flat Type:</b> ' . $flat_type_name;
+//       $fields[] = $data->flat_type;
+			
+//       $fields[] = l('<i class="fa fa-edit"></i> Edit', 'legacy-vs-wohrms-edit/' . encrypt_url($data->online_application_id), array('html' => true, 'attributes' => array('class' => array('btn btn-sm bg-primary px-3 rounded-pill text-white fw-bolder'))));
+    
+//       $rows[] = $fields;
+//       $c++;
+//     }
+
+//     $variables = array(
+//       'attributes' => array('class'=>array('table table-list table-striped')),
+//       'header' => $header,
+//       'rows' => $rows,
+//       'sticky' => true,
+//       'empty' => t("No data found!")
+//       );
+//     if(count($rows) > 0) {
+//       $build['datatable'] = array(
+//         '#theme' => 'datatable',
+//         '#header' => $header,
+//         '#rows' => $rows,
+//         '#attributes' => array(),
+//       );
+      
+//       $variables = array(
+//         'attributes' => array('class'=>array('table table-list table-striped')),
+//         'header' => $header,
+//         'rows' => $rows,
+//       );
+      
+//       $output = theme('datatable', $variables);
+//     }
+//     else {
+//       $output = '<div>
+//                     <table class="datatable_no_data_found table table-list">
+//                       <tr class="tr_no_data_found">
+//                         <th class="th_no_data_found"></th>
+//                       </tr>
+//                       <tr class="tr_no_data_found">
+//                         <td class="td_no_data_found">No data found!</td>
+//                       </tr>
+//                     </table>
+//                 </div>';
+//     }
+//     return $output;
+// }
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {  //updated by dg 07-11-2025,in demo previous function is turned off
     global $base_root, $base_path, $user, $user_role;
     $output = '';
@@ -102,8 +279,12 @@ function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {  //u
 
 	$query->condition('hoa.application_no', 'VS%', 'LIKE');
 	$query->condition('hoa.is_backlog_applicant', '1', '=');
+<<<<<<< HEAD
 	//$query->isNull('heod.hrms_id');
 	$query->condition('haod.hrms_id', '0', '=');
+=======
+	// $query->isNull('heod.hrms_id');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	$query->fields('ha', array('applicant_name', 'gender', 'mobile_no'));
 	$query->fields('hoa', array('application_no', 'date_of_application', 'online_application_id'));

@@ -130,8 +130,12 @@ a:hover {
     -webkit-border-radius: 24px !important;
     border-radius: 24px !important;
     -webkit-border-radius: 24px !important;
+<<<<<<< HEAD
     border-radius: 24px ;
     -webkit-border-radius: 24px !important;
+=======
+    border-radius: 24px -webkit-border-radius: 24px !important;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     border: none;
     padding: 10px 20px !important;
 }
@@ -1720,6 +1724,7 @@ button.swiper-pagination-bullet {
     display: none;
 }
 
+<<<<<<< HEAD
 /* Added on 29-08-2025 By Sangita*/
 
 .bg-banner{
@@ -1737,6 +1742,9 @@ button.swiper-pagination-bullet {
 }
 
 /* End Sangita */
+=======
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 @-webkit-keyframes swiper-preloader-spin {
     100% {
         -webkit-transform: rotate(360deg);
@@ -1749,6 +1757,7 @@ button.swiper-pagination-bullet {
     }
 }
 
+<<<<<<< HEAD
  /* Added by Subham 08-12-2025 */
 .contact-info {
   display: flex;
@@ -1785,3 +1794,5 @@ button.swiper-pagination-bullet {
     text-decoration: underline !important;
 }
 /* End */
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

@@ -4,7 +4,11 @@
 		global $user;
 		
 		// $query = db_select('housing_pay_band', 'hpb'); off By Moumita on 10/09/2025
+<<<<<<< HEAD
 		 
+=======
+
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$query = db_select('housing_pay_band_categories', 'hpb');
 		$query->fields('hpb', array('flat_type_id'));
 		$query->condition('hpb.pay_band_id', $form_state['values']['pay_band'], '=');

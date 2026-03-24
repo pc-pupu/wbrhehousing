@@ -25,7 +25,11 @@ function flat_wise_user_info($status =''){
     
     $inarr = array('new','pending');
     
+<<<<<<< HEAD
     $query->condition('hut.flag',$inarr, 'in');
+=======
+    // $query->condition('hut.flag',$inarr, 'in');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	// $query->condition('hf.flat_status_id',2); // off on 04-11-2025 by Moumita
 	
     $result = $query->execute();
@@ -165,9 +169,14 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 
 	$draft_hrms_id = !empty($result_draft->hrms_id) ? $result_draft->hrms_id : 'Not Available';  //added by dg 20-08-2025
 	$authoried_or_not = !empty($result_draft->authorised_or_not) ? ucwords($result_draft->authorised_or_not) : 'Not Available'; //added by dg 20-08-2025
+<<<<<<< HEAD
 	$draft_ddo_id = (!empty($result_draft->ddo_id) || $result_draft->ddo_id != '') ? $result_draft->ddo_id : 1263;  //added by dg 29-08-2025
 	$draft_pay_band_id = (!empty($result_draft->pay_band_id) || $result_draft->pay_band_id != '') ? $result_draft->pay_band_id : 10;  //added by dg 29-08-2025
 
+=======
+	$draft_ddo_id = (!empty($result_draft->ddo_id) && $result_draft->ddo_id != '') ? $result_draft->ddo_id : 1263;  //added by dg 29-08-2025
+	$draft_pay_band_id = (!empty($result_draft->pay_band_id) && $result_draft->pay_band_id != '') ? $result_draft->pay_band_id : 10;  //added by dg 29-08-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	$display_output1 = '
 		    <div class="table-bottom">
@@ -252,7 +261,10 @@ function flat_wise_user_details($form, $form_state, $en_id = 0){
 		'authorised_or_not' => $result_draft->authorised_or_not,
 		'draft_ddo_id' => $draft_ddo_id,
 		'draft_pay_band_id' => $draft_pay_band_id
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 	);
 

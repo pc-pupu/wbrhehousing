@@ -61,6 +61,7 @@ function user_sso_login($form, &$form_state, $token)
                 ));
                 //drupal_session_regenerate();
                 //$form_state['redirect'] = 'dashboard';
+<<<<<<< HEAD
                 
                 // if(1=1){
                 //     drupal_goto('dashboard');
@@ -68,6 +69,9 @@ function user_sso_login($form, &$form_state, $token)
                     drupal_goto('dashboard');
                 // }
                   
+=======
+                drupal_goto('dashboard');  
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             }else{
 
                 drupal_json_output(array('error' => 'Error: Invalid Token and User or User Not Found'), 400);

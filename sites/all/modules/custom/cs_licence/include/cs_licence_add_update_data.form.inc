@@ -14,7 +14,11 @@
 		//$cs_license_app_arr['allotment_flat']  =   trim($form['allotment_info']['allotment_flat']['#value']);
 		
 		$cs_licence_app_arr['allotment_flat_id']  =   trim($form['allotment_info']['allotment_flat_id']['#value']);		
+<<<<<<< HEAD
 		
+=======
+		/* Turned off by SUbham 24-07-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		if($form_state['values']['file'] != 0){
 			// file exists
 			$file = file_load($form_state['values']['file']);
@@ -29,9 +33,15 @@
 			}
 			
 		}
+<<<<<<< HEAD
 		else {
 			$cs_licence_app_arr['document']  =  NULL;
 		}
+=======
+		else {*/ // Turned off by Subham 24-07-2025
+			$cs_licence_app_arr['document']  =  NULL;
+		// }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		if($online_application_id != 0) {
 			db_insert('housing_license_application')
@@ -46,7 +56,12 @@
 		
 		$cs_licence_app_arr = array();
 
+<<<<<<< HEAD
         // deleted	
+=======
+        /*Turned off by Subham 24-07-2025 
+		// deleted	
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		if($form_state['values']['file'] == 0 ){	
 			$file =  file_load($form_state['values']['file']) ;
 			if ($file) {
@@ -83,7 +98,11 @@
 					//$filename = substr($data->uri, 13);
 					/*echo '<pre>';
 					print_r($filename);*/
+<<<<<<< HEAD
 					
+=======
+					/* Turned off by Subham 24-07-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 					$file1 = file_load($data->file_id);
 					file_usage_delete($file1, 'cs_licence', 'Payslip Document', $user->uid);
     				file_delete($file1);
@@ -95,7 +114,11 @@
 				/*$path_parts = pathinfo($file->filename);
 				$file->filename = 'payslip_doc_'.$user->uid.'_'.time().'.'.$path_parts['extension'];*/
 			//code end		
+<<<<<<< HEAD
 				
+=======
+				/*Turned off by Subham 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 				$file->status = FILE_STATUS_PERMANENT;
 				
 				file_save($file);
@@ -108,8 +131,13 @@
 	   			->condition('online_application_id', $online_application_id, '=')
   	  			->execute();	
 			}
+<<<<<<< HEAD
 		}
 		else {
+=======
+		}*/ // Turend off by Subham 24-07-2025
+		// else {
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$cs_licence_app_arr['document']  =  NULL;
 			
 			if($online_application_id != 0) {
@@ -118,7 +146,11 @@
 				->condition('online_application_id', $online_application_id, '=')
 				->execute();
 			}
+<<<<<<< HEAD
 		}
+=======
+		// }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		/*db_update('housing_license_application')
   	  	->fields($new_license_app_arr)

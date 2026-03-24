@@ -147,7 +147,11 @@
 			// 'access arguments' => array('administer Existing Occupant List')
 		);
 		//~~ End ~~\\
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		/* comment out because the url has been modified at unauthorized_occupant.module by Subham on 10-07-2025 */
 		// $items['view-unauthorised-occupants'] = array(
 		// 	'title' => 'Unauthorised Occupant List',
@@ -862,7 +866,11 @@
 
 		//$query->condition('hoa.status', 'existing_occupant', '='); // turned off by dg because if any existing occupant data become vs cs applied, then view details data is not showing
 		$query->condition('haod.uid',$uid);
+<<<<<<< HEAD
 		// $query->condition('haod.is_active',1);  // added by dg 28-07-2025 // offed by Moumita 22-09-2025 
+=======
+		// $query->condition('haod.is_active',1);  // added by dg 28-07-2025 // offed by Moumita 22-09-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		$query->fields('ha', array('applicant_name','applicant_name','guardian_name','date_of_birth','mobile_no','gender','permanent_street','permanent_city_town_village','permanent_post_office','permanent_pincode','permanent_district','permanent_present_same','present_street','present_city_town_village','present_post_office','present_pincode','present_district'));
 		$query->addField('he', 'estate_name');
@@ -883,7 +891,11 @@
 		$query->addField('hdis_permanent', 'district_name', 'permanent_district_name');
 		$query->addField('hdis_office', 'district_name', 'office_district_name');
 
+<<<<<<< HEAD
 		$result =$query->execute();
+=======
+		$result =$query->execute(); //echo '<pre>'; print_r($result); echo '</pre>';
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$data = $result->fetchObject();
 		
 
@@ -1296,7 +1308,14 @@
 		            <th style="background-color:#00000000">License Issue Date :</th>
 		            <td>'.(isset($data->license_issue_date) ? $data->license_issue_date : 'Not Avalaible').'</td>
 		          </tr>
+<<<<<<< HEAD
 		         
+=======
+		          <tr>
+		            <th style="background-color:#00000000">License Expiry Date :</th>
+		            <td>'.(isset($data->license_expiry_date) ? $data->license_expiry_date : 'Not Avalaible').'</td>
+		          </tr>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		          <tr>
 		            <th style="background-color:#00000000">Occupant Status :</th>
 		            <td>'.(isset($data->authorised_or_not) ? $data->authorised_or_not : 'Not Avalaible').'</td>

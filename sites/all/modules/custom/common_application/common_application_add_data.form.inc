@@ -328,7 +328,11 @@
 			$reason = 'LGH';
 		}else if($reason == 'Physically Handicaped or Serious Illness'){
 			$reason = 'PHI';
+<<<<<<< HEAD
 		}else if($reason == 'Judicial Officer On Transfer'){
+=======
+		}else if($reason == 'Judicial Officer On Transfer'){  //added by dg for A and B 18-09-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$reason = 'JOT';
 		}
 	}
@@ -364,7 +368,11 @@
 		//insertion of computer serial no continuation of existing applicant's computer serial no
 		
 		//28-08-2025  to start with computer serial no with 200001 for NA wef 1st Sept 2025
+<<<<<<< HEAD
 		if(date('Y-m-d')>='2025-09-01'){
+=======
+		if(date('Y-m-d')>='2025-08-28'){
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$check_na = db_query("select 1 from housing_online_application where (substring(application_no, 1, 2) = 'NA') and computer_serial_no is not null");
 			$data_na = $check_na->fetchObject();
 			if(empty($data_na)){

@@ -1,6 +1,10 @@
 <?php 
 global $user, $user_role,$base_path,$base_root;
+<<<<<<< HEAD
 
+=======
+// echo 'sdsdfsdf'."<pre>";print_r($output);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 ?>
 
 <div class="row">
@@ -13,6 +17,7 @@ global $user, $user_role,$base_path,$base_root;
          <h6>Office: <?= !empty($output['user_info']['officeName']) ? $output['user_info']['officeName'] : 'Data not found'; ?></h6>
          <h6>Mobile Number: <?= !empty($output['user_info']['mobileNo']) ? $output['user_info']['mobileNo'] : 'Mobile No. not found'; ?></h6>
          <h6>Email: <?= $output['user_info']['email'] ?></h6>
+<<<<<<< HEAD
          <?php if(isset($output['user_status']) && $output['user_status'] == 'offer_letter_cancel'){ ?>
                   <p style="color:red;">** Your offer letter has been marked as inactive by the system due to non-acceptance within the 15-day timeline. Please contact your Sub-Divisional Asst. Engineer within 5 days to request an offer letter extension. Otherwise, Your application will be cancelled 15 days after the offer letter becomes inactive. </p> <!-- Done by Subham 09-12-2024 -->
          <?php };
@@ -20,6 +25,36 @@ global $user, $user_role,$base_path,$base_root;
             if(isset($output['user_status']) && $output['user_status'] == 'license_cancel'){ ?>
             <p style="color:red;">** The license has been Inactive due to the failure to receive the possession letter within 15 days. Please contact your sub-divisonal Exec. Engineer within 5 days to request for license extension otherwise, your application will be considered cancelled.</p>  
          <?php }; ?> <!-- Done by debaleena 27-11-2024 -->
+=======
+         <?php if($user_role == 4){ ?>
+         <h6>DDO Code: <?= !empty($output['ddo_code']) ? $output['ddo_code'] : 'DDO not found'; ?></h6>
+         <?php } ?>
+         <?php if(isset($output['user_status']) && $output['user_status'] == 'offer_letter_cancel'){ ?>
+                  <p style="color:red;">** Your offer letter has been marked as inactive by the system due to non-acceptance within the 15-day timeline. Please contact your Housing Department within 5 days to request an offer letter extension. Otherwise, Your application will be cancelled 15 days after the offer letter becomes inactive. </p> <!-- Done by Subham 09-12-2024 -->
+         <?php };
+         //added by dg on 06-03-2026
+            if(isset($output['fetch_license_status']->short_code) && $output['fetch_license_status']->short_code == 'license_generate'){ 
+               $license_date = date('d-m-Y', strtotime($output['fetch_license_status']->created_at));
+               $cancel_date = date('d-m-Y', strtotime($license_date . ' +15 days'));
+
+            ?>
+           <p style="color:red;">
+            ** Your license has been generated. Please contact your Sub-Divisional Executive Engineer to either take possession date or apply for a license extension. Otherwise, the allotment will be cancelled on the 15th day(<?php echo $cancel_date; ?>) from the date of license generation. Your license generation date is: <?php echo date('d-m-Y', strtotime($output['fetch_license_status']->created_at)); ?>.
+            </p>
+
+
+            <!-- The license has been Inactive due to the failure to receive the possession letter within 15 days. Please contact your sub-divisonal Exec. Engineer within 5 days to request for license extension otherwise, your application will be considered cancelled.</p>   -->
+         <?php }; 
+
+            if(isset($output['all-application-data'][0]->short_code) && $output['all-application-data'][0]->short_code == 'housing_official_approved'){ //added by dg 09-03-2026?>
+
+               <p style="color:red;">
+                  ** Your allotment has been completed. Kindly click on the “New Allotment” option under the “Allotment Details” tab on the left panel, where you can Accept or Reject the offer. Failure to accept the offer within 15 days will lead to automatic inactivation of the allotment.
+               </p>
+          <?php  }
+
+         ?> <!-- Done by debaleena 27-11-2024 -->
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
          </div>
          <div class="col-md-3"><img src="<?php echo $base_root.$base_path?>sites/all/themes/housingtheme/images/dashboard-user.jpeg" style="border-radius: 50%;" /></div>
          <!-- <img src="<?php //echo $base_root.$base_path?>sites/all/themes/housingtheme/images/dashboard-user.jpeg" class="position-absolute# end-0# counter-box-icon top-0" /> -->
@@ -463,7 +498,11 @@ if ($user_role == 4 || $user_role == 5){ // For Applicant/Occupant
       <h4 class="mt-4">Application List</h4>
       <div class="col-md-9">
          <div class="table-responsive rounded counter-box shadow-sm p-3">
+<<<<<<< HEAD
             <?php if (!empty($output['all-application-data'])){  ?>
+=======
+            <?php if (!empty($output['all-application-data'])){ ?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                <table class="table table-list table-striped table-hover table-bordered">
                   <thead>
                      <tr class="table-primary">
@@ -476,6 +515,7 @@ if ($user_role == 4 || $user_role == 5){ // For Applicant/Occupant
                   </thead>
                   <tbody>
                      <tr> 
+<<<<<<< HEAD
                         <?php foreach ($output['all-application-data'] as $application): // foreach start ?>
                          <tr>
                              <td><b><?= $application->applicant_name ?></b></td>
@@ -506,6 +546,53 @@ if ($user_role == 4 || $user_role == 5){ // For Applicant/Occupant
                              </td>
                          </tr>
                          <?php endforeach; ?>
+=======
+                        <?php foreach ($output['all-application-data'] as $application):  // Done by Subham 24-12-2024?>
+                        <td><b><?= $application->applicant_name ?></b></td>
+                        <td><?= $application->application_no ?></td>
+                        <td><?= !empty($application->date_of_application) ? date('d-m-Y', strtotime($application->date_of_application)) : 'N/A' ?></td>
+                        <td><?= $application->applicant_show_status ?></td> 
+                        <td>
+                          <a href="<?php echo $base_root . $base_path . 'view-application/' . encrypt_url($application->online_application_id); ?>" 
+                             class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                            View
+                          </a>
+                          <?php
+                          
+                          if($application->status == 'allow_new_application'){
+                           ?>
+                           
+                           <a href="<?php echo $base_root . $base_path . 'new-apply'; ?>" 
+                             class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                            Apply As New
+                           </a>
+                           
+                           <?php
+                          }
+
+                          ?>
+                          
+                           <?php if (strpos($application->application_no, 'VS') !== false || strpos($application->application_no, 'CS') !== false):  // condition added by subham dt.03-12-2025?>
+                           <?php else: ?>
+                               <?php 
+                                       //start added by dg 07-12-2025 //
+                                       $result = db_query("SELECT status_id FROM {housing_allotment_status_master} WHERE short_code = :short_code", [':short_code' => $application->status,]);
+
+                                       $status_id = $result->fetchField();
+                                       // end and in below last status_id checking also added//
+
+                                    if ($application->allotment_category != 'General' && $application->extra_doc == '' && $status_id <= 8): ?>
+                                      <br>
+                                      <a href="<?php echo $base_root . $base_path . 'supporting-doc-upload/' . encrypt_url($application->online_application_id); ?>" 
+                                         class="btn btn-outline-primary btn-sm px-5 rounded-pill fw-bolder">
+                                          Upload Supporting Documents
+                                      </a>
+                               <?php endif; ?>
+                           <?php endif; ?>
+                        </td>
+                     </tr>
+                     <?php endforeach; ?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                      
                      <?php }else{  // Done by Subham 03-01-2025?>
                         <tr>No Application Data Found</tr> 

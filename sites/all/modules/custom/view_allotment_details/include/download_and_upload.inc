@@ -19,7 +19,11 @@ function download_and_upload($form, &$form_state, $online_application_id = ''){
 
 
     $data = (object)getHRMSUserData($user->name);
+<<<<<<< HEAD
 
+=======
+    // print_r($data);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $content = '
 	<div>
 		<h3 align="center" style="font-size:20px"><b>DECLARATION BEFORE COMPETENT AUTHORITY</b></h3>
@@ -138,7 +142,11 @@ function download_and_upload_submit($form, &$form_state) {
         //     'short_code' => 'applicant_acceptance'   
 		// );
 
+<<<<<<< HEAD
 		// db_insert('housing_process_flow')->fields($ins_arr)->execute();
+=======
+		//db_insert('housing_process_flow')->fields($ins_arr)->execute();
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
         // drupal_set_message(t('You have accepted the terms and conditions stated in the Declaration before Competent Authority.'));
         drupal_goto('ddo-change/'.$online_application_id);
