@@ -18,6 +18,13 @@ function user_manual() {
             'description' => 'User Manual for Category Shifting Application',
             'file_path' => $base_root.$base_path.'sites/default/files/user_manual/Category_Shifting_Application-User_Manual.pdf',
         ); 
+<<<<<<< HEAD
+        $result[] = array(
+            'description' => 'User Manual for DDOs',
+            'file_path' => $base_root.$base_path.'sites/default/files/user_manual/DDO-User Manual.pdf',
+        ); 
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
         
         $header['serial_no'] = array('data' => 'Serial No.', 'width' => '2%');

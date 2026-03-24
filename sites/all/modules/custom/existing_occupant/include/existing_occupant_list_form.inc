@@ -311,7 +311,11 @@ function view_occupant_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
                 $query->addField('haod', 'hrms_id');
                 $query->addField('u', 'status');
                 $query->addField('haod', 'uid');
+<<<<<<< HEAD
+                $query->addField('hf', 'flat_id');
+=======
                 $query->fields('hf',array('flat_id','flat_no','floor')); //added by dg 07-01-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 $query->addField('hb', 'block_name');
 
                 $db_and = db_and();														// Added by Subham 30-12-2024
@@ -353,7 +357,11 @@ function view_occupant_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
                 $query->addField('haod', 'hrms_id');
                 $query->addField('u', 'status');
                 $query->addField('haod', 'uid');
+<<<<<<< HEAD
+                $query->addField('hf', 'flat_id');
+=======
                 $query->fields('hf',array('flat_id','flat_no','floor'));  //added by dg 07-01-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 $query->addField('hb', 'block_name');
 
                 $query->condition('he.division_id', $data_fetch->division_id, '=');		// Added by Subham 30-12-2024
@@ -377,8 +385,11 @@ function view_occupant_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
         $header['Estate Name'] = array('data' => 'Estate Name');
         $header['Flat Type'] = array('data' => 'Flat Type');
         $header['Block Name'] = array('data' => 'Block Name'); // added by Moumita on 26-06-2025
+<<<<<<< HEAD
+=======
         $header['Flat No.'] = array('data' => 'Flat No.');  //added by dg 07-01-2026
         $header['Floor'] = array('data' => 'Floor');   //added by dg 07-01-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         $header['Approval Status'] = array('data' => 'Approval Status');
         $header['Details'] = array('data' => 'Details');
         $header['edit'] = array('data' => 'Edit');
@@ -400,8 +411,11 @@ function view_occupant_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
         $fields[] = $data->estate_name;
         $fields[] = $data->flat_type;
         $fields[] = $data->block_name;
+<<<<<<< HEAD
+=======
         $fields[] = $data->flat_no;  //added by dg 07-01-2026
         $fields[] = $data->floor;    //added by dg 07-01-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         if($data->status == 0){
             $fields[] = 'Pending Approval at Division Level';
         }else{

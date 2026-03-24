@@ -30,7 +30,11 @@
                 </div>
                 <div class="col-md-4 text-end ftr-link">
                     <p>
+<<<<<<< HEAD
+                        <a href="contact-us">Contact</a> &nbsp;|&nbsp;
+=======
                         <a href="./contact.html">Contact</a> &nbsp;|&nbsp;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                         <a href="#">Site Map</a> &nbsp;|&nbsp;
                         <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
                         <a href="#">Disclaimer</a></p>

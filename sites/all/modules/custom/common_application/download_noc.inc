@@ -1,4 +1,17 @@
 <?php
+<<<<<<< HEAD
+
+function download_noc($online_application_id = '') {
+    // $online_application_id = decrypt_url();
+    
+    date_default_timezone_set("Asia/Kolkata");
+    
+    $output = '';
+
+
+    ob_end_clean();
+	return pdf_using_mpdf_api($page_output, $file_name);
+=======
 date_default_timezone_set("Asia/Kolkata");
 
 function download_noc($application_id = '') {
@@ -59,6 +72,7 @@ function download_noc($application_id = '') {
 		
 		ob_end_clean();
 		return pdf_using_mpdf_api($page_output, 'noc_'.$online_application_id.'.pdf');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 
 

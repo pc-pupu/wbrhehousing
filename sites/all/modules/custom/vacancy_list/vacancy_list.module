@@ -47,7 +47,10 @@
 		
 	 	return $items;
 	}
+<<<<<<< HEAD
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	function vacancy_list_form($form, &$form_state) {
 		global $user, $user_role;
 		if($user_role == 7){ // Condition added by Subham dt.10-12-2025
@@ -78,7 +81,11 @@
 				'#prefix' => '<div class="three" id="flat_type_replace">',
 				'#suffix' => '</div>'
 			);
+<<<<<<< HEAD
+			
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$rhe_flat_type_options = rhe_flat_type(); // added by Moumita on 16-12-2025
 			unset($rhe_flat_type_options[6]); // added by Moumita on 16-12-2025
 				
@@ -86,7 +93,11 @@
 				$form['list_info']['flat_type'] = array(
 					'#title' => t('Flat Type'),
 					'#type' => 'select',
+<<<<<<< HEAD
+					'#options' => $rhe_flat_type_options, // added by Moumita on 16-12-2025,
+=======
 					'#options' => $rhe_flat_type_options, // added by Moumita on 16-12-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 					'#prefix' => '<div class="col-md-4" id="flat_type_replace"><div class="form-floating">',
 					'#suffix' => '</div></div></div>',
 					'#attributes' => array('class'=>array('form-select')),
@@ -142,10 +153,17 @@
 				'#prefix' => '<div class="col-md-6" id="flat_type"><div class="form-floating" >',//sd 24-06-2024
 				'#suffix' => '</div></div></div>',//sd 24-06-2024
 			);
+<<<<<<< HEAD
+
+			$rhe_flat_type_options = rhe_flat_type(); // added by Moumita on 16-12-2025
+			unset($rhe_flat_type_options[6]); // added by Moumita on 16-12-2025
+			
+=======
 			
 			$rhe_flat_type_options = rhe_flat_type(); // added by Moumita on 16-12-2025
 			unset($rhe_flat_type_options[6]); // added by Moumita on 16-12-2025
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			if($district_val != 0) {
 				$form['flat_type'] = array(
 					'#title' => t('Flat Type'),
@@ -189,6 +207,18 @@
 	  	return $form;
   }
 
+<<<<<<< HEAD
+/* Done by Subham dt.10-12-2025 */
+function _reload_rhe_flat_type_callback($form, &$form_state) {
+    $commands = array();
+    
+    $commands[] = ajax_command_replace("#flat_type_replace", drupal_render($form['list_info']['flat_type']));
+    $commands[] = ajax_command_replace("#vacancy_list_replace", drupal_render($form['fetch_list']));
+
+    return array('#type' => 'ajax', '#commands' => $commands);
+}
+/* End */
+=======
 	/* Done by Subham dt.10-12-2025 */
 	function _reload_rhe_flat_type_callback($form, &$form_state) {
 		$commands = array();
@@ -199,6 +229,7 @@
 		return array('#type' => 'ajax', '#commands' => $commands);
 	}
 	/* End */ 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   
    function vacancy_list_form_validate($form, &$form_state) {
 	
@@ -217,6 +248,10 @@
 		$commands[] = ajax_command_replace("#flat_type", drupal_render($form['flat_type']));
 		$commands[] = ajax_command_replace("#vacancy_list", drupal_render($form['vacancy_list']));
 		return array('#type' => 'ajax', '#commands' => $commands);
+<<<<<<< HEAD
+  
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	}
 	
 	function _reload_vacancy_list($form, &$form_state) {
@@ -336,4 +371,8 @@ function rhe_wise_vacancy_list_fetch($rhe_name = 0, $flat_type_id = 0, $flat_sta
 	//echo $query;
 	return $query->execute();
 }
+<<<<<<< HEAD
 /* End */
+=======
+/* End */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

@@ -62,7 +62,11 @@ function rhe_allotment_form_submit($form, &$form_state) {
 			drupal_set_message('Allotment Process Completed Successfully');
 		}else{
 			drupal_set_message('No Application Available for Allotment','error');
+<<<<<<< HEAD
+		}
+=======
 		} 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 
 		

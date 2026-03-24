@@ -98,6 +98,10 @@ function _reload_rhewise_list_view($form, &$form_state) {
 }
 
 function display_specific_flat_list($rhe_name = 0, $flat_type = 0, $block_name = 0) {
+<<<<<<< HEAD
+    // print_r($rhe_name , $flat_type, $block_name );die;
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     global $base_root, $base_path,$user, $user_role;
     $output = '';
     $query_dtls = db_select('users_details', 'ud'); 
@@ -547,6 +551,10 @@ function display_flat_data($rhe_name = 0, $flat_type = 0, $block_name = 0) {
 
     return $output;
 }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 //~~ End ~~\\
 
 function existing_occupant_draft_edit_form($form, &$form_state, $en_row = 0){

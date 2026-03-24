@@ -124,7 +124,11 @@
 	// 		 	form_set_error('dob', 'Date of Birth Can\'t be empty.');
 	// 		 }
 	// 	}
+<<<<<<< HEAD
+	// }
+=======
 	// } 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 	function element_validate_age($element, &$form_state) {  // Updated by Subham dt.03-12-2025
 	    if (!empty($form_state['values']['dob'])) {
@@ -153,7 +157,11 @@
 	        }
 	    }
 	} // End
+<<<<<<< HEAD
+
+=======
 	
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	// function element_validate_joining_age($element, &$form_state) {
 	// 	if(!empty($form_state['values']['doj'])) {
 	// 		$dob = trim($form_state['values']['dob']);
@@ -216,7 +224,10 @@
 	        }
 	    }
 	} // End
+<<<<<<< HEAD
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 	function element_validate_flat_type($element, &$form_state) {
 		$value = trim($element['#value']);

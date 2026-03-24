@@ -29,6 +29,28 @@
             ?>
             <div class="counter-box p-3 rounded mb-3 position-relative shadow-sm row">
                 <h6 class = "">
+<<<<<<< HEAD
+                    <b class="text-danger">If you have already submitted your flat allotment application in physical form to the Housing Department, Government of West Bengal, click here to link it with your HRMS code
+                    <?php echo l('Click Here','search-with-physical-application-no', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success btn-sm')))); ?>
+                    </b>
+                </h6>
+                <h6 class = "">
+                    <b class="text-danger">Continue to Dashboard for Fresh Online Application & Related Activities
+                    <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success btn-sm'), 'id' => 'my-button' ))); ?></b>
+                </h6>
+            </div>
+            <div class="pt-5">
+                <h5><b>If you are currently occupying a rental housing flat alloted by the Housing Department Govt. of WB, please fill the form for verification and click Submit.</b></h5>
+                <?php print $messages; ?>
+                <?php print render($page['content']); ?>
+            </div>
+            <?php
+            }else{
+                print $messages;
+            }
+            ?> 
+            <?= l('Exit', 'user/logout', array('html'=>true, 'attributes'=>array('class'=>array('btn bg-info btn-sm px-5 rounded-pill text-white fw-bolder')))) ?>
+=======
                     <b class="text-danger">If you want to apply for new allotment of a rental housing flat please click here 
                     <?php echo l('Click to Continue','dashboard', array('html'=>true,'attributes'=>array('class'=>array('btn btn-success btn-sm'), 'id' => 'my-button' ))); ?></b>
                 </h6>
@@ -47,6 +69,7 @@
                 <?php print $messages; ?>
                 <?php print render($page['content']); ?>
             </div>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         </div>
     </div>
 </div>

@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+// Done by Subham dt.28-05-2025
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 function existing_applicant_vs_cs_menu() {
   $items = array();
 
@@ -10,6 +14,9 @@ function existing_applicant_vs_cs_menu() {
     'access arguments' => array('administer Existing Applicant for VS CS'),
 	);
 
+<<<<<<< HEAD
+  $items['legacy-vs-list-wohrms'] = array(
+=======
   $items['legay-vs-or-cs-form/%'] = array(
     'title' => 'Form For Existing Applicant VS/CS',
     'page callback' => 'drupal_get_form',
@@ -20,6 +27,7 @@ function existing_applicant_vs_cs_menu() {
   );
 
    $items['legacy-vs-list-wohrms'] = array(
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     'title' => 'Existing Applicant\'s List for Floor Shifting (without HRMS ID)',
     'page callback'=>'drupal_get_form',
     'page arguments' => array('legacy_vs_list_view_wohrms_form'),
@@ -27,7 +35,11 @@ function existing_applicant_vs_cs_menu() {
     'access arguments' => array('administer Existing Applicant for VS CS'),
   );
 
+<<<<<<< HEAD
+  $items['legacy-vs-wohrms-edit/%'] = array(
+=======
     $items['legacy-vs-wohrms-edit/%'] = array(
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     'title' => 'Form for Edit Existing Applicant\'s Data for Floor Shifting (Without HRMS ID)',
     'page callback'=>'drupal_get_form',
     'page arguments' => array('legacy_vs_wohrms_edit_form', 1),
@@ -59,7 +71,11 @@ function existing_applicant_vs_cs_menu() {
     'access arguments' => array('administer Existing Applicant for VS CS'),
   );
 
+<<<<<<< HEAD
+  $items['legacy-cs-wohrms-edit/%'] = array(
+=======
    $items['legacy-cs-wohrms-edit/%'] = array(
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     'title' => 'Form for Edit Existing Applicant\'s Data for Category Shifting (Without HRMS ID)',
     'page callback'=>'drupal_get_form',
     'page arguments' => array('legacy_cs_wohrms_edit_form', 1),
@@ -83,6 +99,19 @@ function existing_applicant_vs_cs_menu() {
     'access arguments' => array('administer Existing Applicant for VS CS'),
   );
 
+<<<<<<< HEAD
+  $items['legay-vs-or-cs-form/%'] = array(
+    'title' => 'Form For Existing Applicant VS/CS',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('legacy_vs_cs_form',1),
+    'file' => 'legacy_vs_cs_form.inc',
+    'access arguments' => array('administer Existing Applicant for VS CS'),
+    
+  );
+
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   return $items;
 }
 
@@ -101,8 +130,11 @@ function existing_applicant_vs_cs_permission() {
 //   return $form['official_info']['pay_band'];
 // }
 
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 function flat_type_name_by_band($pay_band_id) {
   $query = db_select('housing_pay_band_categories', 'hpc');
   $query->innerjoin('housing_flat_type', 'hft', 'hpc.flat_type_id = hft.flat_type_id');
@@ -115,3 +147,10 @@ function flat_type_name_by_band($pay_band_id) {
   return $result ? $result : 'Not Found';
 }
 
+<<<<<<< HEAD
+
+
+
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

@@ -205,6 +205,10 @@ function get_ddo_designation_by_ddoid($ddo_code = '') {
       return $data; // return array
     }    
   } else {
+<<<<<<< HEAD
+    return  array();  
+=======
     return  array();	
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   }
 }

@@ -64,6 +64,8 @@ function application_status_check_menu() {
     'access arguments' => array('common_allotment_view'),
   );
   // End
+<<<<<<< HEAD
+=======
 
   // Done By Moumita on 27-01-2026
     $items['license-extension-list'] = array(
@@ -80,6 +82,7 @@ function application_status_check_menu() {
         'access arguments' => array('common_allotment_view'),
     );
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   return $items;
 }
 
@@ -132,6 +135,16 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
     $result = $query->execute();
     // $data = $result->fetchAll();
     
+<<<<<<< HEAD
+   
+    $header['applicant_name'] = array('data' => 'Name');
+    $header['application_no'] = array('data' => 'Application Number');
+    $header['Status'] = array('data' => 'Status');
+    $header['action'] = array('data' => 'Action', 'width'=>'40%');
+   
+		$rows =array();
+		$output = '';
+=======
     $header['sl_no'] = array('data' => 'Sl. No.');
     $header['applicant_name'] = array('data' => 'Name');
     $header['application_no'] = array('data' => 'Application Number');
@@ -141,17 +154,24 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
 		$rows =array();
 		$output = '';
     $i = 1;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		while($data = $result->fetchObject()) {
      // echo "<pre>";print_r($data);die;
 			$fields = array();
+<<<<<<< HEAD
+=======
       $fields[] = $i++;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$fields[] = $data->applicant_name;
 			$fields[] = $data->application_no;
       $fields[] = $data->status_description;
 
+<<<<<<< HEAD
+=======
       // echo '<pre>';print_r($data);die;
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
       if($user_role == 7){
         // print_r($data);die;
         if($data->license_no != '' && $data->possession_date != '' && $data->release_date){
@@ -213,9 +233,15 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                                   ->condition('hac.cancellation_type', 'offer-letter')
                                   ->countQuery();
             $count = $query->execute()->fetchField();
+<<<<<<< HEAD
+            //echo $count;die;
+            // if($count < 2){ // Turned off by Subham dt.18-12-2025
+            if($count == 1){ // Added by Subham dt.18-12-2025 (if data is visible in 'housing_auto_cancellation' table then only 'if' condition will execute) 
+=======
             // echo $count;die;
             // if($count < 2){ // Turned off by Subham dt.18-12-2025
             if($count >= 1){ // Added by Subham dt.18-12-2025 (if data is visible in 'housing_auto_cancellation' table then only 'if' condition will execute)
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
               $fields[] = l(
                 ' View',
                 'common-application-view-det/'. $app_id.'/'.$app_status,
@@ -223,6 +249,17 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                     'html'=>TRUE,
                     'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                 )
+<<<<<<< HEAD
+                ).' '.
+               l(
+                ' Extend Offer Letter',
+                'request-for-offer-letter-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id).'/'. encrypt_url($data->date_of_verified), //
+                array(
+                    'html'=>TRUE,
+                    'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
+                )
+              );
+=======
                 );
               //   .' '.
               //  l(
@@ -233,6 +270,7 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
               //       'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
               //   )
               // );
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             }else{
               $fields[] = l(
                 'View',
@@ -299,6 +337,12 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                 'html'=>TRUE,
                 'attributes'=> array('class'=>array('btn bg-success btn-sm px-4 fa fa-plus rounded-pill text-white fw-bolder')),
             )
+<<<<<<< HEAD
+            );
+
+        }else{
+          // echo 'hiii';die;
+=======
             ).' '.
             l(
                 ' Extend License',
@@ -328,6 +372,7 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
           );
           
         }else{
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
           $fields[] = l(
             'View',
             'common-application-view-det/'. $app_id.'/'.$app_status, //
@@ -346,6 +391,12 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
               'html'=>TRUE,
               'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
           )
+<<<<<<< HEAD
+          );
+
+        }else if($user_role == 13){
+            // echo "kjhkj";die; // added this role condition by dg 24-07-2025
+=======
           ).
           l(' Allow To Apply New Application','allow-new-application/'. $app_id, array(
                     'html'=>TRUE,
@@ -373,6 +424,7 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
           }
 
            // added this role condition by dg 24-07-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             if($data->license_no != ''){
               $query = db_select('housing_license_application', 'hla');
               $query->innerJoin('housing_occupant_license', 'hol', 'hla.license_application_id = hol.license_application_id');
@@ -389,9 +441,13 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
               $result = $query->execute();
 
               $data = $result->fetchObject();
+<<<<<<< HEAD
+              
+=======
 
               // echo '<pre>';print_r($data);die;
              
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 if($data->possession_date == ''){
                   $fields[] = l(
                     'View',
@@ -400,8 +456,12 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                         'html'=>TRUE,
                         'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                     )
+<<<<<<< HEAD
+                    ).' '.
+=======
                     ). $offer_letter_extension_link ;
                     /*.' '.
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     l(
                       ' Extend License',
                       'request-for-license-extension/'. $app_id.'/'.$app_status.'/'.encrypt_url($data->uid).'/'.encrypt_url($data->applicant_official_detail_id), 
@@ -409,7 +469,11 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                           'html'=>TRUE,
                           'attributes'=> array('class'=>array('btn fa fa-history bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                       )
+<<<<<<< HEAD
+                    );
+=======
                     );*/
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
                 }else if($data->possession_date != ''){
                   $fields[] = l(
@@ -419,7 +483,11 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                         'html'=>TRUE,
                         'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                     )
+<<<<<<< HEAD
+                    );
+=======
                     ). $offer_letter_extension_link;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 }
             }else{ // added by Moumita 17-12-2025
               $fields[] = l(
@@ -429,10 +497,20 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
                     'html'=>TRUE,
                     'attributes'=> array('class'=>array('btn fa fa-eye bg-primary btn-sm px-4 rounded-pill text-white fw-bolder')),
                 )
+<<<<<<< HEAD
+                );
+            }
+        }
+
+      }
+
+      
+=======
                 ). $offer_letter_extension_link ;
             }
         }
       }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
       
 			$rows[] = $fields;
 		}
@@ -483,6 +561,13 @@ function search_common_data_fetch($app_id = '', $app_status = ''){
   }
 }
 
+<<<<<<< HEAD
+
+
+
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 ///////end//////
 
 function common_applicant_data_fetch($app_id = '', $app_status = '') {
@@ -546,7 +631,11 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
       $output['present_city_town_village'] ?? '',
       $output['present_post_office'] ? 'P.O- ' . $output['present_post_office'] : '',
       $output['present_district_name'] ?? '',
+<<<<<<< HEAD
+      $output['present_pincode'] ? '-' . $output['present_pincode'] : '',
+=======
       $output['present_pincode'] ? 'Pin-' . $output['present_pincode'] : '',
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     ]);
 
     $present_address = !empty($present_address_parts) ? implode(', ', $present_address_parts) : 'Not Available';
@@ -556,7 +645,11 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
       $output['permanent_city_town_village'] ?? '',
       $output['permanent_post_office'] ? 'P.O- ' . $output['permanent_post_office'] : '',
       $output['permanent_district_name'] ?? '',
+<<<<<<< HEAD
+      $output['permanent_pincode'] ? '-' . $output['permanent_pincode'] : '',
+=======
       $output['permanent_pincode'] ? 'Pin-' . $output['permanent_pincode'] : '',
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     ]);
     
     $permanent_address = !empty($permanent_address_parts) ? implode(', ', $permanent_address_parts) : 'Not Available';
@@ -566,7 +659,11 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
       $output['office_city_town_village'] ?? '',
       $output['office_post_office'] ? 'P.O- ' . $output['office_post_office'] : '',
       $output['office_district_name'] ?? '',
+<<<<<<< HEAD
+      $output['office_pin_code'] ? '-' . $output['office_pin_code'] : '',
+=======
       $output['office_pin_code'] ? 'Pin-' . $output['office_pin_code'] : '',
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     ]);
     
     $office_address = !empty($office_address_parts) ? implode(', ', $office_address_parts) : 'Not Available';
@@ -591,7 +688,11 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
 
     
 
+<<<<<<< HEAD
+    if ($enc_app_status == 'allotted' || $enc_app_status == 'housing_official_approved' || $enc_app_status == 'housing_official_reject' || $enc_app_status == 'offer_letter_generate' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'applicant_reject' || $enc_app_status == 'ddo_verified_2' || $enc_app_status == 'ddo_rejected_2' || $enc_app_status == 'housing_sup_approved_2' || $enc_app_status == 'housing_sup_reject_2' || $enc_app_status == 'license_generate' || $enc_app_status == 'existing_occupant' || $enc_app_status == 'applied' || $enc_app_status == 'offer_letter_cancel' || $enc_app_status == 'license_cancel' || $enc_app_status == 'applicant_acceptance'|| $enc_app_status == 'housingapprover_approved_2' || $enc_app_status == 'housing_approver_reject_2') {  //added by dg last two housing_approver status 07-12-2025
+=======
     if ($enc_app_status == 'allotted' || $enc_app_status == 'housing_official_approved' || $enc_app_status == 'housing_official_reject' || $enc_app_status == 'offer_letter_generate' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'applicant_reject' || $enc_app_status == 'ddo_verified_2' || $enc_app_status == 'ddo_rejected_2' || $enc_app_status == 'housing_sup_approved_2' || $enc_app_status == 'housing_sup_reject_2' || $enc_app_status == 'license_generate' || $enc_app_status == 'existing_occupant' || $enc_app_status == 'applied' || $enc_app_status == 'offer_letter_cancel' || $enc_app_status == 'license_cancel' || $enc_app_status == 'applicant_acceptance' || $enc_app_status == 'housingapprover_approved_2' || $enc_app_status == 'housing_approver_reject_2') {  //added by dg last two housing_approver status 07-12-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
       $query_get = db_select('housing_occupant_license', 'hol');
       $query_get->innerjoin('housing_license_application','hla','hla.license_application_id = hol.license_application_id');
@@ -666,7 +767,10 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
         $extra_doc_link = '<span color="red">Supporting Document Not Uploaded<br/></span>';
       }
     }
+<<<<<<< HEAD
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     
     // print_r($extra_query);die;
     $display_output = $extra_doc_link. '
@@ -845,6 +949,9 @@ function common_applicant_data_fetch($app_id = '', $app_status = '') {
       </div>';
       
       return $display_output;
+<<<<<<< HEAD
+}
+=======
     }
 }
 
@@ -1005,4 +1112,5 @@ function license_extension_status($online_application_id = '', $action = '') {
         drupal_set_message('Invalid Request.','error');
         drupal_goto('license-extension-list');
     }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 }

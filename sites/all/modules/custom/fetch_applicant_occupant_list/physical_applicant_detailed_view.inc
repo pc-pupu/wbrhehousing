@@ -1,11 +1,18 @@
 <?php
 function physical_applicant_detailed_view_form($app_no = 0){
     $dec_app_no = decrypt_url($app_no);
+<<<<<<< HEAD
+    $query1 = "SELECT hoa.application_no, ha.applicant_name, haod.applicant_designation, hasm.status_description,hasm.short_code, ha.guardian_name, ha.date_of_birth,ha.mobile_no,ha.gender,ha.permanent_street,ha.permanent_city_town_village,ha.permanent_post_office,ha.permanent_pincode,ha.permanent_district,ha.present_street,ha.present_city_town_village,ha.present_post_office,ha.present_pincode,ha.present_district, haod.applicant_headquarter, haod.applicant_posting_place, haod.date_of_joining, haod.date_of_retirement, haod.office_name, haod.office_street, haod.office_city_town_village, haod.office_post_office, haod.office_pin_code, haod.hrms_id, haod.office_phone_no, haod.pay_in_the_pay_band ,hdis_present.district_name AS present_district_name, hdis_permanent.district_name AS permanent_district_name, hdis_office.district_name AS office_district_name
+              FROM housing_online_application hoa
+              INNER JOIN housing_applicant_official_detail haod ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id
+              INNER JOIN housing_applicant ha ON ha.uid = haod.uid
+=======
     $query1 = "SELECT hoa.application_no, ha.applicant_name, haod.applicant_designation, hasm.status_description,hasm.short_code, ha.guardian_name, ha.date_of_birth,ha.mobile_no,ha.gender,ha.permanent_street,ha.permanent_city_town_village,ha.permanent_post_office,ha.permanent_pincode,ha.permanent_district,ha.present_street,ha.present_city_town_village,ha.present_post_office,ha.present_pincode,ha.present_district, haod.applicant_headquarter, haod.applicant_posting_place, haod.date_of_joining, haod.date_of_retirement, haod.office_name, haod.office_street, haod.office_city_town_village, haod.office_post_office, haod.office_pin_code, haod.hrms_id, haod.office_phone_no, haod.pay_in_the_pay_band ,hdis_present.district_name AS present_district_name, hdis_permanent.district_name AS permanent_district_name, hdis_office.district_name AS office_district_name, hnaa.extra_doc_path, hnaa.extra_doc
               FROM housing_online_application hoa
               INNER JOIN housing_applicant_official_detail haod ON hoa.applicant_official_detail_id = haod.applicant_official_detail_id
               INNER JOIN housing_applicant ha ON ha.uid = haod.uid
               LEFT JOIN housing_new_allotment_application hnaa ON hnaa.online_application_id = hoa.online_application_id
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
               INNER JOIN housing_allotment_status_master hasm ON hasm.short_code = hoa.status
               LEFT JOIN housing_district AS hdis_present ON hdis_present.district_code = ha.present_district
               LEFT JOIN housing_district AS hdis_permanent ON hdis_permanent.district_code = ha.permanent_district
@@ -86,6 +93,12 @@ function physical_applicant_detailed_view_form($app_no = 0){
     if (!empty($output1) || !empty($extra_query)) {
       $output = array_merge($output1 ?: [], $extra_query);
     }
+<<<<<<< HEAD
+
+
+    $display_output1 = '
+    <div class="table-bottom">
+=======
     $doc_button = '';
     if($output1['extra_doc_path'] !='' && $output1['extra_doc'] !=''){
         $doc_button = '
@@ -98,6 +111,7 @@ function physical_applicant_detailed_view_form($app_no = 0){
 
     $display_output1 = $doc_button.'
       <div class="table-bottom">
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <table class="table table-list">
           <tr>
             <th colspan="2" style="background: none repeat scroll 0 0 #0a8bd6dc;color:white;text-align: center;font-size: 18px;line-height: 24px; font-weight: normal;font-family: "Dosis",Arial,Verdana,serif;" class="first">Application Information</th>

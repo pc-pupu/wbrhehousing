@@ -133,6 +133,19 @@
 		$query->condition('haod.uid', $user->uid);
 		$query->addField('hpf', 'short_code');
 		$query->addField('hpf', 'created_at');
+<<<<<<< HEAD
+		$query->addField('hasm', 'status_description');
+		//$query->orderBy('hasm.status_id', 'ASC');
+		//echo $query;die;
+		
+		// $query->condition('hoa.online_application_id', $online_application_id, '=');
+		
+		return $result=$query->execute();
+		//$result=$query->execute();
+		//print_r($result->fetchAll());die;
+	}
+	
+=======
 		$query->Fields('hasm', array('status_description','applicant_show_status'));  //updated by dg 26-02-2026
 		
 		return $result=$query->execute();
@@ -165,4 +178,5 @@
 	}
 	
 	
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	

@@ -56,28 +56,47 @@ global $user, $user_role,$base_path,$base_root;
                 <!--sd start 20-06-2024---->
                 <ul class="submenu collapse">
                     <li class="nav-item">
+<<<<<<< HEAD
+                            <?= l('<i aria-hidden="true"></i> Unauthorised with HRMS ID','unauthorized-occupant-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+                    </li>
+                    <li class="nav-item">
+                            <?= l('<i aria-hidden="true"></i> Unauthorised without HRMS ID','unauthorized-occupant-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+=======
                             <?= l('<i aria-hidden="true"></i> Unauthorised with HRMS ID','view-unauthorised-occupants',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
                     </li>
                     <li class="nav-item">
                             <?= l('<i aria-hidden="true"></i> Unauthorised without HRMS ID','unauthorized-occupant',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     </li>
                     
                     
                 </ul>
             </li> 
+<<<<<<< HEAD
+            <li class="nav-item"> <!-- Added by Subham dt.10-11-2025 to display list of vacant flats in Sub Divion end ---->
+                <a href="<?= $base_root.$base_path.'vacany_list' ?>" class="nav-link ">
+                    <i class="fa fa-list" aria-hidden="true"></i>
+                    Vacancy List
+                </a>
+            </li> <!-- End ---->
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             <?php // added by moumita on 26-06-2025 
             }
 
 
 
         if($user_role == 17){ // Changed role 6 to 17 by Subham dt.19-05-2025?>
+<<<<<<< HEAD
+=======
         <li class="nav-item">
             <a href="<?= $base_root.$base_path.'allotment_list_approve' ?>" class="nav-link ">
                 <i class="fa fa-user-plus" aria-hidden="true"></i>
                 Allotment List Approve
             </a>
         </li>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <li class="nav-item has-submenu">
             <a class="nav-link" href="#">
                 <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>  Special Recommendation <i class="fa fa-angle-down fa-lg float-end mt-1" aria-hidden="true"></i>
@@ -97,8 +116,23 @@ global $user, $user_role,$base_path,$base_root;
                 
             </ul>
         </li>
+<<<<<<< HEAD
+        <li class="nav-item">
+            <a href="<?= $base_root.$base_path.'allotment_list_approve' ?>" class="nav-link ">
+                <i class="fa fa-user-plus" aria-hidden="true"></i>
+                Allotment List Approve
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="<?= $base_root.$base_path.'allotment_list_hold' ?>" class="nav-link ">
+                <i class="fa fa-pause" aria-hidden="true"></i>
+                Allotment List for Hold
+            </a>
+        </li>
+=======
 
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <?php }
 
             if($user_role == 10 || $user_role == 11 ||  $user_role == 13){  //remove 6 12-09-2024
@@ -114,7 +148,11 @@ global $user, $user_role,$base_path,$base_root;
                 }else if($user_role == 13){  //added by debaleena 04-09-2024 // housing approver HA
                     $new_status = 'housing_sup_approved_1';
                     $next_status_app = 'housingapprover_approved_1';
+<<<<<<< HEAD
+                    $next_status_rej = 'housing_approver_reject_1';
+=======
                     $next_status_rej = 'housingapprover_reject1';
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 }
         //         else if($user_role == 6){ // housing official //secy_housing// HCA
         //             $new_status = 'allotted';
@@ -154,7 +192,11 @@ global $user, $user_role,$base_path,$base_root;
                 }else if($user_role == 13){// housing-Approver     //12-09-2024
                     $new_status = 'housing_sup_approved_2';
                     $next_status_app = 'housingapprover_approved_2';
+<<<<<<< HEAD
+                    $next_status_rej = 'housing_approver_reject_2'; 
+=======
                     $next_status_rej = 'housingapprover_reject2';
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 }
         ?>
         <li class="nav-item has-submenu">
@@ -226,6 +268,15 @@ global $user, $user_role,$base_path,$base_root;
                  <li class=""><?= l('Category Shifting','view_cs_allotment_details',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
             </ul>
         </li>
+<<<<<<< HEAD
+        <li class="nav-item">
+            <a href="<?= $base_root.$base_path.'flat-wise-applicant-details-view' ?>" class="nav-link active#">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                Flat Wise Applicant Details
+            </a>
+        </li>
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <!-- <li class="nav-item has-submenu">
             <a class="nav-link" href="#">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-person-fill" viewBox="0 0 16 16">
@@ -312,13 +363,27 @@ global $user, $user_role,$base_path,$base_root;
             </a>
             <ul class="submenu collapse">
                 <li class=""><?= l('Legacy Applicant Entry','existing_applicant_entry',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+<<<<<<< HEAD
+                <li class=""><?= l('Legacy Applicant Entry For VS or CS','legacy-vs-cs',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For VS (with HRMS ID)','legacy-vs-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For VS (without HRMS ID)','legacy-vs-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For CS (with HRMS ID)','legacy-cs-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For CS (without HRMS ID)','legacy-cs-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+               <li class=""><?= l('Legacy Applicant List (with HRMS ID)','view-legacy-applicant-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List (without HRMS ID)','view-legacy-applicant-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li> <!-- < added by Subham dt.21-07-2025 > ----> 
+=======
                 <li class=""><?= l('Legacy Applicant List','view-legacy-applicant-list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             </ul>
         </li>
     <?php } ?>
 
+<<<<<<< HEAD
+        <!-- <li class="nav-item has-submenu">
+=======
         <li class="nav-item has-submenu">
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             <a class="nav-link" href="#" title="Treasury Estate Mapping">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-building-gear" viewBox="0 0 16 16">
                 <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
@@ -333,13 +398,21 @@ global $user, $user_role,$base_path,$base_root;
                 <li class=""><?= l('Add Treasury Estate Mapping Record','estate-treasury-selection/add',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
                 <li class=""><?= l('Treasury Estate Mapping List','estate-treasury-selection',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
             </ul>
+<<<<<<< HEAD
+        </li>  -->
+=======
         </li> 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                
 
         
         <?php
             }
+<<<<<<< HEAD
+           if($user_role == 6 || $user_role == 7 || $user_role == 8 || $user_role == 10 || $user_role == 13 || $user_role == 17){
+=======
            if($user_role == 7 || $user_role == 8){
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             
         ?>
         <li class="nav-item has-submenu">
@@ -358,6 +431,19 @@ global $user, $user_role,$base_path,$base_root;
             <li class=""><?= l('Add RHE Block','add_block',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
         </ul>
         </li>
+<<<<<<< HEAD
+
+        <?php
+            }
+            //sd end 20-06-2024
+        ?>
+
+        <?php 
+            // edited by moumita on 22-09-2024
+            if($user_role == 6 || $user_role == 7 || $user_role == 8 ||  $user_role == 13){
+        ?>
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <li class="nav-item has-submenu">
         <a class="nav-link" href="#">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16">
@@ -369,6 +455,43 @@ global $user, $user_role,$base_path,$base_root;
             </svg>
         </a>
         <ul class="submenu collapse">
+<<<<<<< HEAD
+            <?php
+            if ($user_role == 7) { ?>
+                <li><?= l('Occupant Data Entry (without HRMS)', 'rhewise_flatlist_draft', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <li><?= l('Occupant Data Entry (with HRMS)', 'rhewise_flatlist', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <!-- This Link is for Division & Subdivision -->
+                <li><?= l('Existing Occupant List (without HRMS)', 'rhewise_occupant_draft_list', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <li><?= l('Existing Occupant List (with HRMS)', 'view-occupant-list', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+            <?php } else if ($user_role == 8) { ?>
+                <li><?= l('Occupant Data Approve', 'rhewise_occupantlist', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <!-- This Link is for Division & Subdivision -->
+                <li><?= l('Existing Occupant List (without HRMS)', 'rhewise_occupant_draft_list', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <li><?= l('Existing Occupant List (with HRMS)', 'view-occupant-list', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+            <?php } else if ($user_role == 6 || $user_role == 13) { ?>
+                <!-- Changed by Moumita on 22-09-2025 -->
+                <!-- This Link is for other official users except Division & Subdivision -->
+                <li><?= l('Existing Occupant List (without HRMS)', 'existing-occupant-list-wohrms', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+                <li><?= l('Existing Occupant List (with HRMS)', 'existing-occupant-list-whrms', ['html' => true, 'attributes' => ['class' => ['nav-link']]]); ?></li>
+            <?php } ?>
+        </ul>
+        </li>
+        
+        
+        <?php        
+            }
+        
+        ?>
+
+        
+
+        
+
+        <!-- <li class="nav-item">
+            <?= l('Allotment','#',array('html' =>true, 'attributes' => array('class' => array('nav-link')))); ?>
+        </li>  -->
+        <?php if($user_role == 11 || $user_role == 7 || $user_role == 8){   // by debaleena 13-09-2024,updated by dg 08-12-2025,for ddo,subdiv,div?>
+=======
             <?php if($user_role == 7){?>
                 <li class=""><?= l('Occupant Data Entry (without HRMS)','rhewise_flatlist_draft',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
                 <li class=""><?= l('Occupant Data Entry (with HRMS)','rhewise_flatlist',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>                
@@ -390,16 +513,59 @@ global $user, $user_role,$base_path,$base_root;
             <?= l('Allotment','#',array('html' =>true, 'attributes' => array('class' => array('nav-link')))); ?>
         </li>  -->
         <?php if($user_role == 11){   // by debaleena 13-09-2024?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <li class="nav-item">
             <?= l('<i class="fa fa-list" aria-hidden="true"></i> Applicant List with Flat Possession','view-flat-possession-taken-ddo',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
         </li>
         <li class="nav-item"> <!-- </Done by Subham 07-01-2025> -->
             <?= l('<i class="fa fa-share-square-o" aria-hidden="true"></i> Applicant List with Released Flats','view-flat-released-ddo',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
         </li>
+<<<<<<< HEAD
+        <li class="nav-item"> <!-- </Done by Subham 07-01-2025> -->
+            <?= l('<i class="fa fa-share-square-o" aria-hidden="true"></i> Applicant List with License Generation','view-license-generation-list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+        </li>
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <?php } ?>
 
 
 
+<<<<<<< HEAD
+        <?php if($user_role == 6 || $user_role == 10 || $user_role == 13 || $user_role == 17){   // by debaleena 13-09-2024
+
+           if($user_role != 6){ ?>
+               <li class="nav-item">     <!-- added b dg 14-11-2025-->
+                <a href="<?= $base_root.$base_path.'allotment_list' ?>" class="nav-link active#">
+                    <i class="fa fa-list" aria-hidden="true"></i>
+                    Allotment List
+                </a>
+            </li> 
+ 
+          <?php   } ?>
+            <li class="nav-item has-submenu">
+            <a class="nav-link" href="#">
+                <i class="fa fa-list" aria-hidden="true"></i> Occupant & Aplicant List
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down float-end mt-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                </svg>
+            </a>
+            <ul class="submenu collapse">    
+                <li class="nav-item">
+                    <?= l('<i aria-hidden="true"></i> Existing Occupant List (with HRMS)','existing-occupant-list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+                </li>
+                <li class="nav-item">
+                    <?= l('<i aria-hidden="true"></i> Existing Occupant List (without HRMS)','existing-occupant-list-draft',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+                </li>
+               <li class="nav-item">
+                    <?= l('<i  aria-hidden="true"></i> Physical Applicant List (with HRMS)','view-legacy-applicant-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+                </li>
+                <li class="nav-item">
+                    <?= l('<i  aria-hidden="true"></i> Physical Applicant List (without HRMS)','view-legacy-applicant-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?>
+                </li>
+                <!-- by subham 21-07-2025 -->
+            </ul>
+            </li> 
+=======
         <?php if($user_role == 6 || $user_role == 10 || $user_role == 13){   // by debaleena 13-09-2024?>
 
 
@@ -419,30 +585,128 @@ global $user, $user_role,$base_path,$base_root;
             </li>
         </ul>
         </li> 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         <?php } 
         if($user_role == 18 ){
             ?>
         <li class="nav-item has-submenu">
             <a class="nav-link" href="#">
+<<<<<<< HEAD
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 1 1 0-18c1.052 0 2.062.18 3 .512M7 9.577l3.923 3.923 8.5-8.5M17 14v6m-3-3h6"/>
+                </svg>
+                Content Management
+=======
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-building-gear" viewBox="0 0 16 16">
             <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
             <path d="M4.5 2a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.386 1.46c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
             </svg> Content Management
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             </a>
             <ul class="submenu collapse">
                 <li class=""><?= l('Add Content','cms-content-add',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
                 <li class=""><?= l('List of Contents','cms-content-list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
             </ul>
+<<<<<<< HEAD
+        </li>
+            <?php
+        }
+
+        if($user_role == 13){
+             // Estate-Treasury Mapping Role changed to Housing Approver dt.17-07-2025
+            ?>
+        <li class="nav-item has-submenu">
+            <a class="nav-link" href="#" title="Treasury Estate Mapping">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-building-gear" viewBox="0 0 16 16">
+                <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6.5a.5.5 0 0 1-1 0V1H3v14h3v-2.5a.5.5 0 0 1 .5-.5H8v4H3a1 1 0 0 1-1-1z"/>
+                <path d="M4.5 2a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-6 3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm3 0a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm4.386 1.46c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+                </svg> 
+                    Treasury Mapping
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down float-end mt-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                </svg>
+            </a>
+            <ul class="submenu collapse">
+                <li class=""><?= l('Add Treasury Estate Mapping Record','estate-treasury-selection/add',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Treasury Estate Mapping List','estate-treasury-selection',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+            </ul>
+        </li>
+
+        <li class="nav-item has-submenu">
+            <a class="nav-link" href="#">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-database-add" viewBox="0 0 16 16">
+                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/>
+                <path d="M12.096 6.223A5 5 0 0 0 13 5.698V7c0 .289-.213.654-.753 1.007a4.5 4.5 0 0 1 1.753.25V4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.5 4.5 0 0 1-.813-.927Q8.378 15 8 15c-1.464 0-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13h.027a4.6 4.6 0 0 1 0-1H8c-1.464 0-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10q.393 0 .774-.024a4.5 4.5 0 0 1 1.102-1.132C9.298 8.944 8.666 9 8 9c-1.464 0-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777M3 4c0-.374.356-.875 1.318-1.313C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4"/>
+            </svg>
+                Legacy Data  
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down float-end mt-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                </svg>
+            </a>
+            <ul class="submenu collapse">
+                <li class=""><?= l('Legacy Applicant Entry','existing_applicant_entry',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant Entry For VS or CS','legacy-vs-cs',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For VS (with HRMS ID)','legacy-vs-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For VS (without HRMS ID)','legacy-vs-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For CS (with HRMS ID)','legacy-cs-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List For CS (without HRMS ID)','legacy-cs-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+               <li class=""><?= l('Legacy Applicant List (with HRMS ID)','view-legacy-applicant-list-whrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('Legacy Applicant List (without HRMS ID)','view-legacy-applicant-list-wohrms',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li> <!-- < added by Subham dt.21-07-2025 > ----> 
+            </ul>
+        </li>
+
+        <li class="nav-item">
+            <a href="<?= $base_root.$base_path.'flat_type_waiting_list' ?>" class="nav-link active#">
+                <i class="fa fa-list" aria-hidden="true"></i>
+                Flat Type Wise Waiting List
+            </a>
+        </li> 
+
+        <li class="nav-item has-submenu">
+            <a class="nav-link" href="#" title="Treasury Estate Mapping">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15v3c0 .5523.44772 1 1 1h10M3 15v-4m0 4h9m-9-4V6c0-.55228.44772-1 1-1h16c.5523 0 1 .44772 1 1v3M3 11h11m-2-.2079V19m3-4h1.9909M21 15c0 1.1046-.8954 2-2 2s-2-.8954-2-2 .8954-2 2-2 2 .8954 2 2Z"/>
+                </svg> DDO Management
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down float-end mt-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+                </svg>
+            </a>
+            <ul class="submenu collapse">
+                <li class=""><?= l('Add DDO Information','ddo-add',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+                <li class=""><?= l('DDO List','ddo-list',array('html'=>true, 'attributes'=>array('class'=>array('nav-link')))); ?></li>
+            </ul>
+        </li>
+        <li class="nav-item">
+            <a href="<?= $base_root.$base_path.'flat-wise-user-info' ?>" class="nav-link active#">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                Flat-HRMS User Tagging
+            </a>
+        </li> 
+        <li class="nav-item">  
+            <a href="<?= $base_root.$base_path.'vacany_list' ?>" class="nav-link active#">
+                <i class="fa fa-list" aria-hidden="true"></i>
+                Vacancy List
+            </a>
+        </li> 
+            <?php
+
+        }   //vacancy list aded by dg 03-11-2025
+=======
         </li> 
             <?php
         }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         
         ?>
 
         <?php if($user_role != 4 && $user_role != 11 ){ ?>
         <li class="nav-item">
             <a href="<?= $base_root.$base_path.'password_change' ?>" class="nav-link active#">
+<<<<<<< HEAD
+                <i class="fa fa-key" aria-hidden="true"></i>
+=======
                 <i class="fa fa-tachometer" aria-hidden="true"></i>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 Change Password
             </a>
         </li>
@@ -450,7 +714,11 @@ global $user, $user_role,$base_path,$base_root;
 
 
         <li class="nav-item">
+<<<<<<< HEAD
+            <?= l('<i class="fa fa-sign-out" aria-hidden="true"></i> Logout','/user/logout',array('html' =>true, 'attributes' => array('class' => array('nav-link'), 'id' => 'my-logout'))); ?>
+=======
             <?= l('<i class="fa fa-sign-out" aria-hidden="true"></i> Logout','/user/logout',array('html' =>true, 'attributes' => array('class' => array('nav-link')))); ?>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         </li>        
     </ul>
     <!-- <img src="<?= $base_root.$base_path ?>sites/all/themes/housingtheme/images/designed-by-nic.png" class="w-100"> -->

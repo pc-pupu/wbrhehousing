@@ -15,7 +15,11 @@ function ddo_change($form, &$form_state, $online_application_id = '') {
     //echo $query;die;
 
     $deptresult = $query->execute()->fetchObject();
+<<<<<<< HEAD
+    echo '<pre>';print_r($deptresult);die;
+=======
     // echo '<pre>';print_r($deptresult);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
     if(!empty($deptresult)){
         $ddo_designation =  $deptresult->ddo_designation;
@@ -42,8 +46,13 @@ function ddo_change($form, &$form_state, $online_application_id = '') {
             $current_ddo_id = $current_ddo_designation_arr['ddo_id'];   //added by dg 26-11-2025
             $current_ddo_designation = $current_ddo_designation_arr['ddo_designation'];
         }else{
+<<<<<<< HEAD
+            $current_ddo_code = '<span style="color:red;">DDO code not found in the Housing Department records. Please contact the department for updation.</span>';
+            $current_ddo_designation = '';
+=======
             $current_ddo_code = '<span style="color:red;">Current DDO code not found in the Housing Department records. Please contact the department for updation.</span>';
             $current_ddo_designation = $hrmsdata->ddoId;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         }
 
     }else{
@@ -54,12 +63,20 @@ function ddo_change($form, &$form_state, $online_application_id = '') {
     // echo '<pre>';print_r($hrmsdata);die;
     
     $output = '<div class="col-md-12 mt-4">
+<<<<<<< HEAD
+                    <h4 style="font-weight: 600;line-height: 30px;font-size: 17px;">Your DDO details as recorded with the Housing Department:<br/><span style="font-size: 17px;font-weight: 300;margin-top: 11px;">'.$ddo_designation.'('.$ddo_code.')'.'</span></h4>
+=======
                     <h4 style="font-weight: 600;line-height: 30px;font-size: 17px;">Your DDO details as recorded with the Housing Department:<br/><span style="font-size: 17px;font-weight: 300;margin-top: 11px;">'.$ddo_designation.' ('.$ddo_code.')'.'</span></h4>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     
                 </div>
 
                 <div class="col-md-12">
+<<<<<<< HEAD
+                    <h4 style="font-weight: 600;line-height: 30px;font-size: 17px;">Your current DDO information, as per HRMS data:<br/><span style="font-size: 17px;font-weight: 300;margin-top: 11px;">'.$current_ddo_designation.'('.$current_ddo_code.')</span></h4>
+=======
                     <h4 style="font-weight: 600;line-height: 30px;font-size: 17px;">Your current DDO information, as per HRMS data:<span style="font-size: 17px;font-weight: 300;margin-top: 11px;">'.$current_ddo_designation.'<br> ('.$current_ddo_code.')</span></h4>
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     
                     <div>All further proceedings related to this application will be routed through this DDO</div>
                 </div>
@@ -107,7 +124,11 @@ function ddo_change_submit($from, &$form_state) {
     global $user;
     $values = $form_state['values'];
 
+<<<<<<< HEAD
+    $hiddenArr = unserialize($values['hidden_data']); echo '<pre>';print_r($hiddenArr);die;
+=======
     $hiddenArr = unserialize($values['hidden_data']); //echo '<pre>';print_r($hiddenArr);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $online_application_id = $hiddenArr['online_application_id'];
 
     if($values['agree_chk']!=1){
@@ -127,12 +148,20 @@ function ddo_change_submit($from, &$form_state) {
                 drupal_set_message(t('Current DDO code not found in the Housing Department records. Please contact the department for updation.'),'error');
                 drupal_goto('dashboard');
                 return;
+<<<<<<< HEAD
+            }            
+=======
             }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             
 
             if($hiddenArr['current_ddo_code'] == $hiddenArr['old_ddo_code']){
                 
+<<<<<<< HEAD
+                echo $hiddenArr['current_ddo_code'].'----'.$hiddenArr['old_ddo_code']; die;
+=======
                 // echo $hiddenArr['current_ddo_code'].'----'.$hiddenArr['old_ddo_code']; die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                 // added on 17-01-2026 by Moumita //
                 // update housing_declration table
 
@@ -142,7 +171,11 @@ function ddo_change_submit($from, &$form_state) {
                     'ddo_id_to' => $hiddenArr['current_ddo_id'],
                 );
 
+<<<<<<< HEAD
+                echo '<pre>';print_r($ddodeclration_data);die;
+=======
                 // echo '<pre>';print_r($ddodeclration_data);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
                 db_update('housing_declration')
                 ->fields($ddodeclration_data)

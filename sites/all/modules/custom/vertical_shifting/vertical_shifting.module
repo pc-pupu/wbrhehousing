@@ -301,7 +301,10 @@ function vertical_shifting_form_application_form_alter(&$form, &$form_state, $fo
 			'#markup' => '</div>'
 		);
 		
+<<<<<<< HEAD
+=======
 		
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$form['current_occupation']['file_licence'] = array(
 			'#title' => t('Upload Current Licence'),
 			'#type' => 'managed_file',
@@ -320,7 +323,10 @@ function vertical_shifting_form_application_form_alter(&$form, &$form_state, $fo
 			'#process' => array('vertical_shifting_element_process'),
 		);
 
+<<<<<<< HEAD
+=======
 		/* Turned off by Subham 24-07-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		 ///added by dg 20-12-2024///
 		 $form['current_occupation']['vs_scanned_sign'] = array(
 			'#title' => t('Upload Scanned Signature'),
@@ -337,7 +343,11 @@ function vertical_shifting_form_application_form_alter(&$form, &$form_state, $fo
 			'#upload_location' => 'public://doc/',
 			'#required' => TRUE,
 			'#process' => array('vertical_shifting_element_process'),
+<<<<<<< HEAD
+		);
+=======
 		);*/ // Turned off by Subham 24-07-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 													 
 		fetch_vs_data($form);
@@ -523,6 +533,13 @@ function vertical_shifting_form_application_form_alter(&$form, &$form_state, $fo
 
 
 
+<<<<<<< HEAD
+
+
+
+	
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	$file_licence = file_load($form_state['values']['file_licence']);
 	if($file_licence->filesize > 1048576) {
 		form_set_error('licence_file_size', 'The file '.$file_licence->filename.' could not be uploaded, because it exceeds 1 MB, the maximum allowed size for uploads.');	

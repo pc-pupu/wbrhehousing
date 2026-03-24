@@ -43,7 +43,11 @@ if($result->rowCount() > 0) {
 	if($vs_result->rowCount() > 0) {
 		if($vs_data->app_status == 'draft') {
 			echo l('Floor Shifting' , 'online_application/'.encrypt_url('vs'), $output == 'vs'?$options:$options4);
+<<<<<<< HEAD
+		} else if($na_data->app_status == 'reject') {
+=======
 		} else if($vs_data->app_status == 'reject') {
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			echo l('Floor Shifting' , 'online_application/'.encrypt_url('vs'), $output == 'vs'?$options:$options3);
 		}else {
 			echo l('Floor Shifting' , 'online_application/'.encrypt_url('vs'), $output == 'vs'?$options:$options2);
@@ -60,7 +64,11 @@ if($result->rowCount() > 0) {
 	if($cs_result->rowCount() > 0) {
 		if($cs_data->app_status == 'draft') {
 			echo l('Category Shifting' , 'online_application/'.encrypt_url('cs'), $output == 'cs'?$options:$options4);
+<<<<<<< HEAD
+		} else if($na_data->app_status == 'reject') {
+=======
 		} else if($cs_data->app_status == 'reject') {
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			echo l('Category Shifting' , 'online_application/'.encrypt_url('cs'), $output == 'cs'?$options:$options3);
 		}else {
 			echo l('Category Shifting' , 'online_application/'.encrypt_url('cs'), $output == 'cs'?$options:$options2);

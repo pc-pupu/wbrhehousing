@@ -1,7 +1,10 @@
 <?php
 // Done by Subham dt.28-05-2025
 function user_tagging_menu() {
+<<<<<<< HEAD
+=======
   // echo "kk";die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $items = array();
 
   $items['user-tagging'] = array(
@@ -188,5 +191,9 @@ function element_validate_dob_before_license_issue($element, &$form_state) {
       form_set_error('dob', t('Please enter valid dates in dd/mm/yyyy format.'));
     }
   }
+<<<<<<< HEAD
+}
+=======
 }
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

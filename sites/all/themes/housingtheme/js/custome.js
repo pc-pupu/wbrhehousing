@@ -26,6 +26,26 @@ document.addEventListener("DOMContentLoaded", function(){
     }) // forEach
   }); 
 
+<<<<<<< HEAD
+(function ($) {
+  // Unique behavior name for setting the cookie
+  Drupal.behaviors.setCookieOnClick = {
+    attach: function (context, settings) {
+      $('#my-button', context).once('set-cookie-on-click').click(function () {
+        document.cookie = "user_type=new; path=/;";
+        alert('You are about to be redirected to the dashboard.');
+      });
+    }
+  };
+})(jQuery);
+
+(function ($) {
+  // Unique behavior name for unsetting the cookie
+  Drupal.behaviors.unsetCookieOnLogout = {
+    attach: function (context, settings) {
+      $('#my-logout', context).once('unset-cookie-on-logout').click(function () {
+        document.cookie = "user_type=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+=======
   (function ($) {
   Drupal.behaviors.setCookieAlert = {
     attach: function (context, settings) {
@@ -34,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function(){
         document.cookie = "user_type=new; max-age=30;"; 
         // Show alert
         // alert('Cookie has been set!');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
       });
     }
   };

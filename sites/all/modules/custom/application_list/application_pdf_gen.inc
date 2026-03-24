@@ -58,7 +58,11 @@
 
 			 //debolina start
 			  $preference_data=$output[5];
+<<<<<<< HEAD
+			  $status_description=$output[4]->status_description;   //by dg 2025
+=======
 			  $status_description=$output[4]->applicant_show_status;   //by dg 26-02-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			 //debolina end
 			
 			if($common_data->status == 'allotted') {
@@ -396,6 +400,12 @@
 
       					}else{
       						$page_output .='
+<<<<<<< HEAD
+							<tr bgcolor="#CCCCCC">
+	  							<th colspan="2" style="text-align: center;font-size: 16px;line-height: 24px;font-weight: normal;font-family: "Dosis",Arial,Verdana,serif; border: 1px solid black; border-collapse: collapse;">Allotment Details</th>
+	  						</tr>
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 							<tr style="font-size:14px;">
 								<th style="border: 1px solid black; border-collapse: collapse;">' . $headArr[0] . '</th>
 								<td style="border: 1px solid black; border-collapse: collapse;">' . $application_data->allotment_category . '</td>

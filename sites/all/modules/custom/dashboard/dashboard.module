@@ -120,7 +120,10 @@ function dashboard_content() {
     
     $query = db_select('housing_online_application', 'hoa');
 		$query->innerJoin('housing_applicant_official_detail', 'haod', 'haod.applicant_official_detail_id = hoa.applicant_official_detail_id');
+<<<<<<< HEAD
+=======
     
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		// $query->addExpression('MAX(online_application_id)','id');
 		$query->fields('hoa', array('status'));
 		$query->condition('haod.uid', $uid, '=');
@@ -129,8 +132,12 @@ function dashboard_content() {
 			
 		$result = $query->execute();
 		$data = $result->fetchObject();
+<<<<<<< HEAD
+    // print_r($data);die;
+=======
 
     
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $output['user_status'] = isset($data->status) ? $data->status : '';
     $output['all-application-data'] = all_application_details_fetch($uid); // Done by Subham 24-12-2024
 
@@ -158,6 +165,14 @@ function dashboard_content() {
     $query2->condition('haod.is_active', '1','=');
     $query2->condition('haod.uid', $uid,'=');
    
+<<<<<<< HEAD
+    $query2->addField('hpf', 'short_code');
+    $query2->addField('hpf', 'online_application_id');
+
+    $output['fetch_license_status'] = $query2->execute()->fetchObject();
+
+
+=======
     $query2->Fields('hpf', array('short_code','created_at'));  //updated by dg 06-03-2026
     $query2->addField('hpf', 'online_application_id');
 
@@ -173,6 +188,7 @@ function dashboard_content() {
     $data = $result->fetchObject();
     $output['ddo_code'] = isset($data->ddo_code) ? $data->ddo_code : '';
     /* End */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
     // print_r($output['fetch_license_status']);die;
     // print_r($output);die;
@@ -255,6 +271,10 @@ function dashboard_content() {
       $output['special-recommendation-list-data'] = fetch_special_recommendation_list_data()->rowCount();
     }
     ////end////
+<<<<<<< HEAD
+  }
+  // print_r($output['all-exsting-occupant']);die;
+=======
   }else{
     $output['user_info']['applicantName'] = $user->name;
     $output['user_info']['mobileNo'] = 'N/A';
@@ -263,6 +283,7 @@ function dashboard_content() {
     $output['user_info']['officeName'] = 'Housing Department';
   }
   // print_r($output);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   return theme('custom_dashboard_template', array('output' => $output));
 }
 
@@ -316,11 +337,19 @@ function all_application_details_fetch($uid = ''){
   $query->leftjoin('housing_new_allotment_application', 'hnaa', 'hnaa.online_application_id = hoa.online_application_id'  ); // added by Moumita on 19-11-2025
   $query->fields('hnaa', array('extra_doc','extra_doc_path','allotment_category')); // added by Moumita on 19-11-2025
   $query->condition('haod.uid', $uid, '=');
+<<<<<<< HEAD
+  $query->fields('hoa', array('application_no','date_of_application','online_application_id'));  //add online_application_id by dg 21-07-2025
+  $query->addField('haod','applicant_designation');
+  $query->addField('ha','applicant_name');
+  $query->addField('hasm', 'status_description');
+  $query->orderBy('hoa.status', 'ASC');
+=======
   $query->fields('hoa', array('application_no','date_of_application','online_application_id','status'));  //add online_application_id by dg 21-07-2025 modified by Moumita 13-02-2026
   $query->addField('haod','applicant_designation');
   $query->addField('ha','applicant_name');
   $query->Fields('hasm', array('status_id','status_description','short_code','applicant_show_status'));  //updated by dg 26-02-2026
   $query->orderBy('hoa.online_application_id', 'DESC'); // modified by Moumita 13-02-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $results = $query->execute()->fetchAll();
   // echo '<pre>'.$uid ; echo $query; print_r($results); die;
   return $results;

@@ -116,7 +116,11 @@ function update_rhe_allotment_new($allotment_type, $district_code = 0) {
             //fetching applicant according roaster and seniority
             // $applicant_result = get_applicant_new($allotment_type, $next_roaster_counter);// old code by prasenjit// turned off 30-10-2024
             $f_applicant_result = get_applicant_new($allotment_type, $next_roaster_counter);
+<<<<<<< HEAD
+            //print_r($f_applicant_result);die;
+=======
             
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             $applicant_result  = $f_applicant_result['result'];
             //print_r($applicant_result->rowCount());die;
 
@@ -309,12 +313,20 @@ function get_applicant($estate_id, $flat_type_id, $shifting_type) {
         'cs' => 'housing_cs_application',
     );
 
+<<<<<<< HEAD
+    //NO hrms no VS,CS allotment 27-08-2025 SD (haod.hrms_id is not NULL)
+=======
     //NO hrms no VS,CS allotment 27-08-2025 SD (haod.hrms_id is not NULL) // AND haod.hrms_id != '' AND haod.hrms_id != '0'  added by Moumita on 28-11-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $result = db_query("select hoa.online_application_id, hca.flat_type_id, hca.occupation_estate, hca.occupation_flat, hoa.date_of_application from {housing_online_application} as hoa
     inner join {housing_applicant_official_detail} as haod on haod.applicant_official_detail_id = hoa.applicant_official_detail_id
     inner join {" . $shifting_applicant_table[$shifting_type] . "} as hca on hca.online_application_id = hoa.online_application_id
     where hoa.status = 'housingapprover_approved_1' and hca.occupation_estate = $estate_id and hca.flat_type_id = $flat_type_id
+<<<<<<< HEAD
+    AND haod.hrms_id is not NULL 
+=======
     AND haod.hrms_id is not NULL AND haod.hrms_id != '0'
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     order by hoa.date_of_application ASC, hoa.online_application_id ASC limit 1");//SD added 27-08-2025 to choose based on date of application
     //order by hoa.online_application_id ASC limit 1"); //before(done by prasenjit)   housing_sup_approved_1 to housingapprover_approved_1 by debaleena 04-09-2024
     //order by hoa.computer_serial_no ASC limit 1");// after (done by Moumita)
@@ -337,7 +349,11 @@ function get_vacancy_on_preference($flat_type_id, $online_application_id, $distr
 
     return $result;
 }
+<<<<<<< HEAD
+function get_vacancy_details_new($flat_type_id, $district_code = 0) {  /*//added by dg 9th floor 05-08-2025*/
+=======
 function get_vacancy_details_new($flat_type_id, $district_code = 0) {   /*//added by dg 9th floor 05-08-2025*/
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $result = db_query("SELECT t1.* FROM housing_flat AS t1
     INNER JOIN housing_estate AS t2 ON t1.estate_id = t2.estate_id
     INNER JOIN housing_district AS t3 ON t2.district_code = t3.district_code
@@ -384,7 +400,10 @@ function get_next_roaster_counter($flat_type_id) {
 }
 
 function get_applicant_new($flat_type_id, $next_roaster_counter) {
+<<<<<<< HEAD
+=======
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $roaster_tbl = ""; 
     $is_spl_recomended = 0; // 29-10-2024 special recommendation
     switch($flat_type_id) { // 1=>A, 2=>B, 3=>C, 4=>D, 5=> A+ // changed by Moumita 06-06-2024
@@ -418,7 +437,10 @@ function get_applicant_new($flat_type_id, $next_roaster_counter) {
         $spl_recommended_datas = $query->fetchObject();
         
         if($query->rowCount() > 0){
+<<<<<<< HEAD
+=======
             
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             $spl_recommended_applicant = db_query("select * from housing_special_recommended  ORDER BY priority_order ASC limit 1");
             $spl_recommended_applicant=$spl_recommended_applicant->fetchObject();
             //print_r($spl_recommended_applicant->housing_online_application_id);die;
@@ -429,7 +451,11 @@ function get_applicant_new($flat_type_id, $next_roaster_counter) {
             INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
             WHERE t1.status = 'housingapprover_approved_1'  
             and t2.flat_type_id = " . $flat_type_id . "
+<<<<<<< HEAD
+            AND t3.hrms_id is not NULL AND t3.hrms_id != '' AND t3.hrms_id != '0'
+=======
             AND t3.hrms_id is not NULL AND t3.hrms_id != '0'
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             and t1.online_application_id = " . $spl_recommended_applicant->housing_online_application_id  . "
             ORDER BY 
                 regexp_replace(t1.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
@@ -438,7 +464,10 @@ function get_applicant_new($flat_type_id, $next_roaster_counter) {
             $is_spl_recomended = 1;
             //print_r($result->fetchObject());die;
         }else{
+<<<<<<< HEAD
+=======
            
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             //inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 26-06-2025 // AND haod.hrms_id != '' AND haod.hrms_id != '0'  added by Moumita on 28-11-2025
 
             $result = db_query("select * from housing_online_application as t1
@@ -446,7 +475,11 @@ function get_applicant_new($flat_type_id, $next_roaster_counter) {
             INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
             WHERE t1.status = 'housingapprover_approved_1'  
             and t2.flat_type_id = " . $flat_type_id . "
+<<<<<<< HEAD
+            AND t3.hrms_id is not NULL AND t3.hrms_id != '' AND t3.hrms_id != '0'
+=======
             AND t3.hrms_id is not NULL AND t3.hrms_id != '0'
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
             and t2.allotment_category = (select category from " . $roaster_tbl . " where counter = " . $next_roaster_counter . ")
             ORDER BY 
                 regexp_replace(t1.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
@@ -456,21 +489,31 @@ function get_applicant_new($flat_type_id, $next_roaster_counter) {
             // echo "ppp";echo "<pre>";print_r($result);die;
         }
     }else{
+<<<<<<< HEAD
+=======
        //echo $flat_type_id."<br>".$roaster_tbl."<br>".$next_roaster_counter;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
          //inner join added with housing_applicant_official_detail and AND t3.hrms_id != NULL condition added by dg 26-06-2025 // AND haod.hrms_id != '' AND haod.hrms_id != '0'  added by Moumita on 28-11-2025
         $result = db_query("select * from housing_online_application as t1
         INNER JOIN housing_new_allotment_application as t2 on t1.online_application_id = t2.online_application_id
         INNER JOIN housing_applicant_official_detail as t3 ON t1.applicant_official_detail_id = t3.applicant_official_detail_id
         WHERE t1.status = 'housingapprover_approved_1'  
         and t2.flat_type_id = " . $flat_type_id . "
+<<<<<<< HEAD
+        AND t3.hrms_id is not NULL AND t3.hrms_id != '' AND t3.hrms_id != '0'
+=======
         AND t3.hrms_id is not NULL AND t3.hrms_id != '0'
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         and t2.allotment_category = (select category from " . $roaster_tbl . " where counter = " . $next_roaster_counter . ")
         ORDER BY 
                 regexp_replace(t1.computer_serial_no, '[^0-9]', '', 'g')::int ASC,
                 regexp_replace(t1.computer_serial_no, '[0-9]', '', 'g') ASC
             limit 1");
         $is_spl_recomended=0;
+<<<<<<< HEAD
+=======
         // echo "<pre>";print_r($result);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     }
 
     //end

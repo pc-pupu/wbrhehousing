@@ -57,9 +57,15 @@
 			'file' => 'include/allotment_detail_pdf_gen.inc',
 			'access arguments' => array('access content'),
 		);
+<<<<<<< HEAD
+
+
+		
+=======
 		
 		//End
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		return $items;
 	}
 	
@@ -119,8 +125,13 @@
 		$query->addField('hf', 'floor');  //debaleena 29-07-2024
 		
 		// allowed application to view
+<<<<<<< HEAD
+		$status_arr = array('housing_official_approved','allotted','applicant_acceptance','applicant_reject','ddo_verified_2','ddo_reject_2','housing_sup_approved_2','housing_sup_reject_2','license_generate','offer_letter_extended','flat_possession_taken'); //add flat_possession_taken by dg 22-07-2025
+
+=======
 		$status_arr = array('housing_official_approved','allotted','applicant_acceptance','applicant_reject','ddo_verified_2','ddo_reject_2','housing_sup_approved_2','housing_sup_reject_2','license_generate','offer_letter_extended','flat_possession_taken','housingapprover_approved_2','housing_approver_reject_2','offer_letter_cancel'); //add flat_possession_taken by dg 22-07-2025, last 3 status added by dg 07-12-2025
 		// echo $online_application_id;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		if($online_application_id == ''){
 			$db_and = db_and();
@@ -220,14 +231,21 @@
 	// added by moumita
 	function get_applicant_upload_docs($app_id = ''){
 		global $user;
+<<<<<<< HEAD
+=======
 		// echo $app_id;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		// echo $user->uid;die;
 		// $query = db_select('housing_online_application_upload_doc', 'haupdoc');
 		$query = db_select('housing_new_allotment_application', 'haupdoc');
 		$query->fields('haupdoc', array());
 		if($app_id!=''){
 			$query->condition('haupdoc.online_application_id', $app_id, '=');
+<<<<<<< HEAD
+		}else{
+=======
 		} else{
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$query->condition('haupdoc.uid', $user->uid, '=');
 		}
 		return $query->execute();

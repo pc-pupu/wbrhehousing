@@ -39,7 +39,11 @@ jQuery(document).ready(function(){
 jQuery(window).load(function () {
 	jQuery('#overlay').fadeOut();
 });
+<<<<<<< HEAD
+
+=======
 /*
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 jQuery(document).ready(function () {
 	var allotment_category = jQuery('#check_allotment_reason').val();
 	jQuery('#edit-document-upload > legend').attr('class', 'fieldset-legend').hide();
@@ -59,7 +63,11 @@ jQuery(document).ready(function () {
 		if (allotment_category == 'Transfer') {
 			jQuery('.form-item-extra-doc').show();
 			jQuery('#edit-document-upload > legend').attr('class', 'fieldset-legend').append(' <span class="required-star" style="color:red;font-weight:bold;">*</span>').show();
+<<<<<<< HEAD
+		} else if (allotment_category == 'Physically Handicaped Or Serious Illness') {    //debaleena 30-07-2024
+=======
 		} else if (allotment_category == 'Physically Handicaped or Serious Illness') {    //debaleena 30-07-2024
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			jQuery('.form-item-extra-doc').show();
 			jQuery('#edit-document-upload > legend').attr('class', 'fieldset-legend').append(' <span class="required-star" style="color:red;font-weight:bold;">*</span>').show();
 		} else if (allotment_category == 'Recommended') {									//debaleena 30-07-2024
@@ -81,6 +89,32 @@ jQuery(document).ready(function () {
 		}
 	});
 });
+<<<<<<< HEAD
+
+// jQuery(document).ajaxSuccess(function () {
+// 	var allotment_category = jQuery('#check_allotment_reason').val();
+// 	if ((allotment_category != 'Transfer') && (allotment_category != 'Physically Handicaped Or Serious Illness') && (allotment_category != 'Officer on Transfer having earmarked Bungalow or Quater in their immediate previous posting')) {
+// 		jQuery('.form-item-extra-doc').hide();
+// 	}
+// 	//alert('ok');
+// 	//jQuery('[name=reason]').change(function(){
+// 	jQuery('#check_allotment_reason').change(function () {
+// 		//alert('ok');
+// 		var allotment_category = jQuery(this).val();
+// 		if (allotment_category == 'Transfer') {
+// 			jQuery('.form-item-extra-doc').show();
+// 		} else if (allotment_category == 'Physically Handicaped Or Serious Illness') {
+// 			jQuery('.form-item-extra-doc').show();
+// 		} else if (allotment_category == 'Officer on Transfer having earmarked Bungalow or Quater in their immediate previous posting') {
+// 			jQuery('.form-item-extra-doc').show();
+// 		} else {
+// 			jQuery('.form-item-extra-doc').hide();
+// 		}
+// 	});
+
+
+// });
+=======
 */
 /*
 jQuery(document).ajaxSuccess(function () {
@@ -107,6 +141,7 @@ jQuery(document).ajaxSuccess(function () {
 
 });
 */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 
 

@@ -8,7 +8,11 @@ function legacy_vs_cs_form($form, &$form_state, $uid = '') {
 
 
 	$uid = decrypt_url($uid);
+<<<<<<< HEAD
+    
+=======
     // echo $uid;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     $district = isset($form_state['values']['district']) && !empty($form_state['values']['district']) ? $form_state['values']['district'] : '';
     
     $designation = isset($form_state['values']['designation']) && !empty($form_state['values']['designation']) ? $form_state['values']['designation'] : '';
@@ -344,7 +348,11 @@ function legacy_vs_cs_form($form, &$form_state, $uid = '') {
 	);
 	$form['prrsonal_info']['housing_hidden_uid_or_draft_id'] = array(
 			'#type' => 'hidden',
+<<<<<<< HEAD
+			'#default_value' => isset($uid) ? $uid : '', //added by dg 28-08-2025
+=======
 			'#default_value' => isset($uid) ? $uid : '',
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	);
 		
 	// applicant's official information
@@ -399,12 +407,16 @@ function legacy_vs_cs_form($form, &$form_state, $uid = '') {
 	);
 
 	$selected_type = isset($form_state['values']['pay_type_new']) && !empty($form_state['values']['pay_type_new']) ? $form_state['values']['pay_type_new'] : 'old';
+<<<<<<< HEAD
+	
+=======
 	// $selected_band = isset($form_state['values']['pay_type_new']) ? $form_state['values']['pay_type_new'] : '';
 
 	// If Pay Type changed, reset Pay Band
 	// if (isset($form_state['triggering_element']['#name']) && $form_state['triggering_element']['#name'] == 'pay_type_new') {
 	//     $selected_band = ''; // clear selection when pay type changes
 	// }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	if(!empty($selected_type) && $selected_type!=''){
 
@@ -436,11 +448,15 @@ function legacy_vs_cs_form($form, &$form_state, $uid = '') {
 		);
 
 		$flat_type_text = isset($form_state['values']['pay_band']) ? $flat_type_text : '';
+<<<<<<< HEAD
+		
+=======
 		// if($form_state['values']['pay_band'] ==''){
 		// 	$flat_type_text = '';
 		// }else{
 		// 	$flat_type_text = $flat_type_text;
 		// }
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		$form['official_info']['flat_type_display'] = array(
 			'#type' => 'textfield',
@@ -938,8 +954,22 @@ function legacy_vs_cs_form($form, &$form_state, $uid = '') {
 
 
 function legacy_vs_cs_form_submit($form, &$form_state){
+<<<<<<< HEAD
+	// echo "<pre>";print_r($form_state['values']);
+	// echo 'Under Maintenance';die;
+
+
+// 	$bigint_fields = ['ddo_id', 'pay_band_id', 'office_phone_no'];
+
+// foreach ($bigint_fields as $field) {
+//   if (isset($form_state['values'][$field]) && $form_state['values'][$field] === '') {
+//     $form_state['values'][$field] = NULL;
+//   }
+// }
+=======
 	// echo "<pre>";print_r($form_state['values']);die;
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	$housing_applicant_id = $form_state['values']['housing_applicant_id'];
 	$housing_hidden_hrms_id = $form_state['values']['housing_hrms_id'];
 	$housing_hidden_uid = $form_state['values']['housing_hidden_uid'];
@@ -1177,7 +1207,11 @@ function legacy_vs_cs_form_submit($form, &$form_state){
 		$app_off_detail_arr['uid']  =  !empty($housing_hidden_hrms_id) ? $housing_hidden_uid : trim($data->max_uid);
 		$app_off_detail_arr['hrms_id'] = !empty($form_state['values']['hrms_id']) ? trim($form_state['values']['hrms_id']) : 0;
 		$app_off_detail_arr['applicant_designation']  =  strtoupper(trim($form_state['values']['app_designation']));
+<<<<<<< HEAD
+		$app_off_detail_arr['pay_band_id']  = $form_state['values']['pay_band']; 
+=======
 		$app_off_detail_arr['pay_band_id']  = !empty($form_state['values']['pay_band']) ? trim($form_state['values']['pay_band']) : 0; 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$app_off_detail_arr['pay_in_the_pay_band']  =  trim($form_state['values']['pay_in']);
 		$app_off_detail_arr['applicant_posting_place']  =  strtoupper(trim($form_state['values']['app_posting_place']));
 		$app_off_detail_arr['applicant_headquarter']  =  strtoupper(trim($form_state['values']['app_headquarter']));
@@ -1190,12 +1224,20 @@ function legacy_vs_cs_form_submit($form, &$form_state){
 		$app_off_detail_arr['office_district']  =  trim($form_state['values']['office_district']);
 		$app_off_detail_arr['office_pin_code']  = !empty($form_state['values']['office_pincode']) ? trim($form_state['values']['office_pincode']) : 0;  
 		$app_off_detail_arr['office_phone_no']  = !empty($form_state['values']['office_phone_no']) ? trim($form_state['values']['office_phone_no']) : 0;   
+<<<<<<< HEAD
+		//$app_off_detail_arr['ddo_id']  = !empty($form_state['values']['designation']) ? trim($form_state['values']['designation']) : NULL; 
+		$designation = trim($form_state['values']['designation']);
+		if ($designation !== '') {
+		    $app_off_detail_arr['ddo_id'] = (int) $designation;
+		}  
+=======
 		//$app_off_detail_arr['ddo_id']  = trim($form_state['values']['designation']);
 		$designation = trim($form_state['values']['designation']);
 		if ($designation !== '') {
 		    $app_off_detail_arr['ddo_id'] = (int) $designation;
 		}
 		//$app_off_detail_arr['ddo_id'] = (int) trim($form_state['values']['designation']);   
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$app_off_detail_arr['housing_applicant_id']  =   $last_housing_applicant_id;
 		// echo "<pre>";print_r($app_off_detail_arr);die;
 		db_insert('housing_applicant_official_detail')
@@ -1221,8 +1263,13 @@ function legacy_vs_cs_form_submit($form, &$form_state){
 		$online_app_arr['status']  =  'housingapprover_approved_1'; 
 		$online_app_arr['is_backlog_applicant']  =  1;	
 		$online_app_arr['physical_application_no']  =  trim($form_state['values']['physical_application_no']);
+<<<<<<< HEAD
+		$online_app_arr['application_no'] = trim($form_state['values']['application_type']);	
+		$online_app_arr['date_of_application'] = trim( implode('-', array_reverse(explode('/', $form_state['values']['application_date']))));
+=======
 		$online_app_arr['application_no'] = trim($form_state['values']['application_type']);
 		$online_app_arr['date_of_application'] = trim( implode('-', array_reverse(explode('/', $form_state['values']['application_date']))));	
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 				
 		$last_online_application_id = db_insert('housing_online_application')
 		->fields($online_app_arr)
@@ -1298,14 +1345,21 @@ function legacy_vs_cs_form_submit($form, &$form_state){
 
 function get_info_form_ajax_callback($form, &$form_state) {
   $commands = array();
+<<<<<<< HEAD
+
+=======
   // print_r($form_state['values']['pay_band']);
   // unset($form_state['values']['pay_band']);
   // Replace radios and select dropdown
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $commands[] = ajax_command_replace('#pay_type_new_replace_div', drupal_render($form['official_info']['pay_type_new']));
   $commands[] = ajax_command_replace('#pay_band_replace_div', drupal_render($form['official_info']['pay_band']));
 
   $commands[] = ajax_command_replace('#flat_type_display_div', drupal_render($form['official_info']['flat_type_display']));
 
+<<<<<<< HEAD
+ 
+=======
   // // Get selected pay band ID
   // $pay_band_id = isset($form_state['values']['pay_band']) ? $form_state['values']['pay_band'] : '';
 
@@ -1320,6 +1374,7 @@ function get_info_form_ajax_callback($form, &$form_state) {
   // // Replace the flat type display
   // $commands[] = ajax_command_replace('#flat_type_display_div', '<div id="flat_type_display_div">' . $flat_type_text . '</div>');
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 
@@ -1327,3 +1382,10 @@ function get_info_form_ajax_callback($form, &$form_state) {
 
 
 
+<<<<<<< HEAD
+
+
+
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

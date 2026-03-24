@@ -170,6 +170,29 @@ function outertheme_field__taxonomy_term_reference($variables) {
 // }
 
 function outertheme_preprocess_page(&$variables) {
+<<<<<<< HEAD
+  /*Done by Subham 17-07-2025*/
+  if (drupal_is_front_page()) {
+    $query = db_select('housing_cms', 'hc')
+      ->fields('hc', array('housing_cms_id', 'content_type', 'content_title', 'content_description'))
+      ->condition('hc.content_type', 'what_is_new', '=')
+      ->orderBy('housing_cms_id', 'DESC');
+    
+    $result = $query->execute()->fetchAll();
+
+    $items = array();
+    foreach ($result as $row) {
+      $items[] = array(
+        'id' => $row->housing_cms_id,
+        'title' => check_plain($row->content_title),
+        'description' => check_plain($row->content_description),
+      );
+    }
+    $variables['front_page_items'] = $items;
+  } /*End 17-07-2025*/
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   if (user_is_anonymous()) {
     $variables['theme_hook_suggestions'][] = 'header';
     $variables['theme_hook_suggestions'][] = 'footer';

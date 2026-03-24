@@ -186,12 +186,21 @@ function special_recommendation_occupant_submit($form, &$form_state) {
 
     // create allotment process number
     $allotment_process_data = db_query("SELECT MAX(allotment_process_no) as allotment_process_no FROM housing_allotment_process WHERE allotment_process_type = 'MANUAL' OR allotment_process_type = 'ALOT'")->fetchObject();
+<<<<<<< HEAD
+
+    if(!empty($allotment_process_data)){
+       $allotment_process_no = 'ALOT-' . str_pad((int) preg_replace('/\D/', '', $allotment_process_data->allotment_process_no) + 1, 2, '0', STR_PAD_LEFT); 
+    }else{
+        $allotment_process_no = 'ALOT-01';
+    }
+=======
     // echo "<pre>";print_r($allotment_process_data);
     if(!empty($allotment_process_data)){
         $allotment_process_no = 'ALOT-' . str_pad((int) preg_replace('/\D/', '', $allotment_process_data->allotment_process_no) + 1, 2, '0', STR_PAD_LEFT); 
     }else{
         $allotment_process_no = 'ALOT-01';
     } 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     
     // Allotment Process insert into housing_allotment_process
     $allotment_process_arr = array(
@@ -203,6 +212,10 @@ function special_recommendation_occupant_submit($form, &$form_state) {
     // echo "<pre>";print_r($allotment_process_arr); die;
     db_insert('housing_allotment_process')->fields($allotment_process_arr)->execute();
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
    /* update new alltment application*/  
     $new_allotment_app_arr = array();
     $new_allotment_app_arr['flat_type_id'] = $val['updated_flat_type']; 

@@ -252,7 +252,11 @@
 					if($process_data->allotment_status =='partial_deleted'){
 						$delete_link = l(
 							t('Click to View Partially Deleted Allottee Information'), 
+<<<<<<< HEAD
+							'allotment-deleted-info', 
+=======
 							'allotment-deleted-info/'.encrypt_url($allotment_process_no).'/'.encrypt_url($allotment_process), 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 							array('attributes' => array('class' => array('btn', 'bg-info', 'btn-sm', 'px-5', 'rounded-pill', 'text-white', 'mb-4', 'fw-bolder', 'w-100')))
 						);
 
@@ -287,7 +291,11 @@
 				if($allotment_process_date != '' && $allotment_process_no != '' && $allotment_process_type != '' && $process_data->allotment_status =='full_deleted'){
 					$delete_link = l(
 						t('Click to View Fully Deleted Allottee Information'), 
+<<<<<<< HEAD
+						'allotment-deleted-info', 
+=======
 						'allotment-deleted-info/'.encrypt_url($allotment_process_no).'/'.encrypt_url($allotment_process), 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						array('attributes' => array('class' => array('btn', 'bg-info', 'btn-sm', 'px-5', 'rounded-pill', 'text-white', 'mb-4', 'fw-bolder', 'w-100')))
 					);
 

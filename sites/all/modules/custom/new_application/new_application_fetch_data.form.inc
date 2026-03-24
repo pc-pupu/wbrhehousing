@@ -97,8 +97,15 @@ function fetch_new_app_status($status){
 		
 		
    		$query = db_select('housing_applicant_official_detail', 'haod');
+<<<<<<< HEAD
+		$query->innerJoin('housing_online_application', 'hoa',
+		'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->innerJoin('housing_new_allotment_application', 'hna',
+		'hoa.online_application_id = hna.online_application_id');
+=======
 		$query->innerJoin('housing_online_application', 'hoa',	'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
 		$query->innerJoin('housing_new_allotment_application', 'hna', 'hoa.online_application_id = hna.online_application_id');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$query->addExpression('COALESCE(MAX(hoa.online_application_id),0)','id');
 		$db_and = db_and();
 		$db_and->condition('haod.uid', $user->uid, '=');

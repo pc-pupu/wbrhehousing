@@ -97,4 +97,13 @@ font-style: italic;
 	font-size:18px
 }
 
+<<<<<<< HEAD
+.custom-required {  //added by dg 18-09-2025
+  color: red !important;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 

@@ -78,6 +78,9 @@ function _reload_cs_wohrms_list_view($form, &$form_state) {
     return array('#type' => 'ajax', '#commands' => $commands);
 }
 
+<<<<<<< HEAD
+function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {   //updated by dg 07-11-2025,in demo previous function is turned off
+=======
 // turned off by dg 07-11-2025 function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
 //     global $base_root, $base_path, $user, $user_role;
 //     $output = '';
@@ -252,6 +255,7 @@ function _reload_cs_wohrms_list_view($form, &$form_state) {
 // }
 
 function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     global $base_root, $base_path, $user, $user_role;
     $output = '';
     // echo "<pre>";print_r($flat_type);die;
@@ -283,7 +287,10 @@ function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
 	$query->addField('hb', 'block_name');
 	$query->addField('hft', 'flat_type');
 	$query->fields('hf', array('flat_no', 'flat_id'));
+<<<<<<< HEAD
+=======
     $query->fields('hca', array('flat_type_id'));
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	if($data_fetch->division_id != '' && $data_fetch->subdiv_id != '') { 
         if($data_fetch->subdiv_id != 0) {
@@ -296,6 +303,17 @@ function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
             $db_and->condition('he.division_id', $data_fetch->division_id, '=');			
             $query->condition($db_and);	
 		}
+<<<<<<< HEAD
+	}	
+	$db_or = db_or();											
+	$db_or->isNull('haod.hrms_id'); 
+	$db_or->condition('haod.hrms_id', '0', '=');  // modified by DG And Moumita on 15-12-2025
+	$query->condition($db_or);
+	if($rhe_name != 0 && $flat_type != 0){
+		$db_and = db_and();
+		$db_and->condition('hf.estate_id', $rhe_name, '=');
+		//$db_and->condition('hf.flat_type_id', $flat_type, '='); //turned o by dg 07-11-2025
+=======
 	}											
 
     // $query->isNull('haod.hrms_id');
@@ -306,13 +324,17 @@ function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
 		$db_and = db_and();
 		$db_and->condition('hf.estate_id', $rhe_name, '=');
 		//$db_and->condition('hf.flat_type_id', $flat_type, '='); //turned off by dg 07-11-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
         $db_and->condition('hca.flat_type_id', $flat_type, '='); // added by dg 07-11-2025 as per requirement
 
 		$query->condition($db_and);
 	}
 	$query->orderBy('hoa.date_of_application', 'ASC');
 	$result =$query->execute();
+<<<<<<< HEAD
+=======
 		// echo $query;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
     $header['sl_no'] = array('data' => 'Sl. No.');
     $header['application_no'] = array('data' => 'Application No');
@@ -327,17 +349,26 @@ function legacy_cs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
     $rows =array();
     $output = '';
     $c= 1;
+<<<<<<< HEAD
+
+    while($data = $result->fetchObject()) {
+=======
     
   
     while($data = $result->fetchObject()) {
      // echo "<pre>";print_r($data);die;   
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
       $fields = array();
 
       $flat_type_name = '';
         if ($flat_type != 0) {
               $query_flat_type = db_select('housing_flat_type', 'hft');  // query updated by dg 07-11-2025 as per requirement
               $query_flat_type->innerJoin('housing_flat', 'hf', 'hf.flat_type_id = hft.flat_type_id');
+<<<<<<< HEAD
+              $query_flat_type->innerJoin('housing_flat', 'hf', 'hf.flat_type_id = hft.flat_type_id');
+=======
               //$query_flat_type->innerJoin('housing_flat', 'hf', 'hf.flat_type_id = hft.flat_type_id');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
               $query_flat_type->fields('hft', array('flat_type'));
               $query_flat_type->condition('hf.flat_id', $data->flat_id, '=');
               $query_flat_type = $query_flat_type->execute();

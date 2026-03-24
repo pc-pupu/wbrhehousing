@@ -75,6 +75,8 @@
 			'access arguments' => array('administer Application List'),
 		);
 		/* end */
+<<<<<<< HEAD
+=======
 
 		$items['noc-details-view/%/%'] = array(
 			'title' => 'Flat Information for NOC',
@@ -84,6 +86,7 @@
 			'access arguments' => array('access content'),
 		);
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		return $items;
 	}
@@ -106,7 +109,11 @@
 			$current_application_status_description=fetch_application_status_description($app_data->status);
 			$fetch_application_estate_preference = fetch_application_estate_preference($app_id);
 			$fetch_existing_flat_details = fetch_existing_flat_details($app_id);	
+<<<<<<< HEAD
+
+=======
 			
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			//debolina end
 			// get document info  added on 27-11-2025
 			$fetchDoc = get_applicant_upload_docs($app_id);
@@ -188,11 +195,14 @@
 		  'title' => t('administer Application Flat Released List View'),
 		  'description' => t('Perform administer to see list of flat released.'),
 		),
+<<<<<<< HEAD
+=======
 
 		'admin_ddo_official_list_view' => array(
 			'title' => t('Admin DDO Official List View'),
 			'description' => t('Administration DDO and Official List View'),
 		),
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	  );
 	}
 
@@ -838,6 +848,19 @@
 
 
 	/* Done by Subham 07-01-2025*/
+<<<<<<< HEAD
+	function ddo_flat_released_list(){
+		global $user,$user_role;
+
+		$query = db_select('housing_applicant_official_detail', 'haod');
+		$query->innerJoin('housing_applicant', 'ha','ha.housing_applicant_id = haod.housing_applicant_id');
+		$query->innerJoin('housing_online_application', 'hoa','hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+		$query->innerJoin('housing_license_application', 'hla','hla.online_application_id = hoa.online_application_id');
+		$query->innerJoin('housing_occupant_license', 'hol','hol.license_application_id = hla.license_application_id');
+		$query->innerJoin('housing_ddo', 'hd',
+		'hd.ddo_id = haod.ddo_id');
+		$query->innerJoin('housing_allotment_status_master', 'hsm','hsm.short_code = hoa.status');
+=======
 	// function ddo_flat_released_list(){
 	// 	global $user,$user_role;
 
@@ -961,11 +984,20 @@
 		$query->innerJoin('housing_allotment_status_master', 'hsm','hsm.short_code = hoa.status');
 		$query->innerJoin('housing_flat', 'hf','hf.flat_id = hfo.flat_id');
 		$query->innerJoin('housing_estate', 'he','he.estate_id = hf.estate_id');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		$query->addField('hoa', 'online_application_id');
 		$query->addField('ha', 'applicant_name');
 		$query->addField('hoa', 'application_no');
 		$query->addField('hol', 'possession_date');
+<<<<<<< HEAD
+		
+
+		$query->condition('hoa.status','flat_released');
+
+		if($user_role == 11){
+			$query->condition('hd.ddo_code',$user->name);
+=======
 		$query->addField('hfo', 'flat_id','allotment_flat_id');
 		
 		//query updated by dg 23-03-2026
@@ -987,22 +1019,45 @@
 			$query->condition($and);
 		}else if($user_role == 8){
 			$query->condition('he.division_id', $division_id); 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		}
 		
 		
 		
+<<<<<<< HEAD
+		$result = $query->execute();
+=======
 		$result = $query->execute(); //echo "<pre>";print_r($result);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		$header['applicant_name'] = array('data' => 'Applicant Name');
 		$header['application_no'] = array('data' => 'Application No.');
 		$header['Possession_date'] = array('data' => 'Possession Date');
 		$header['download_license'] = array('data' => 'Download License', 'width'=>'20%');
+<<<<<<< HEAD
+
+=======
 		$header['view_details'] = array('data' => 'Issuance of NOC');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		
 		$rows =array();
 		$output = '';
 		
 		while($data = $result->fetchObject()) {
+<<<<<<< HEAD
+			$fields = array();
+			$fields[] = $data->applicant_name;
+			$fields[] = $data->application_no;
+			$fields[] = $data->possession_date;	
+			
+			
+			
+			$fields[] = l(
+					'<span class="btn bg-dark btn-sm fa fa-download text-white rounded" style="font-size:12px" ></span>' ,
+					'download_licence_pdf/'.encrypt_url($data->online_application_id).'/', //
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+				);
+=======
 			// echo "<pre>";print_r($data);
 			$fields = array();
 			$fields[] = $data->applicant_name;
@@ -1055,6 +1110,7 @@
 				$fields[] = l('View (Forwarded to Division)','noc-details-view/' .encrypt_url($data->online_application_id) . '/' .encrypt_url($data->allotment_flat_id),
 							array('attributes' => array('style' => 'color:#1e7e34; font-weight:800;'),'html' => TRUE));
 			}
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			$rows[] = $fields;
 		}
 

@@ -8,8 +8,11 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 	$result = fetch_allotment_details();
 	$data = $result->fetchObject();
 
+<<<<<<< HEAD
+=======
 	// print_r($data);die;
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	if(strpos($data->application_no, 'NA') == true)
 	{
 		$application_type = 'Fresh';
@@ -20,6 +23,11 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 	}else{
 		$application_type = 'Fresh';
 	}
+<<<<<<< HEAD
+
+	// print_r($data);die;
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 	$page_output = ''; // PDF Content modifid by Subham dt.27-11-2025
 	$page_output = '
@@ -82,6 +90,10 @@ function allotment_detail_pdf_gen($app_id='', $file_name = '') {
 	
 }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 function generate_application_form_pdf($online_application_id = '',$file_name = ''){
 	// error_reporting(E_ALL);
 	$result_applicant_personal_details = get_applicant_info();

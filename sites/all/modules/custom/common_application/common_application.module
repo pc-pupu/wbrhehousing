@@ -73,8 +73,13 @@
 		$items['download-noc/%'] = array(
 			'title' => 'No Objection Certificate',	
 			'page callback' => 'download_noc',
+<<<<<<< HEAD
+			'file'=>'download_noc.inc',
+			'page arguments' => array(1),
+=======
 			'page arguments' => array(1),
 			'file'=>'download_noc.inc',
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			'access arguments' => array('access content'),
 		);
 
@@ -786,8 +791,12 @@ function custom_mail_function($to ='', $subject='', $message='', $name ='', $otp
 
 		$mail->isSMTP();
 		if($otp == 'otp'){
+<<<<<<< HEAD
+			$mail->Host       = '164.100.2.239'; // https://otprelay.nic.in
+=======
 			//$mail->Host       = '164.100.2.239'; // https://otprelay.nic.in  //off for migration on 09-02-2026
 			$mail->Host       = '164.100.172.25'; // https://otprelay.nic.in
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		}else{
 			$mail->Host       = '164.100.13.55'; // https://smtpsgwhyd.nic.in
 		}

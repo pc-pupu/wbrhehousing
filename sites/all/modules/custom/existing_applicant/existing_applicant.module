@@ -69,6 +69,8 @@
 			'page arguments' => array(1,2,3),
 			'access arguments' => array('access content'),
 		);
+<<<<<<< HEAD
+=======
 
 		/* Done by Subham dt.19-02-2026 */
 		$items['physical-application-reject/%'] = array(
@@ -77,6 +79,7 @@
 			'access arguments' => array('administer Physical Applicant Reject'),
 		);
 		/* End */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		return $items;	
 		
 	}
@@ -92,17 +95,25 @@
 				'title' => t('administer Physical Applicant List Display'),
 				'description' => t('Perform administer to see Physical Applicant List.'),
 			),
+<<<<<<< HEAD
+=======
 
 			'administer Physical Applicant Reject' => array(
 				'title' => t('administer Physical Applicant Reject'),
 				'description' => t('Perform administer to Reject any Physical Applicant.'),
 			),
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		);	
 
 	
 	}
 
 	/*Done by Subham*/
+<<<<<<< HEAD
+	function view_legacy_applicant_list_with_hrms_form() {
+		global $base_root, $base_path,$user,$user_role;
+		$output = '';
+=======
 	// function view_legacy_applicant_list_with_hrms_form() {
 	// 	global $base_root, $base_path,$user,$user_role;
 	// 	$output = '';
@@ -334,6 +345,7 @@
 
 	function legacy_applicant_list($flat_type_id) {
 		global $user_role;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		if (db_table_exists('housing_applicant')) {
 			$query = db_select('housing_applicant', 'ha');
@@ -349,9 +361,13 @@
 
 			$query->condition('hoa.application_no', 'PA%', 'LIKE');
 			$query->condition('hoa.is_backlog_applicant', '1', '=');
+<<<<<<< HEAD
+			$query->isNotNull('haod.hrms_id');
+=======
 			$query->condition('hoa.status', 'housingapprover_approved_1', '='); // Only approved applications will be displayed in the list; rejected applications will not be shown. ~ Added by Subham dt.19-02-2026
 			$query->isNotNull('haod.hrms_id');
 			$query->condition('hft.flat_type_id', $flat_type_id);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 			$query->addField('ha', 'applicant_name');
 			$query->addField('ha', 'guardian_name');
@@ -405,9 +421,14 @@
 			$header['flat_type'] = [
 			    'data' => 'Flat Type <span style="color:#0394fc;">(Pay Scale)</span>'  //added by dg on 12-11-2025
 			];
+<<<<<<< HEAD
+			if($user_role == 13){
+				$header['view_details'] = array('data' => 'View Details');
+=======
 			if($user_role == 13){  // Reject button added by Subham dt.19-02-2026
 				$header['view_details'] = array('data' => 'View Details');
 				$header['reject_application'] = array('data' => 'Reject Application');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			}
 			// $header['present_address'] = array('data' => 'Present Address'); // added on 24-06-2025 by dg
 			// $header['parmanent_address'] = array('data' => 'Permanent Address'); // added on 24-06-2025 by dg
@@ -425,6 +446,19 @@
 			   $fields[] = $c;		
 			   $fields[] = $data->application_no;
 			   $fields[] = $data->applicant_name;
+<<<<<<< HEAD
+			   $fields[] = $data->date_of_application;
+			   $fields[] = $data->computer_serial_no;
+			   $fields[] = $data->hrms_id;
+			   $fields[] = $data->mobile_no;
+			   $fields[] = $data->gender;
+			   $fields[] = $data->flat_type.'<span style="color:#0394fc;">('.$data->flag.')</span>'; //added by dg on 12-11-2025
+			   if($user_role == 13){
+					$fields[] = l('<span class="btn bg-success btn-sm fa fa-eye text-white rounded" style="font-size:12px" ></span>' ,
+					'physical-applicant-details/'.encrypt_url($data->application_no).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+				);
+=======
 			   $fields[] = date('d/m/Y', strtotime($data->date_of_application));
 			   $fields[] = $data->computer_serial_no;
 			   $fields[] = $data->hrms_id;
@@ -438,6 +472,7 @@
 
 					$fields[] = l('<span class="btn bg-danger btn-sm fa fa-times text-white rounded" style="font-size:12px"></span>', 'physical-application-reject/' . encrypt_url($data->online_application_id), array('html' => TRUE, 'query' => array('destination' => $current_path), 'attributes' => array('onclick' => "return confirm('Are you sure you want to reject this application?');")));
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 				}
 			//    $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','.$data->present_district .','. $data->present_pincode;
 			//    $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.$data->permanent_district .','. $data->permanent_pincode;
@@ -488,6 +523,18 @@
 								</table>
 							</div>';
 			}
+<<<<<<< HEAD
+		
+		   return $output;
+		}
+
+	}
+
+	/*Done by Subham dt.21-07-2025*/
+	function view_legacy_applicant_list_without_hrms_form() {
+		global $base_root, $base_path,$user,$user_role;
+		$output = '';
+=======
 		   return $output;
 		}
 	}
@@ -697,14 +744,22 @@
 
 	function legacy_applicant_list_without_hrms($flat_type_id) {
 		global $user_role;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 		if (db_table_exists('housing_applicant')) {
 			$query = db_select('housing_applicant', 'ha');
 
+<<<<<<< HEAD
+			$query->leftJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid'); // edited by Moumita on 09-12-2025
+			$query->leftJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
+			$query->leftJoin('housing_pay_band_categories', 'hpbc', 'hpbc.pay_band_id = haod.pay_band_id');  //added by dg on 12-11-2025
+			$query->leftJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hpbc.flat_type_id');  //added by dg on 12-11-2025
+=======
 			$query->innerJoin('housing_applicant_official_detail', 'haod', 'ha.uid = haod.uid');
 			$query->innerJoin('housing_online_application', 'hoa', 'hoa.applicant_official_detail_id = haod.applicant_official_detail_id');
 			$query->innerJoin('housing_pay_band_categories', 'hpbc', 'hpbc.pay_band_id = haod.pay_band_id');  //added by dg on 12-11-2025
 			$query->innerJoin('housing_flat_type', 'hft', 'hft.flat_type_id = hpbc.flat_type_id');  //added by dg on 12-11-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			//$query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
 			//$query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
 			//$query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
@@ -712,9 +767,13 @@
 
 			$query->condition('hoa.application_no', 'PA%', 'LIKE');
 			$query->condition('hoa.is_backlog_applicant', '1', '=');
+<<<<<<< HEAD
+			$query->isNull('haod.hrms_id');
+=======
 			$query->condition('hoa.status', 'housingapprover_approved_1', '='); // Only approved applications will be displayed in the list; rejected applications will not be shown. ~ Added by Subham dt.19-02-2026
 			$query->isNull('haod.hrms_id');
 			$query->condition('hft.flat_type_id', $flat_type_id);
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 			$query->addField('ha', 'applicant_name');
 			$query->addField('ha', 'guardian_name');
@@ -765,9 +824,14 @@
 			$header['flat_type'] = [
 			    'data' => 'Flat Type <span style="color:#0394fc;">(Pay Scale)</span>','width'=>'10%'  //added by dg on 12-11-2025
 			];
+<<<<<<< HEAD
+			if($user_role == 13){
+				$header['view_details'] = array('data' => 'View Details');
+=======
 			if($user_role == 13){  // Reject button added by Subham dt.19-02-2026
 				$header['view_details'] = array('data' => 'View Details');
 				$header['reject_application'] = array('data' => 'Reject Application');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 			}
 			// $header['present_address'] = array('data' => 'Present Address'); // added on 24-06-2025 by dg
 			// $header['parmanent_address'] = array('data' => 'Permanent Address'); // added on 24-06-2025 by dg
@@ -784,6 +848,18 @@
 			   $fields[] = $c;		
 			   $fields[] = $data->application_no;
 			   $fields[] = $data->applicant_name;
+<<<<<<< HEAD
+			   $fields[] = $data->date_of_application;
+			   $fields[] = $data->computer_serial_no;
+			   $fields[] = $data->mobile_no;
+			   $fields[] = $data->gender;
+			   $fields[] = $data->flat_type.'<span style="color:#0394fc;">('.$data->flag.')</span>'; //added by dg on 12-11-2025
+			   if($user_role == 13){
+					$fields[] = l('<span class="btn bg-success btn-sm fa fa-eye text-white rounded" style="font-size:12px" ></span>' ,
+					'physical-applicant-details/'.encrypt_url($data->application_no).'/', 
+					array('html'=>TRUE,'attributes'=> array('target' => '_blank'))
+				);
+=======
 			   $fields[] = date('d/m/Y', strtotime($data->date_of_application));
 			   $fields[] = $data->computer_serial_no;
 			   $fields[] = !empty($data->mobile_no) ? $data->mobile_no : '--';
@@ -796,6 +872,7 @@
 
 					$fields[] = l('<span class="btn bg-danger btn-sm fa fa-times text-white rounded" style="font-size:12px"></span>', 'physical-application-reject/' . encrypt_url($data->online_application_id), array('html' => TRUE, 'query' => array('destination' => $current_path), 'attributes' => array('onclick' => "return confirm('Are you sure you want to reject this application?');")));
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 				}
 			//    $fields[] = $data->present_street .','. $data->present_city_town_village .','.$data->present_post_office .','.$data->present_district .','. $data->present_pincode;
 			//    $fields[] = $data->permanent_street .','. $data->permanent_city_town_village .','.$data->permanent_post_office .','.$data->permanent_district .','. $data->permanent_pincode;
@@ -849,8 +926,14 @@
 		
 		   return $output;
 		}
+<<<<<<< HEAD
+
+	}
+
+=======
 	}
 	/* End */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	/* by dg on 20-06-2025  update on 16-07-2025*/
 	function physical_applicant_search_form(){
@@ -1073,6 +1156,11 @@
 			drupal_goto('physical-application-view/'.encrypt_url($app_id));
 		
 	}
+<<<<<<< HEAD
+
+
+	/*  end  */
+=======
 	/*  end  */
 
 	/* Done by Subham dt.19-02-2026 */
@@ -1119,3 +1207,4 @@
 		}
 	}
 	/* End */
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0

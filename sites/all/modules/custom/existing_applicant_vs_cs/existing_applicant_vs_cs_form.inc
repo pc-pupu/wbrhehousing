@@ -184,7 +184,11 @@ function view_legacy_applicant_details($rhe_name = 0, $flat_type = 0, $block_nam
                 // echo "<pre>";print_r($data);
 
                 if (empty($data)) {
+<<<<<<< HEAD
+                    // echo "kjh";die;
+=======
                     
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
                     $query1 = db_select('housing_existing_occupant_draft', 'head'); 
                     $query1->innerJoin('housing_flat', 'hf', 'hf.flat_id = head.flat_id');
                     $query1->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');

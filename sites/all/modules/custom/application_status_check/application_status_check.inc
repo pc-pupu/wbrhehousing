@@ -1,8 +1,14 @@
 <?php 
 function application_status_check_form($form,&$form_state) {
+<<<<<<< HEAD
+  global $user_role;
+
+  // echo $user_role; die;
+=======
   global $user_role,$user;
 
   
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
   
  // <div class="row">
@@ -16,11 +22,14 @@ function application_status_check_form($form,&$form_state) {
     $title_txt = t('Enter Application Number or HRMS Id: ');
   }
 
+<<<<<<< HEAD
+=======
    $form['user_uid'] = array(
     '#type' => 'hidden',
     '#value' => $user->uid, 
     );
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
   $form['select_button'] = array(
     '#type' => 'radios',
@@ -56,14 +65,23 @@ function application_status_check_form($form,&$form_state) {
 
 function application_status_check_form_submit($form,&$form_state){
 
+<<<<<<< HEAD
+=======
   $user_uid = $form_state['values']['user_uid'];
   // echo $user_uid;die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
   $select_button_status = $form_state['values']['select_button'];
  
   if($select_button_status == 1){
     $app_no = isset($form_state['values']['application_or_hrms_no']) && !empty($form_state['values']['application_or_hrms_no']) ? $form_state['values']['application_or_hrms_no'] : '';
 
     $query = db_select('housing_online_application', 'hoa');
+<<<<<<< HEAD
+    $query->fields('hoa', ['online_application_id', 'status']);
+    $query->condition('hoa.application_no', $app_no);
+    $result = $query->execute();
+    $result = $result->fetchObject();
+=======
     $query->innerJoin('housing_flat_occupant', 'hfo', 'hfo.online_application_id = hoa.online_application_id');
     $query->innerJoin('housing_flat', 'hf', 'hf.flat_id = hfo.flat_id');
     $query->innerJoin('housing_estate', 'he', 'he.estate_id = hf.estate_id');
@@ -77,6 +95,7 @@ function application_status_check_form_submit($form,&$form_state){
   // echo "<pre>"; print_r($result);die;
     $result = $result->fetchObject();
 // echo "<pre>";print_r($result);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
     if ($result) {
       $app_id = $result->online_application_id;
       $app_status = $result->status;

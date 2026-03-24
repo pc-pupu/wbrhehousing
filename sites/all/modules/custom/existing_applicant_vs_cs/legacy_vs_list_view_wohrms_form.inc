@@ -78,6 +78,8 @@ function _reload_vs_wohrms_list_view($form, &$form_state) {
     return array('#type' => 'ajax', '#commands' => $commands);
 }
 
+<<<<<<< HEAD
+=======
 // function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {
 //     global $base_root, $base_path, $user, $user_role;
 //     $output = '';
@@ -252,6 +254,7 @@ function _reload_vs_wohrms_list_view($form, &$form_state) {
 //     return $output;
 // }
 
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {  //updated by dg 07-11-2025,in demo previous function is turned off
     global $base_root, $base_path, $user, $user_role;
     $output = '';
@@ -276,7 +279,12 @@ function legacy_vs_list_fetch_without_hrms($rhe_name = 0, $flat_type = 0) {  //u
 
 	$query->condition('hoa.application_no', 'VS%', 'LIKE');
 	$query->condition('hoa.is_backlog_applicant', '1', '=');
+<<<<<<< HEAD
+	//$query->isNull('heod.hrms_id');
+	$query->condition('haod.hrms_id', '0', '=');
+=======
 	// $query->isNull('heod.hrms_id');
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 
 	$query->fields('ha', array('applicant_name', 'gender', 'mobile_no'));
 	$query->fields('hoa', array('application_no', 'date_of_application', 'online_application_id'));

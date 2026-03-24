@@ -48,7 +48,11 @@
 			'#attributes' => array('oninput'=>"this.value=this.value.toUpperCase()", 'class'=>array('form-control')),
 		);
 		
+<<<<<<< HEAD
+	//Permanent Address
+=======
 		//Permanent Address
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$form['prrsonal_info']['permanent_address'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('Permanent Address'),
@@ -93,7 +97,11 @@
 			// 	'width' => '500',
 			// 	//'placeholder' => '- Select -',
 			// 	'allowClear' => TRUE
+<<<<<<< HEAD
+   //      	)
+=======
    		//      	)
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		);
 		$form['prrsonal_info']['permanent_address']['permanent_pincode'] = array(
 			'#title' => t('Pincode'),
@@ -105,7 +113,11 @@
 			'#suffix' => '</div></div></div>',
 			'#attributes' => array('class' => array('numeric_positive'), 'class'=>array('form-control')),
 		);
+<<<<<<< HEAD
+	//end
+=======
 		//end
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 		// Turned off checkbox 23-04-2025	
 
@@ -221,7 +233,11 @@
 				'#suffix' => '</div>',
 			);*/
 		// }
+<<<<<<< HEAD
+	//end
+=======
 		//end
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 	
 		$form['prrsonal_info']['mobile'] = array(
 			'#title' => t('Mobile no'),
@@ -546,7 +562,11 @@
 			'#attributes' => array('class' => array('numeric_positive'), 'class' => array('form-control')),
 		);
 		
+<<<<<<< HEAD
+// ddo details
+=======
 		// ddo details
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		$form['ddo'] = array(
 			'#type' => 'fieldset',
 			'#title' => t('DDO with full address'),
@@ -916,7 +936,11 @@
 		// echo $physical_application_no;die;
 		/* end */
 		
+<<<<<<< HEAD
+		if(empty($data_4->computer_serial_no) || $data_4->computer_serial_no!='')  // by dg 01-07-2025
+=======
 		if(empty($data_4->computer_serial_no) || $data_4->computer_serial_no =='')  // by dg 01-07-2025 modified on 02-02-2026
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 		{    
 
 			if($computer_serial_no == $confirm_computer_serial_no)
@@ -964,7 +988,10 @@
 
 					if($form_state['values']['hrms_id'] != '')
 					{
+<<<<<<< HEAD
+=======
 						// echo "hrms id";die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						$newUser	   	   = array();
 						$newUser['name']   = trim($form_state['values']['hrms_id']);
 						$newUser['pass']   = trim($form_state['values']['hrms_id']);
@@ -984,7 +1011,10 @@
 							$newUser['mail']   = trim($form_state['values']['email']);
 						}
 						$newUser['status'] = 1;
+<<<<<<< HEAD
+=======
 						// echo "<pre>";print_r($newUser);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						
 					}
 
@@ -992,7 +1022,10 @@
 					$querycheck = db_query("select uid from users where name ilike '%".$username."%' "); // changed by Moumita on 09-12-2025
 					$resultchk = $querycheck->fetchObject();
 					if(empty($resultchk)){
+<<<<<<< HEAD
+=======
 						// echo "ll";die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						user_save(null, $newUser);
 						/*get last inserted uid by dg 12-12-2025 start*/
 						$query = db_select('users','u');
@@ -1090,6 +1123,10 @@
 						// drupal_goto('existing_applicant_entry');
 					}
 					/*by dg 12-12-2025 end*/
+<<<<<<< HEAD
+					
+=======
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 					/*insert into housing_applicant table*/
 					
 					$applicant_personal_detail_arr = array();
@@ -1146,7 +1183,11 @@
 					// 	$applicant_personal_detail_arr['present_pincode']  =  NULL;	
 					// }
 					
+<<<<<<< HEAD
+					
+=======
 					// echo "<pre>";print_r($applicant_personal_detail_arr);die;
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 					$last_id = db_insert('housing_applicant')
 					->fields($applicant_personal_detail_arr)
 					->execute();
@@ -1159,7 +1200,11 @@
 					$housing_applicant_id = $haid_result->housing_applicant_id; 
 					/*assign user roles*/
 					
+<<<<<<< HEAD
+					if(empty($user_uid)){  //condition added by dg 12-12-2025
+=======
 					if(!empty($user_uid)){  //condition added by dg 12-12-2025
+>>>>>>> 2502ab393f49b61f25516e6bb0502acbb6d447a0
 						$arr_user_roles = array();
 						$arr_user_roles['uid'] = $applicant_personal_detail_arr['uid'];
 						$arr_user_roles['rid'] = 4;
